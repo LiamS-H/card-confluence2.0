@@ -2,7 +2,7 @@
 
 This Turborepo starter is maintained by the Turborepo core team.
 
-## Using this example
+## Using this scrycards
 
 Run the following command:
 
@@ -57,7 +57,7 @@ pnpm dev
 
 Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-scrycardss), then enter the following commands:
 
 ```
 cd my-turborepo
