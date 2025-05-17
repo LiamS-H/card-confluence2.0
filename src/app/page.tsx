@@ -1,7 +1,11 @@
+import { ScrycardsEditor } from "@/components/(editor)/editor";
+
 export default function Home() {
     return (
-        <main>
-            <h1>Landing</h1>
+        <main className="w-full h-full">
+            <div className="">
+                <ScrycardsEditor />
+            </div>
         </main>
     );
 }

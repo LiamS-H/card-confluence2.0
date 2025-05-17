@@ -51,19 +51,22 @@ function NavItem({
 export function NavBar() {
     const current_path = usePathname();
     return (
-        <nav className="absolute right-0">
-            <ul className="p-2 flex flex-row items-center gap-4">
-                <li>
-                    <ThemeToggle />
-                </li>
-                {paths.map((item) => (
-                    <NavItem
-                        key={item.path}
-                        current_path={current_path}
-                        item={item}
-                    />
-                ))}
-            </ul>
-        </nav>
+        <>
+            <nav className="absolute right-0">
+                <ul className="p-2 flex flex-row items-center gap-4">
+                    <li>
+                        <ThemeToggle />
+                    </li>
+                    {paths.map((item) => (
+                        <NavItem
+                            key={item.path}
+                            current_path={current_path}
+                            item={item}
+                        />
+                    ))}
+                </ul>
+            </nav>
+            <div className="h-14"></div>
+        </>
     );
 }
