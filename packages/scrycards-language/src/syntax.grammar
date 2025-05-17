@@ -1,26 +1,43 @@
 @top Program { expression* }
 
-@skip { space | LineComment }
-
 expression {
-  Identifier |
-  String |
-  Boolean |
-  Application { "(" expression* ")" }
+    Tag |
+    Clause { "(" space? expression space? ")" }
 }
 
+Tag { Prefix? Argument Operator Value }
+
+Value {
+    String |
+    // Number |
+    StringLiteral |
+    RegExp
+}
+
+// Conjunction { (space | ")") And | Or (space | "(")}
+
 @tokens {
-  Identifier { $[a-zA-Z_\-0-9]+ }
 
-  String { '"' (!["\\] | "\\" _)* '"' }
+    Prefix { "!" | "-" }
 
-  Boolean { "#t" | "#f" }
+    // And { "and" }
+    // Or { "or" }
 
-  LineComment { ";" ![\n]* }
+    Argument { $[a-zA-Z]+ }
 
-  space { $[ \t\n\r]+ }
+    // Number { $[0-9]+$[\.]$[0-9]+ } // having trouble because this overlaps with string
 
-  "(" ")"
+    String { $[a-zA-Z_\-0-9]+ }
+
+    Operator { ":" | "=" | "<" | ">" | "<=" | ">=" | "!=" | "<>" | "~" }
+
+    StringLiteral { '"' (!["\\] | "\\" _)* '"' }
+
+    RegExp { '/' (!["\\] | "\\" _)* '/' } // this is copied from the string definition, fix to work with /RegExp/
+
+    space { $[ \t\n\r]+ }
+
+    "(" ")"
 }
 
 @detectDelim
