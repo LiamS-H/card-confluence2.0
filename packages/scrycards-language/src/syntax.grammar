@@ -1,39 +1,50 @@
-@top Program { expression* }
+@top Program { Expression }
 
-expression {
-    Tag |
-    Clause { "(" space? expression space? ")" }
+Expression {
+  (Identifier ~expression (space Expression)?) |
+  (Identifier Clause) |
+  (Clause ~expression space? Expression) |
+  (Clause)
 }
+
+Clause { "(" space? Expression ~expression space? ")" }
+
+Identifier {Tag | Conjunction | Name }
+
+Conjunction { And | Or }
 
 Tag { Prefix? Argument Operator Value }
 
 Value {
     String |
-    // Number |
+    Number |
     StringLiteral |
     RegExp
 }
 
-// Conjunction { (space | ")") And | Or (space | "(")}
 
 @tokens {
+    @precedence { And, Or, Prefix, Name, Argument }
+    @precedence { Number, String }
 
     Prefix { "!" | "-" }
 
-    // And { "and" }
-    // Or { "or" }
+    And { "and" }
+    Or { "or" }
 
     Argument { $[a-zA-Z]+ }
 
-    // Number { $[0-9]+$[\.]$[0-9]+ } // having trouble because this overlaps with string
+    Number { $[0-9]+ ("." $[0-9]+)? }
 
-    String { $[a-zA-Z_\-0-9]+ }
+    Name { $[a-zA-Z0-9"']+ }
 
-    Operator { ":" | "=" | "<" | ">" | "<=" | ">=" | "!=" | "<>" | "~" }
+    String { $[^0123456789 \t\n\r]+ $[^ \t\n\r]+ }
+
+    Operator { ":" | "=" | "<" | ">" | "<=" | ">=" | "!=" }
 
     StringLiteral { '"' (!["\\] | "\\" _)* '"' }
 
-    RegExp { '/' (!["\\] | "\\" _)* '/' } // this is copied from the string definition, fix to work with /RegExp/
+    RegExp { '/' (!["\\] | "\\" _)* '/' } // this is copied from the string definition, todo fix to work with /RegExp/
 
     space { $[ \t\n\r]+ }
 
