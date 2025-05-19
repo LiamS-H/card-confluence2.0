@@ -1,17 +1,17 @@
-@top Program { Expression }
+@top Program { expression }
 
-Expression {
-  (Identifier ~expression (space Expression)?) |
-  (Identifier Clause) |
-  (Clause ~expression space? Expression) |
+expression {
+  (statement ~id (space expression)?) |
+  (statement Clause) |
+  (Clause ~id space? expression) |
   (Clause)
 }
 
-Clause { "(" space? Expression ~expression space? ")" }
+Clause { "(" space? expression ~id space? ")" }
 
-Identifier {Tag | Conjunction | Name }
+statement { Tag ~tag | conjunction | (Prefix? Argument) ~tag } // todo: distinguish between and Name and Argument (should be name here)
 
-Conjunction { And | Or }
+conjunction { And | Or }
 
 Tag { Prefix? Argument Operator Value }
 
@@ -24,8 +24,9 @@ Value {
 
 
 @tokens {
-    @precedence { And, Or, Prefix, Name, Argument }
-    @precedence { Number, String }
+    @precedence { And, Or, Prefix }
+    @precedence { And, Or, Argument }
+    @precedence { Number, StringLiteral, RegExp, String }
 
     Prefix { "!" | "-" }
 
@@ -36,15 +37,15 @@ Value {
 
     Number { $[0-9]+ ("." $[0-9]+)? }
 
-    Name { $[a-zA-Z0-9"']+ }
+    // Name { $[a-zA-Z0-9"']+ } // having trouble distinguishing from the start of an argument and name
 
-    String { $[^0123456789 \t\n\r]+ $[^ \t\n\r]+ }
+    String { $[a-zA-Z0-9"'_;:\-\.]+ }
 
     Operator { ":" | "=" | "<" | ">" | "<=" | ">=" | "!=" }
 
     StringLiteral { '"' (!["\\] | "\\" _)* '"' }
 
-    RegExp { '/' (!["\\] | "\\" _)* '/' } // this is copied from the string definition, todo fix to work with /RegExp/
+    RegExp { '/' (![/\\] | "\\" _)* '/' } // this is copied from the string definition, todo fix to work with /RegExp/
 
     space { $[ \t\n\r]+ }
 

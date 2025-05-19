@@ -1,41 +1,23 @@
-# Booleans
+# Name Only
 
-#t
-#f
-
-==>
-
-Program(Boolean, Boolean)
-
-# Identifiers
-
-one
-Two_Three
+Test
 
 ==>
 
-Program(Identifier, Identifier)
+Program(Argument)
 
-# Strings
+# Tag Only
 
-"hello"
-"one\"\\two"
-
-==>
-
-Program(String, String)
-
-# Applications
-
-(begin
-  (when #t
-    (print (concat "hello" " " "world")))
-  (print "DONE"))
+-test:test
 
 ==>
 
-Program(Application(
-  Identifier,
-  Application(Identifier, Boolean, Application(
-    Identifier, Application(Identifier, String, String, String)))
-  Application(Identifier, String)))
+Program(Tag(Prefix,Argument,Operator,Value(String)))
+
+# String Tag
+
+test:"long test"
+
+==>
+
+Program(Tag(Argument,Operator,Value(StringLiteral)))
