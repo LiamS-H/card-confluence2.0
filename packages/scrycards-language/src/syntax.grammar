@@ -22,18 +22,17 @@ Value {
     RegExp
 }
 
+Or { @specialize<Argument, "or"> }
+And { @specialize<Argument, "and"> }
 
 @tokens {
-    @precedence { And, Or, Prefix }
-    @precedence { And, Or, Argument }
-    @precedence { Number, StringLiteral, RegExp, String }
+    @precedence { Prefix, Number, StringLiteral, RegExp, String }
 
     Prefix { "!" | "-" }
 
-    And { "and" }
-    Or { "or" }
 
     Argument { $[a-zA-Z]+ }
+
 
     Number { $[0-9]+ ("." $[0-9]+)? }
 

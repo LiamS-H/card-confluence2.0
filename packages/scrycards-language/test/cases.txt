@@ -21,3 +21,19 @@ test:"long test"
 ==>
 
 Program(Tag(Argument,Operator,Value(StringLiteral)))
+
+# Order Tag
+
+order:cmc
+
+==>
+
+Program(Tag(Argument,Operator,Value(String)))
+
+# Compound Query
+
+t:creature or t:artifact
+
+==>
+
+Program(Tag(Argument, Operator, Value(String)), Or, Tag(Argument, Operator, Value(String)))
