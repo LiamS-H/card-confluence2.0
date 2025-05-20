@@ -7,8 +7,8 @@ import {
     foldInside,
     delimitedIndent,
 } from "@codemirror/language";
-import { autocompletion } from "@codemirror/autocomplete";
-import { styleTags, tags as t } from "@lezer/highlight";
+import { styleTags, tags } from "@lezer/highlight";
+import { ScrycardsTooltips } from "./tooltip";
 import { ScrycardsAutocomplete } from "./autocomplete";
 
 export const scrycardsLanguage = LRLanguage.define({
@@ -21,16 +21,16 @@ export const scrycardsLanguage = LRLanguage.define({
                 Application: foldInside,
             }),
             styleTags({
-                Prefix: t.logicOperator,
-                And: t.keyword,
-                Or: t.keyword,
-                Argument: t.variableName,
+                Prefix: tags.logicOperator,
+                And: tags.keyword,
+                Or: tags.keyword,
+                Argument: tags.variableName,
                 // Name: t.variableName,
-                Number: t.number,
-                String: t.string,
-                Operator: t.operator,
-                StringLiteral: t.string,
-                RegExp: t.regexp,
+                Number: tags.number,
+                String: tags.string,
+                Operator: tags.operator,
+                StringLiteral: tags.string,
+                RegExp: tags.regexp,
                 // Boolean: t.bool,
             }),
         ],
@@ -42,6 +42,7 @@ export const scrycardsLanguage = LRLanguage.define({
 
 export function scrycards() {
     return new LanguageSupport(scrycardsLanguage, [
-        autocompletion({ override: [ScrycardsAutocomplete] }),
+        ScrycardsAutocomplete,
+        ScrycardsTooltips,
     ]);
 }

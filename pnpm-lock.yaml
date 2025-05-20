@@ -150,6 +150,9 @@ importers:
       '@codemirror/language':
         specifier: ^6.11.0
         version: 6.11.0
+      '@codemirror/view':
+        specifier: 6.36.8
+        version: 6.36.8
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1

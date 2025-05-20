@@ -18,7 +18,8 @@
   "dependencies": {
     "@lezer/lr": "^1.4.2",
     "@lezer/highlight": "^1.2.1",
-    "@codemirror/autocomplete": "^6.18.6"
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/view": "6.36.8"
   },
   "peerDependencies": {
     "@codemirror/language": "^6.11.0"
