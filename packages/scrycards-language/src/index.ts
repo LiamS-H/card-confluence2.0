@@ -9,7 +9,7 @@ import {
 } from "@codemirror/language";
 import { styleTags, tags } from "@lezer/highlight";
 import { ScrycardsTooltips } from "./tooltip";
-import { ScrycardsAutocomplete } from "./autocomplete";
+import { completeScrycards } from "./autocomplete";
 
 export const scrycardsLanguage = LRLanguage.define({
     parser: parser.configure({
@@ -42,7 +42,9 @@ export const scrycardsLanguage = LRLanguage.define({
 
 export function scrycards() {
     return new LanguageSupport(scrycardsLanguage, [
-        ScrycardsAutocomplete,
         ScrycardsTooltips,
+        scrycardsLanguage.data.of({ autocomplete: completeScrycards }),
     ]);
 }
+
+export { completeScrycards };

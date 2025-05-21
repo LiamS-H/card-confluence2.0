@@ -1,19 +1,31 @@
 import { hoverTooltip } from "@codemirror/view";
 
+import { syntaxTree } from "@codemirror/language";
+import { tagFromTree } from "./utils/tag-from-tree";
+
 export const ScrycardsTooltips = hoverTooltip((view, pos, side) => {
-    let { from, to, text } = view.state.doc.lineAt(pos);
-    let start = pos,
-        end = pos;
-    while (start > from && /\w/.test(text[start - from - 1])) start--;
-    while (end < to && /\w/.test(text[end - from])) end++;
-    if ((start == pos && side < 0) || (end == pos && side > 0)) return null;
+    const tag = tagFromTree(view, pos + 1);
+
+    if (!tag) {
+        const cursor = syntaxTree(view.state).cursorAt(pos + 1, -1);
+        return {
+            end: pos,
+            pos,
+            above: true,
+            create(view) {
+                let dom = document.createElement("div");
+                dom.textContent = cursor.name;
+                return { dom };
+            },
+        };
+    }
+
     return {
-        pos: start,
-        end,
+        pos: tag.arg_start,
         above: true,
         create(view) {
             let dom = document.createElement("div");
-            dom.textContent = text.slice(start - from, end - from);
+            dom.textContent = `${tag.argument}${tag.operator}${tag.value}`;
             return { dom };
         },
     };
