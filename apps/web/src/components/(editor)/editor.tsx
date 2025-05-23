@@ -2,25 +2,26 @@
 import ReactCodeEditor from "@uiw/react-codemirror";
 import { keymap } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
-import { useState } from "react";
-import { scrycards } from "codemirror-lang-scrycards";
-import { useTheme } from "next-themes";
+import { useMemo, useState } from "react";
+import { scrycardsFromCatalog, type ICatalog } from "codemirror-lang-scrycards";
 import { useLightDark } from "../(theme)/use-theme";
 
 const INITIAL = `game:arena is:permanent (o:draw or o:reveal)
 -o:enters (order:cmc (direction:arena (o:"test o" or o:/[\\/]+/)))
 `;
 
-export function ScrycardsEditor() {
+export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [doc, setDoc] = useState(INITIAL);
-    const extensions = [keymap.of(defaultKeymap), scrycards()];
+    const extensions = useMemo(() => {
+        return [keymap.of(defaultKeymap), scrycardsFromCatalog(catalog)];
+    }, [catalog]);
     const theme = useLightDark();
     return (
         <ReactCodeEditor
             extensions={extensions}
             value={doc}
             theme={theme === "dark" ? "dark" : "light"}
-            onChange={(value, viewUpdate) => {
+            onChange={(value) => {
                 setDoc(value);
             }}
         />

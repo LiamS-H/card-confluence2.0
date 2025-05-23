@@ -1,0 +1,174 @@
+import { getEmptyCatalog, type ICatalog } from "codemirror-lang-scrycards";
+import { type ScryfallList, type ScryfallCatalog } from "@scryfall/api-types";
+
+async function fetchWithHeaders(url: URL) {
+    return fetch(url, {
+        headers: {
+            "User-Agent": "card-confluence/0.0",
+            Accept: "*/*",
+        },
+    });
+}
+
+export async function fetchSearch(query: string): Promise<ScryfallList.Cards> {
+    const url = new URL("https://api.scryfall.com/cards/search");
+    const search = new URLSearchParams({ q: query });
+    url.search = search.toString();
+    const response = await fetchWithHeaders(url);
+    const card_list: ScryfallList.Cards = await response.json();
+    return card_list;
+}
+
+export async function fetchCatalog(endpoint: string): Promise<string[]> {
+    const url = new URL(`https://api.scryfall.com/catalog/${endpoint}`);
+    const response = await fetchWithHeaders(url);
+    const catalog: ScryfallCatalog = await response.json();
+    return catalog.data;
+}
+
+export async function fetchSets(): Promise<string[]> {
+    const url = new URL("https://api.scryfall.com/sets");
+    const response = await fetchWithHeaders(url);
+    const catalog: ScryfallList.Sets = await response.json();
+    return catalog.data.map((set) => set.code);
+}
+
+export async function getCatalog(): Promise<ICatalog> {
+    const catalogEndpoints = [
+        "card-names",
+        "artist-names",
+        "word-bank",
+        "supertypes",
+        "card-types",
+        "artifact-types",
+        "battle-types",
+        "creature-types",
+        "enchantment-types",
+        "land-types",
+        "planeswalker-types",
+        "spell-types",
+        "powers",
+        "toughnesses",
+        "loyalties",
+        "keyword-abilities",
+        "keyword-actions",
+        "ability-words",
+        "flavor-words",
+        "watermarks",
+    ] as const;
+
+    const catalog = getEmptyCatalog();
+
+    const promises: Promise<unknown>[] = [];
+
+    for (const endpoint of catalogEndpoints) {
+        const promise = fetchCatalog(endpoint)
+            .then((list) => {
+                catalog[endpoint] = list;
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+        promises.push(promise);
+    }
+
+    await Promise.allSettled(promises);
+
+    catalog.criteria = [
+        "Adventure",
+        "Arena ID",
+        "Art Series",
+        "Artist",
+        "Artist Misprint",
+        "Attraction Lights",
+        "Augment",
+        "Back",
+        "Bear",
+        "Booster",
+        "Borderless",
+        "Brawl Commander",
+        "Buy-a-Box",
+        "Cardmarket ID",
+        "Class Layout",
+        "Color Indicator",
+        "Colorshifted",
+        "Commander",
+        "Companion",
+        "Content Warning",
+        "Covered",
+        "Creature Land",
+        "Datestamped",
+        "Digital",
+        "Double Sided",
+        "Duel Commander",
+        "E T B",
+        "English Art",
+        "Etched",
+        "Extended Art",
+        "Extra",
+        "First Printing",
+        "Flavor Name",
+        "Flavor Text",
+        "Flip",
+        "Foil",
+        "Foreign Black Border",
+        "Foreign White Border",
+        "French Vanilla",
+        "Full Art",
+        "Funny",
+        "Future",
+        "Game Day",
+        "Highres",
+        "Historic",
+        "Hybrid Mana",
+        "Illustration",
+        "Intro Pack",
+        "Invitational Card",
+        "Leveler",
+        "Localized Name",
+        "MTGO ID",
+        "Masterpiece",
+        "Meld",
+        "Modal",
+        "Modal Double Faced",
+        "Modern",
+        "Multiverse ID",
+        "New",
+        "Nonfoil",
+        "Oathbreaker",
+        "Old",
+        "Oversized",
+        "Paired Commander",
+        "Paper Art",
+        "Party",
+        "Permanent",
+        "Phyrexian Mana",
+        "Planar",
+        "Planeswalker Deck",
+        "Prerelease Promo",
+        "Printed Text",
+        "Promo",
+        "Related",
+        "Release Promo",
+        "Reprint",
+        "Reserved List",
+        "Reversible",
+        "Security Stamp",
+        "Showcase",
+        "Spell",
+        "Spellbook",
+        "Spikey",
+        "Split Card",
+        "Stamped",
+        "Starter Deck",
+        "Story Spotlight",
+        "TCGplayer ID",
+        "Textless",
+        "Token",
+        "Tombstone",
+    ];
+
+    console.log(catalog);
+
+    return catalog;
+}
