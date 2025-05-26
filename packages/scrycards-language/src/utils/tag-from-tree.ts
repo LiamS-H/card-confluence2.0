@@ -8,6 +8,7 @@ interface Tag {
     op_start: number;
     value: string;
     val_start: number;
+    tag_end: number;
 }
 
 export function tagFromTree(view: EditorView, pos: number): Tag | null {
@@ -16,6 +17,7 @@ export function tagFromTree(view: EditorView, pos: number): Tag | null {
     while (cursor.name !== "Tag" && cursor.parent()) {}
 
     if (cursor.name === "Tag") {
+        const tag_end = cursor.node.to;
         cursor.firstChild();
         const argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
         const arg_start = cursor.from;
@@ -25,7 +27,15 @@ export function tagFromTree(view: EditorView, pos: number): Tag | null {
         cursor.nextSibling();
         const value = view.state.sliceDoc(cursor.node.from, cursor.node.to);
         const val_start = cursor.from;
-        return { argument, arg_start, operator, op_start, value, val_start };
+        return {
+            argument,
+            arg_start,
+            operator,
+            op_start,
+            value,
+            val_start,
+            tag_end,
+        };
     }
 
     return null;

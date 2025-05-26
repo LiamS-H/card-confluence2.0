@@ -14,7 +14,7 @@ export async function fetchSearch(query: string): Promise<ScryfallList.Cards> {
     const url = new URL("https://api.scryfall.com/cards/search");
     const search = new URLSearchParams({ q: query });
     url.search = search.toString();
-    const response = await fetchWithHeaders(url);
+    const response = await fetch(url); // we don't use headers since we are inside browser
     const card_list: ScryfallList.Cards = await response.json();
     return card_list;
 }
@@ -168,7 +168,48 @@ export async function getCatalog(): Promise<ICatalog> {
         "Tombstone",
     ];
 
-    console.log(catalog);
+    catalog.formats = [
+        "historic",
+        "timeless",
+        "gladiator",
+        "pioneer",
+        "explorer",
+        "modern",
+        "legacy",
+        "pauper",
+        "vintage",
+        "penny", // Penny Dreadful
+        "commander",
+        "oathbreaker",
+        "standardbrawl",
+        "brawl",
+        "alchemy",
+        "paupercommander",
+        "duel", // Duel Commander
+        "oldschool", // Old School 93/94
+        "premodern",
+        "predh",
+    ];
+
+    catalog.rarities = ["common", "uncommon", "rare", "mythic"];
+
+    catalog.cubes = [
+        "arena",
+        "grixis",
+        "legacy",
+        "chuck",
+        "twisted",
+        "protour",
+        "uncommon",
+        "april",
+        "modern",
+        "amaz",
+        "tinkerer",
+        "livethedream",
+        "chromatic",
+        "vintage",
+    ];
+    catalog.games = ["paper", "mtgo", "mtga"];
 
     return catalog;
 }

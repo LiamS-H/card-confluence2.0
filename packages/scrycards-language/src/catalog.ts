@@ -22,6 +22,11 @@ export interface ICatalog {
     "flavor-words": string[];
     watermarks: string[];
 
+    stamps: string[];
+    games: string[];
+    formats: string[];
+    cubes: string[];
+    rarities: string[];
     criteria: string[]; // used for the is: tag
     "mana-costs": string[];
     otags: string[];
@@ -52,6 +57,11 @@ export function getEmptyCatalog(): ICatalog {
         "flavor-words": [],
         watermarks: [],
 
+        stamps: [],
+        games: [],
+        formats: [],
+        cubes: [],
+        rarities: [],
         criteria: [],
         "mana-costs": [],
         otags: [],
