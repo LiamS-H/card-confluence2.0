@@ -196,7 +196,9 @@ export const completeScrycards: CompletionSource = (context) => {
         case "flavor":
             return null;
         case "oracle":
+            return null;
         case "type":
+            return null;
         case "set":
             result.options = catalog.sets.map((set) => ({ label: set }));
             return result;
@@ -260,10 +262,18 @@ export const completeScrycards: CompletionSource = (context) => {
             return result;
         case "border":
         case "frame":
+            return null;
         case "stamp":
+            result.options = catalog.stamps.map((a) => ({ label: a }));
+            return result;
         case "date":
+            return null;
         case "atag":
+            result.options = catalog.atags.map((at) => ({ label: at }));
+            return result;
         case "otag":
+            result.options = catalog.otags.map((ot) => ({ label: ot }));
+            return result;
         case "game":
             result.options = catalog.games.map((g) => ({ label: g }));
             return result;

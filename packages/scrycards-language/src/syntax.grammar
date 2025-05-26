@@ -17,7 +17,7 @@ Tag { Prefix? Argument Operator Value }
 
 Value {
     String |
-    Number |
+    // Number |
     StringLiteral |
     RegExp
 }
@@ -26,7 +26,10 @@ Or { @specialize<Argument, "or"> }
 And { @specialize<Argument, "and"> }
 
 @tokens {
-    @precedence { Prefix, Number, StringLiteral, RegExp, String }
+    // @precedence { Prefix, Number, StringLiteral, RegExp, String } // todo: putting number first leads to issues with tags like artist:6VCR
+    // Number { $[0-9]+ ("." $[0-9]+)? }
+    @precedence { Prefix, StringLiteral, RegExp, String }
+
 
     Prefix { "!" | "-" }
 
@@ -34,7 +37,6 @@ And { @specialize<Argument, "and"> }
     Argument { $[a-zA-Z]+ }
 
 
-    Number { $[0-9]+ ("." $[0-9]+)? }
 
     // Name { $[a-zA-Z0-9"']+ } // having trouble distinguishing from the start of an argument and name
 
@@ -44,7 +46,7 @@ And { @specialize<Argument, "and"> }
 
     StringLiteral { '"' (!["\\] | "\\" _)* '"' }
 
-    RegExp { '/' (![/\\] | "\\" _)* '/' } // this is copied from the string definition, todo fix to work with /RegExp/
+    RegExp { '/' (![/\\] | "\\" _)* '/' }
 
     space { $[ \t\n\r]+ }
 

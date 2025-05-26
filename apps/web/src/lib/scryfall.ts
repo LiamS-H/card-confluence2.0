@@ -1,5 +1,6 @@
 import { getEmptyCatalog, type ICatalog } from "codemirror-lang-scrycards";
 import { type ScryfallList, type ScryfallCatalog } from "@scryfall/api-types";
+import { parse } from "node-html-parser";
 
 async function fetchWithHeaders(url: URL) {
     return fetch(url, {
@@ -33,6 +34,42 @@ export async function fetchSets(): Promise<string[]> {
     return catalog.data.map((set) => set.code);
 }
 
+export async function fetchTags(): Promise<{
+    atags: string[];
+    otags: string[];
+}> {
+    const otags: string[] = [];
+    const atags: string[] = [];
+
+    const resp = await fetch("https://scryfall.com/docs/tagger-tags");
+    const text = await resp.text();
+    const root = parse(text);
+
+    const headers = root.querySelectorAll(".prose > h2");
+
+    headers.forEach((header) => {
+        if (!header.textContent) return;
+        const tags: string[] = [];
+        const nextParagraph = header.nextElementSibling;
+
+        if (nextParagraph) {
+            const links = nextParagraph.querySelectorAll("a");
+            links.forEach((link) => {
+                if (!link.textContent) return;
+                const tag = link.textContent.trim();
+                tags.push(tag);
+            });
+
+            if (header.textContent.endsWith("(functional)")) {
+                otags.push(...tags);
+            } else {
+                atags.push(...tags);
+            }
+        }
+    });
+    return { otags, atags };
+}
+
 export async function getCatalog(): Promise<ICatalog> {
     const catalogEndpoints = [
         "card-names",
@@ -61,6 +98,17 @@ export async function getCatalog(): Promise<ICatalog> {
 
     const promises: Promise<unknown>[] = [];
 
+    promises.push(
+        fetchTags()
+            .then((resp) => {
+                catalog.atags = resp.atags;
+                catalog.otags = resp.otags;
+            })
+            .catch((e) => {
+                console.error(e);
+            })
+    );
+
     for (const endpoint of catalogEndpoints) {
         const promise = fetchCatalog(endpoint)
             .then((list) => {
@@ -71,6 +119,15 @@ export async function getCatalog(): Promise<ICatalog> {
             });
         promises.push(promise);
     }
+    promises.push(
+        fetchSets()
+            .then((list) => {
+                catalog.sets = list;
+            })
+            .catch((e) => {
+                console.error(e);
+            })
+    );
 
     await Promise.allSettled(promises);
 
