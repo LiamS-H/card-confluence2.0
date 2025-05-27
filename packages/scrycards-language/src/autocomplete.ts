@@ -192,7 +192,7 @@ export const completeScrycards: CompletionSource = (context) => {
                         insert: completion.label,
                     },
                     selection: EditorSelection.cursor(
-                        from + completion.label.length + 1
+                        from + completion.label.length
                     ),
                     userEvent: "completion.apply",
                 })
