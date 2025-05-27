@@ -44,9 +44,10 @@ export const completeScrycards: CompletionSource = (context) => {
         }
 
         const argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+        const lower_arg = argument.toLowerCase();
 
         // arguments don't match so the argument is a name
-        if (ARGUMENTS.every((a) => !a.includes(argument))) {
+        if (ARGUMENTS.every((a) => !a.includes(lower_arg))) {
             while (cursor.prevSibling() && cursor.name === "Argument") {}
             if (cursor.name !== "Argument") cursor.nextSibling();
             const from = cursor.node.from;
@@ -63,11 +64,12 @@ export const completeScrycards: CompletionSource = (context) => {
                 })),
             };
         }
+
         const result: CompletionResult = {
             from: cursor.node.from,
             to: cursor.node.to,
             options: ARGUMENTS.map((tag): Completion => {
-                const boost = tag.startsWith(argument) ? 1 : -1;
+                const boost = tag.startsWith(lower_arg) ? 1 : -1;
                 const { detail, info } = detailFromArg(tag);
                 return {
                     label: tag,
@@ -79,8 +81,8 @@ export const completeScrycards: CompletionSource = (context) => {
             commitCharacters: BEGIN_OPERATORS,
         };
         // const results = result.options.length;
-        if (isArgument(argument)) {
-            const node = nodeFromArg(argument);
+        if (isArgument(lower_arg)) {
+            const node = nodeFromArg(lower_arg);
             const operators =
                 node.operator === "assert" ? ASSERT_OPERATORS : OPERATORS;
             result.options = result.options.concat(
@@ -106,12 +108,14 @@ export const completeScrycards: CompletionSource = (context) => {
         tag_end,
     } = tag;
 
+    const lower_arg = argument.toLowerCase();
+
     if (pos <= op_start) {
         const result: CompletionResult = {
             from: arg_start,
             to: op_start,
             options: ARGUMENTS.map((tag) => {
-                const boost = tag.startsWith(argument) ? 1 : -1;
+                const boost = tag.startsWith(lower_arg) ? 1 : -1;
                 const { detail, info } = detailFromArg(tag);
                 return {
                     label: tag,
@@ -121,7 +125,7 @@ export const completeScrycards: CompletionSource = (context) => {
                 };
             }),
         };
-        if (isArgument(argument)) {
+        if (isArgument(lower_arg)) {
             const apply: Completion["apply"] = (view, completion) => {
                 view.dispatch(
                     view.state.update({
@@ -137,7 +141,7 @@ export const completeScrycards: CompletionSource = (context) => {
                     })
                 );
             };
-            const node = nodeFromArg(argument);
+            const node = nodeFromArg(lower_arg);
             const operators =
                 node.operator === "assert" ? ASSERT_OPERATORS : OPERATORS;
             result.options = result.options.concat(
@@ -219,11 +223,41 @@ export const completeScrycards: CompletionSource = (context) => {
         case "number":
             return null;
         case "flavor":
-            return null;
+            result.options = catalog["flavor-words"].map((fw) => ({
+                label: fw,
+            }));
+            return result;
         case "oracle":
+            // result.options = catalog["ability-words"].map((fw) => ({
+            //     label: fw,
+            // }));
+            // return result;
             return null;
         case "type":
-            return null;
+            const types = [
+                "card-types",
+                "creature-types",
+                "artifact-types",
+                "enchantment-types",
+                "land-types",
+                "planeswalker-types",
+                "battle-types",
+                "spell-types",
+                "supertypes",
+            ] as const;
+
+            for (let i = 0; i < types.length; i++) {
+                const type = types[i];
+                result.options = result.options.concat(
+                    catalog[type].map((t) => ({
+                        label: t.toLowerCase(),
+                        displayLabel: t,
+                        section: { name: type, rank: i },
+                    }))
+                );
+            }
+
+            return result;
         case "set":
             result.options = catalog.sets.map((set) => ({ label: set }));
             return result;
@@ -244,6 +278,7 @@ export const completeScrycards: CompletionSource = (context) => {
             result.options = catalog.loyalties.map((loy) => ({ label: loy }));
             return result;
         case "mana":
+            return null;
         case "name":
             result.options = catalog["card-names"].map((n) => ({
                 label: n,
@@ -252,7 +287,6 @@ export const completeScrycards: CompletionSource = (context) => {
             return result;
         case "color":
             return null;
-
         case "keyword":
             result.options = catalog["keyword-abilities"].map((n) => ({
                 label: n,
@@ -260,6 +294,7 @@ export const completeScrycards: CompletionSource = (context) => {
             }));
             return result;
         case "cmc":
+            return null;
         case "rarity":
             result.options = catalog.rarities.map((r) => ({ label: r }));
             return result;
@@ -279,6 +314,7 @@ export const completeScrycards: CompletionSource = (context) => {
             result.options = catalog["artist-names"].map((a) => ({ label: a }));
             return result;
         case "border":
+            return null;
         case "frame":
             return null;
         case "stamp":
