@@ -13,6 +13,7 @@ import { EditorSelection } from "@codemirror/state";
 import {
     argTypeFromArg,
     ARGUMENTS,
+    detailFromArg,
     isArgument,
     nodeFromArg,
 } from "./utils/completion";
@@ -60,7 +61,6 @@ export const completeScrycards: CompletionSource = (context) => {
                 options: catalog["card-names"].map((name) => ({
                     label: name,
                 })),
-                // commitCharacters: [" "],
             };
         }
         const result: CompletionResult = {
@@ -68,9 +68,12 @@ export const completeScrycards: CompletionSource = (context) => {
             to: cursor.node.to,
             options: ARGUMENTS.map((tag): Completion => {
                 const boost = tag.startsWith(argument) ? 1 : -1;
+                const { detail, info } = detailFromArg(tag);
                 return {
                     label: tag,
                     boost,
+                    detail,
+                    info,
                 };
             }),
             commitCharacters: BEGIN_OPERATORS,
@@ -109,9 +112,12 @@ export const completeScrycards: CompletionSource = (context) => {
             to: op_start,
             options: ARGUMENTS.map((tag) => {
                 const boost = tag.startsWith(argument) ? 1 : -1;
+                const { detail, info } = detailFromArg(tag);
                 return {
                     label: tag,
                     boost,
+                    detail,
+                    info,
                 };
             }),
         };
@@ -161,9 +167,10 @@ export const completeScrycards: CompletionSource = (context) => {
         return null;
     }
     let val;
-    let to;
-    let from;
+    let to: number;
+    let from: number;
     let commitCharacters: string[] = [];
+    let apply: Completion["apply"];
     if (value.length > 1 && value.at(0) === '"' && value.at(-1) === '"') {
         val = value.substring(1, value.length - 1);
         from = val_start + 1;
@@ -173,6 +180,24 @@ export const completeScrycards: CompletionSource = (context) => {
         from = val_start;
         to = tag_end;
         commitCharacters = [" "];
+        apply = (view, completion) => {
+            if (completion.label.includes(" ")) {
+                completion.label = `"${completion.label}"`;
+            }
+            view.dispatch(
+                view.state.update({
+                    changes: {
+                        from,
+                        to,
+                        insert: completion.label,
+                    },
+                    selection: EditorSelection.cursor(
+                        from + completion.label.length + 1
+                    ),
+                    userEvent: "completion.apply",
+                })
+            );
+        };
     }
 
     if (!isArgument(argument)) {
@@ -203,7 +228,9 @@ export const completeScrycards: CompletionSource = (context) => {
             result.options = catalog.sets.map((set) => ({ label: set }));
             return result;
         case "is":
-            result.options = catalog.criteria.map((crit) => ({ label: crit }));
+            result.options = catalog.criteria.map((crit) => ({
+                label: crit,
+            }));
             return result;
         case "power":
             result.options = catalog.powers.map((po) => ({ label: po }));
@@ -212,22 +239,7 @@ export const completeScrycards: CompletionSource = (context) => {
             result.options = catalog.powers.map((to) => ({ label: to }));
             return result;
         case "powtou":
-            if (val.includes("/")) {
-                const p = val.replace(/[/].*$/, "");
-                result.options = catalog.toughnesses.map((po) => ({
-                    label: p + po, // everything up to "/"
-                    displayLabel: po,
-                }));
-                return result;
-            }
-            if (catalog.powers.includes(val)) {
-                result.options = [{ label: val + "/", displayLabel: "/" }];
-                return result;
-            }
-            result.options = catalog.powers.map((po) => ({
-                label: po,
-            }));
-            return result;
+            return null;
         case "loyalty":
             result.options = catalog.loyalties.map((loy) => ({ label: loy }));
             return result;
@@ -235,13 +247,16 @@ export const completeScrycards: CompletionSource = (context) => {
         case "name":
             result.options = catalog["card-names"].map((n) => ({
                 label: n,
+                apply,
             }));
             return result;
         case "color":
+            return null;
 
         case "keyword":
             result.options = catalog["keyword-abilities"].map((n) => ({
                 label: n,
+                apply,
             }));
             return result;
         case "cmc":
@@ -252,10 +267,13 @@ export const completeScrycards: CompletionSource = (context) => {
             result.options = catalog.cubes.map((c) => ({ label: c }));
             return result;
         case "format":
-            result.options = catalog.formats.map((f) => ({ label: f }));
+            result.options = catalog.formats.map((f) => ({ label: f, apply }));
             return result;
         case "artist":
-            result.options = catalog["artist-names"].map((a) => ({ label: a }));
+            result.options = catalog["artist-names"].map((a) => ({
+                label: a,
+                apply,
+            }));
             return result;
         case "watermark":
             result.options = catalog["artist-names"].map((a) => ({ label: a }));
