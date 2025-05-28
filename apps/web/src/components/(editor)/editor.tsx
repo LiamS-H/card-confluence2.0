@@ -1,7 +1,8 @@
 "use client";
 import ReactCodeEditor from "@uiw/react-codemirror";
 import { keymap } from "@codemirror/view";
-import { defaultKeymap } from "@codemirror/commands";
+import { defaultKeymap, indentWithTab } from "@codemirror/commands";
+import { acceptCompletion } from "@codemirror/autocomplete";
 import { useMemo, useState } from "react";
 import { scrycardsFromCatalog, type ICatalog } from "codemirror-lang-scrycards";
 import { useLightDark } from "../(theme)/use-theme";
@@ -13,7 +14,11 @@ const INITIAL = `game:arena is:permanent (o:draw or o:reveal)
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [doc, setDoc] = useState(INITIAL);
     const extensions = useMemo(() => {
-        return [keymap.of(defaultKeymap), scrycardsFromCatalog(catalog)];
+        return [
+            keymap.of(defaultKeymap),
+            keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
+            scrycardsFromCatalog(catalog),
+        ];
     }, [catalog]);
     const theme = useLightDark();
     return (
