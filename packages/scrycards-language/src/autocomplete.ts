@@ -204,13 +204,13 @@ export const completeScrycards: CompletionSource = (context) => {
         };
     }
 
-    if (!isArgument(argument)) {
+    if (!isArgument(lower_arg)) {
         return null;
     }
 
     // const node = nodeFromArg(argument);
 
-    const arg_type = argTypeFromArg(argument);
+    const arg_type = argTypeFromArg(lower_arg);
 
     const result: CompletionResult = {
         from,
