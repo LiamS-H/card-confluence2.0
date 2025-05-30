@@ -39,6 +39,16 @@ export const completeScrycards: CompletionSource = (context) => {
     if (!tag) {
         const cursor = syntaxTree(view.state).cursorAt(pos, -1);
 
+        if (cursor.name === "StringLiteral") {
+            return {
+                from: cursor.from + 1,
+                to: cursor.to - 1,
+                options: catalog["card-names"].map((name) => ({
+                    label: name,
+                })),
+            };
+        }
+
         if (cursor.name !== "Argument") {
             return null;
         }

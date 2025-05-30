@@ -9,7 +9,7 @@ expression {
 
 Clause { "(" space? expression ~id space? ")" }
 
-statement { Tag ~tag | conjunction | (Prefix? Argument) ~tag } // todo: distinguish between and Name and Argument (should be name here)
+statement { Tag ~tag | conjunction | (Prefix? (Argument | StringLiteral)) ~tag }
 
 conjunction { And | Or }
 
@@ -50,7 +50,7 @@ And { @specialize<Argument, "and"> }
 
     space { $[ \t\n\r]+ }
 
-    "(" ")"
+    // "(" ")"
 }
 
 @detectDelim

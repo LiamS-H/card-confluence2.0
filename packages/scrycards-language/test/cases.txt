@@ -6,6 +6,14 @@ Test
 
 Program(Argument)
 
+# Name Literal Only
+
+"Test"
+
+==>
+
+Program(StringLiteral)
+
 # Tag Only
 
 -test:test
@@ -37,3 +45,11 @@ t:creature or t:artifact
 ==>
 
 Program(Tag(Argument, Operator, Value(String)), Or, Tag(Argument, Operator, Value(String)))
+
+# Complex Compound Query
+
+t:creature or (t:artifact t:vehicle)
+
+==>
+
+Program(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String))))
