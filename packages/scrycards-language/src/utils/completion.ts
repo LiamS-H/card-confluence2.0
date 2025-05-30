@@ -462,3 +462,8 @@ export function nodeFromArg(arg: Argument): ICompletionNode {
 export function argTypeFromArg(arg: Argument): ARG_TYPE {
     return ARG_TYPE_MAP[arg];
 }
+
+export function argTypeFromString(string: string): ARG_TYPE | null {
+    if (!isArgument(string)) return null;
+    return argTypeFromArg(string);
+}

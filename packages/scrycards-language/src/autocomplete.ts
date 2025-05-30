@@ -12,11 +12,14 @@ import { EditorSelection } from "@codemirror/state";
 
 import {
     argTypeFromArg,
+    argTypeFromString,
     ARGUMENTS,
     detailFromArg,
     isArgument,
     nodeFromArg,
 } from "./utils/completion";
+import { completionFromTypes, TYPE_TAG_TYPE } from "./utils/type-completion";
+import { getConstraintContext } from "./utils/constraint-from-tree";
 
 const BEGIN_OPERATORS = [":", "<", ">", "=", "!"] as const;
 
@@ -222,6 +225,9 @@ export const completeScrycards: CompletionSource = (context) => {
 
     const arg_type = argTypeFromArg(lower_arg);
 
+    const constraints = getConstraintContext(view, pos);
+    console.log(constraints);
+
     const result: CompletionResult = {
         from,
         to,
@@ -244,29 +250,44 @@ export const completeScrycards: CompletionSource = (context) => {
             // return result;
             return null;
         case "type":
-            const types = [
-                "card-types",
-                "creature-types",
-                "artifact-types",
-                "enchantment-types",
-                "land-types",
-                "planeswalker-types",
-                "battle-types",
-                "spell-types",
-                "supertypes",
-            ] as const;
-
-            for (let i = 0; i < types.length; i++) {
-                const type = types[i];
-                result.options = result.options.concat(
-                    catalog[type].map((t) => ({
-                        label: t.toLowerCase(),
-                        displayLabel: t,
-                        section: { name: type, rank: i },
-                    }))
+            if (!constraints) {
+                result.options = completionFromTypes(catalog);
+                return result;
+            }
+            constraints.required = constraints.required.filter(
+                (c) => argTypeFromString(c.argument) === "type"
+            );
+            const card_types = catalog["card-types"].map((t) =>
+                t.toLowerCase()
+            );
+            const required_types = constraints.required
+                .map((c) => c.value.toLowerCase())
+                .filter((v) => card_types.includes(v));
+            if (required_types.length > 0) {
+                const catalog_type_names = required_types
+                    .map((t) => {
+                        switch (t) {
+                            case "creature":
+                            case "artifact":
+                            case "enchantment":
+                            case "land":
+                            case "planeswalker":
+                            case "battle":
+                                // return "battle-types";
+                                return (t + "-types") as TYPE_TAG_TYPE;
+                            default:
+                                return null;
+                        }
+                    })
+                    .filter((n) => !!n);
+                result.options = completionFromTypes(
+                    catalog,
+                    catalog_type_names
                 );
+                return result;
             }
 
+            result.options = completionFromTypes(catalog);
             return result;
         case "set":
             result.options = catalog.sets.map((set) => ({ label: set }));
