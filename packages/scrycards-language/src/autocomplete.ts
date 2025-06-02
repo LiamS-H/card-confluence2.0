@@ -311,6 +311,7 @@ export const completeScrycards: CompletionSource = (context) => {
         case "mana":
             return null;
         case "name":
+            result.commitCharacters = undefined;
             result.options = catalog["card-names"].map((n) => ({
                 label: n,
                 apply,
