@@ -24,8 +24,12 @@ export function completionFromTypes(
     types: readonly TYPE_TAG_TYPE[] = TYPE_TAG_TYPES
 ) {
     let result: Completion[] = [];
+    const included: Set<TYPE_TAG_TYPE> = new Set();
+
     for (let i = 0; i < types.length; i++) {
         const type = types[i];
+        if (included.has(type)) continue;
+        included.add(type);
         // const rank = types.indexOf(type);
         result = result.concat(
             catalog[type].map((t) => ({

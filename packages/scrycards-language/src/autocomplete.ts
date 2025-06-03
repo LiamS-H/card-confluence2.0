@@ -19,7 +19,7 @@ import {
     nodeFromArg,
 } from "./utils/completion";
 import { completionFromTypes, TYPE_TAG_TYPE } from "./utils/type-completion";
-import { getConstraintContext } from "./utils/constraint-from-tree";
+import { capturingTagStringsFromTree } from "./utils/constraint-from-tree";
 
 const BEGIN_OPERATORS = [":", "<", ">", "=", "!"] as const;
 
@@ -225,7 +225,7 @@ export const completeScrycards: CompletionSource = (context) => {
 
     const arg_type = argTypeFromArg(lower_arg);
 
-    const constraints = getConstraintContext(view, pos);
+    const constraints = capturingTagStringsFromTree(view);
     console.log(constraints);
 
     const result: CompletionResult = {
@@ -280,6 +280,8 @@ export const completeScrycards: CompletionSource = (context) => {
                         }
                     })
                     .filter((n) => !!n);
+                catalog_type_names.push("card-types");
+                catalog_type_names.push("supertypes");
                 result.options = completionFromTypes(
                     catalog,
                     catalog_type_names

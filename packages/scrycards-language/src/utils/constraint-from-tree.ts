@@ -9,302 +9,314 @@ interface TagString {
 }
 
 interface Constraint {
-    type: "tag" | "and" | "or";
-    tags?: TagString[];
-    children?: Constraint[];
-    position?: { from: number; to: number };
-}
-
-interface ConstraintContext {
     required: TagString[];
-
-    alternatives: TagString[][];
-
-    forbidden: TagString[];
-
-    currentNode: Constraint;
+    options: TagString[][];
 }
 
-export function parseConstraintsFromTree(
-    view: EditorView,
-    pos: number
+export function capturingTagStringsFromTree(
+    view: EditorView
 ): Constraint | null {
-    const cursor = syntaxTree(view.state).cursorAt(pos, -1);
+    const tree = syntaxTree(view.state);
+    const cursor = tree.cursor();
 
-    while (cursor.name !== "Program" && cursor.parent()) {}
     if (cursor.name !== "Program") {
         return null;
     }
 
-    return parseConstraintNode(view, cursor);
+    // Parse the program content
+    const result = parseNode(cursor, view);
+    if (!result) {
+        return null;
+    }
+
+    return result;
 }
 
-function parseConstraintNode(view: EditorView, cursor: any): Constraint | null {
-    const nodeName = cursor.name;
-    const nodePos = { from: cursor.node.from, to: cursor.node.to };
+function parseNode(cursor: any, view: EditorView): Constraint | null {
+    const nodeName = cursor.name as string;
 
     switch (nodeName) {
         case "Program":
-            if (cursor.firstChild()) {
-                const children: Constraint[] = [];
-                do {
-                    const child = parseConstraintNode(view, cursor);
-                    if (child) children.push(child);
-                } while (cursor.nextSibling());
-                cursor.parent();
-
-                if (children.length === 1) {
-                    return children[0];
-                } else {
-                    return {
-                        type: "and",
-                        children,
-                        position: nodePos,
-                    };
-                }
-            }
-            break;
-
-        case "Tag":
-            return {
-                type: "tag",
-                tags: [parseTagFromCursor(view, cursor)],
-                position: nodePos,
-            };
-
+            return parseProgram(cursor, view);
         case "Or":
-            return {
-                type: "or",
-                children: [],
-                position: nodePos,
-            };
-
+            return parseOr(cursor, view);
         case "And":
-            return {
-                type: "and",
-                children: [],
-                position: nodePos,
-            };
-
+            return parseAnd(cursor, view);
         case "Clause":
-            if (cursor.firstChild()) {
-                const children: Constraint[] = [];
-                let currentOperator: "and" | "or" = "and";
-                let operandNodes: Constraint[] = [];
-
-                do {
-                    if (cursor.name === "Or") {
-                        if (operandNodes.length > 0) {
-                            children.push(
-                                operandNodes.length === 1
-                                    ? operandNodes[0]
-                                    : { type: "and", children: operandNodes }
-                            );
-                        }
-                        operandNodes = [];
-                        currentOperator = "or";
-                    } else if (cursor.name === "And") {
-                        currentOperator = "and";
-                    } else {
-                        const child = parseConstraintNode(view, cursor);
-                        if (child) operandNodes.push(child);
-                    }
-                } while (cursor.nextSibling());
-
-                if (operandNodes.length > 0) {
-                    children.push(
-                        operandNodes.length === 1
-                            ? operandNodes[0]
-                            : { type: "and", children: operandNodes }
-                    );
-                }
-
-                cursor.parent();
-
-                if (children.length === 1) {
-                    return children[0];
-                } else {
-                    return {
-                        type: currentOperator,
-                        children,
-                        position: nodePos,
-                    };
-                }
-            }
-            break;
-
+            return parseClause(cursor, view);
+        case "Tag":
+            return parseTag(cursor, view);
+        case "Argument":
+            return parseStandaloneArgument(cursor, view);
+        case "StringLiteral":
+            return parseStringLiteral(cursor, view);
         default:
+            // Skip unknown nodes and try children
             if (cursor.firstChild()) {
-                const child = parseConstraintNode(view, cursor);
+                const result = parseNode(cursor, view);
                 cursor.parent();
-                return child;
+                return result;
             }
+            return null;
     }
-    return null;
 }
 
-function parseTagFromCursor(view: EditorView, cursor: any): TagString {
-    const tag: Partial<TagString> = {};
+function parseProgram(cursor: any, view: EditorView): Constraint | null {
+    if (!cursor.firstChild()) {
+        return null;
+    }
+
+    const children: Constraint[] = [];
+
+    do {
+        const childResult = parseNode(cursor, view);
+        if (childResult) {
+            children.push(childResult);
+        }
+    } while (cursor.nextSibling());
+
+    cursor.parent();
+
+    if (children.length === 0) {
+        return null;
+    }
+
+    // Combine all children with AND logic (since they're at program level)
+    return combineWithAnd(children);
+}
+
+function parseOr(cursor: any, view: EditorView): Constraint | null {
+    // For OR nodes, we need to collect the operands before and after
+    // Since OR has lower precedence, we need to look at siblings
+    cursor.parent(); // Go back to parent to collect all operands
+
+    const operands: Constraint[] = [];
+    let foundOr = false;
 
     if (cursor.firstChild()) {
         do {
-            const nodeName = cursor.name;
-            const nodeText = view.state.sliceDoc(
-                cursor.node.from,
-                cursor.node.to
-            );
+            if (cursor.name === "Or") {
+                foundOr = true;
+                continue;
+            }
 
-            switch (nodeName) {
-                case "Prefix":
-                    tag.prefix = nodeText;
-                    break;
-                case "Argument":
-                    tag.argument = nodeText;
-                    break;
-                case "Operator":
-                    tag.operator = nodeText;
-                    break;
-                case "Value":
-                case "StringLiteral":
-                    if (cursor.firstChild()) {
-                        tag.value = view.state.sliceDoc(
-                            cursor.node.from,
-                            cursor.node.to
-                        );
-                        cursor.parent();
-                    } else {
-                        tag.value = nodeText;
-                    }
-                    break;
+            const operand = parseNode(cursor, view);
+            if (operand) {
+                operands.push(operand);
             }
         } while (cursor.nextSibling());
+
         cursor.parent();
     }
 
-    return tag as TagString;
-}
-
-export function getConstraintContext(
-    view: EditorView,
-    pos: number
-): ConstraintContext | null {
-    const rootConstraint = parseConstraintsFromTree(view, pos);
-    if (!rootConstraint) return null;
-
-    const currentNode = findConstraintAtPosition(rootConstraint, pos);
-    if (!currentNode) return null;
-
-    return extractContext(rootConstraint, currentNode);
-}
-
-function findConstraintAtPosition(
-    constraint: Constraint,
-    pos: number
-): Constraint | null {
-    if (
-        constraint.position &&
-        pos >= constraint.position.from &&
-        pos <= constraint.position.to
-    ) {
-        if (constraint.children) {
-            for (const child of constraint.children) {
-                const found = findConstraintAtPosition(child, pos);
-                if (found) return found;
-            }
-        }
-        return constraint;
+    if (!foundOr || operands.length < 2) {
+        return null;
     }
-    return null;
+
+    return combineWithOr(operands);
 }
 
-function extractContext(
-    rootConstraint: Constraint,
-    currentNode: Constraint
-): ConstraintContext {
-    const context: ConstraintContext = {
-        required: [],
-        alternatives: [],
-        forbidden: [],
-        currentNode,
+function parseAnd(cursor: any, view: EditorView): Constraint | null {
+    // AND is mostly implicit, but when explicit, treat like program
+    cursor.parent();
+
+    const operands: Constraint[] = [];
+
+    if (cursor.firstChild()) {
+        do {
+            if (cursor.name === "And") {
+                continue;
+            }
+
+            const operand = parseNode(cursor, view);
+            if (operand) {
+                operands.push(operand);
+            }
+        } while (cursor.nextSibling());
+
+        cursor.parent();
+    }
+
+    return combineWithAnd(operands);
+}
+
+function parseClause(cursor: any, view: EditorView): Constraint | null {
+    if (!cursor.firstChild()) {
+        return null;
+    }
+
+    const children: Constraint[] = [];
+    let hasOr = false;
+
+    do {
+        if (cursor.name === "Or") {
+            hasOr = true;
+            continue;
+        }
+
+        const childResult = parseNode(cursor, view);
+        if (childResult) {
+            children.push(childResult);
+        }
+    } while (cursor.nextSibling());
+
+    cursor.parent();
+
+    if (children.length === 0) {
+        return null;
+    }
+
+    if (hasOr) {
+        return combineWithOr(children);
+    } else {
+        return combineWithAnd(children);
+    }
+}
+
+function parseTag(cursor: any, view: EditorView): Constraint | null {
+    if (!cursor.firstChild()) {
+        return null;
+    }
+
+    let prefix: string | undefined;
+    let argument: string = "";
+    let operator: string = "";
+    let value: string = "";
+
+    // Check for prefix first
+    if (cursor.name === "Prefix") {
+        prefix = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+        cursor.nextSibling();
+    }
+
+    // Get argument
+    if (cursor.name === "Argument") {
+        argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+        cursor.nextSibling();
+    }
+
+    // Get operator
+    if (cursor.name === "Operator") {
+        operator = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+        cursor.nextSibling();
+    }
+
+    // Get value
+    if (cursor.name === "Value") {
+        if (cursor.firstChild()) {
+            value = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+            cursor.parent();
+        }
+    }
+
+    cursor.parent();
+
+    const tag: TagString = {
+        argument,
+        operator,
+        value,
     };
 
-    collectConstraints(rootConstraint, context, currentNode);
-
-    return context;
-}
-
-function collectConstraints(
-    constraint: Constraint,
-    context: ConstraintContext,
-    excludeNode?: Constraint
-): void {
-    if (constraint === excludeNode) return;
-
-    switch (constraint.type) {
-        case "tag":
-            if (constraint.tags) {
-                context.required.push(...constraint.tags);
-            }
-            break;
-
-        case "and":
-            if (constraint.children) {
-                for (const child of constraint.children) {
-                    collectConstraints(child, context, excludeNode);
-                }
-            }
-            break;
-
-        case "or":
-            if (constraint.children) {
-                const orGroup: TagString[] = [];
-                for (const child of constraint.children) {
-                    if (child.type === "tag" && child.tags) {
-                        orGroup.push(...child.tags);
-                    }
-                }
-                if (orGroup.length > 0) {
-                    context.alternatives.push(orGroup);
-                }
-            }
-            break;
+    if (prefix) {
+        tag.prefix = prefix;
     }
+
+    return {
+        required: [tag],
+        options: [],
+    };
 }
 
-export function getValidTagsForPosition(
-    view: EditorView,
-    pos: number,
-    allPossibleTags: TagString[]
-): TagString[] {
-    const context = getConstraintContext(view, pos);
-    if (!context) return allPossibleTags;
+function parseStandaloneArgument(
+    cursor: any,
+    view: EditorView
+): Constraint | null {
+    const argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
 
-    return allPossibleTags.filter((tag) => {
-        if (context.required.some((req) => tagsEqual(req, tag))) {
-            return false;
+    const tag: TagString = {
+        argument: "n",
+        operator: ":",
+        value: argument,
+    };
+
+    return {
+        required: [tag],
+        options: [],
+    };
+}
+
+function parseStringLiteral(cursor: any, view: EditorView): Constraint | null {
+    const value = view.state.sliceDoc(cursor.node.from, cursor.node.to);
+
+    const tag: TagString = {
+        argument: "n",
+        operator: ":",
+        value: value,
+    };
+
+    return {
+        required: [tag],
+        options: [],
+    };
+}
+
+function combineWithAnd(constraints: Constraint[]): Constraint {
+    const required: TagString[] = [];
+    const options: TagString[][] = [];
+
+    for (const constraint of constraints) {
+        required.push(...constraint.required);
+        options.push(...constraint.options);
+    }
+
+    return { required, options };
+}
+
+function combineWithOr(constraints: Constraint[]): Constraint {
+    const options: TagString[][] = [];
+
+    for (const constraint of constraints) {
+        if (constraint.required.length > 0 && constraint.options.length === 0) {
+            // This is a simple required constraint, add it as an option
+            options.push(constraint.required);
+        } else if (constraint.options.length > 0) {
+            // This has options, add all of them
+            options.push(...constraint.options);
         }
+    }
 
-        if (context.forbidden.some((forbidden) => tagsEqual(forbidden, tag))) {
-            return false;
-        }
-
-        return true;
-    });
+    return {
+        required: [],
+        options: options,
+    };
 }
 
-function tagsEqual(tag1: TagString, tag2: TagString): boolean {
-    return (
-        tag1.argument === tag2.argument &&
-        tag1.operator === tag2.operator &&
-        tag1.value === tag2.value &&
-        tag1.prefix === tag2.prefix
-    );
-}
+// Helper function to detect OR operations in a sequence of siblings
+function detectOrPattern(cursor: any, view: EditorView): Constraint | null {
+    const parts: Constraint[] = [];
+    let hasOrOperator = false;
 
-export function debugConstraintTree(view: EditorView, pos: number): void {
-    const constraint = parseConstraintsFromTree(view, pos);
-    console.log("Parsed constraint tree:", JSON.stringify(constraint, null, 2));
+    if (cursor.firstChild()) {
+        do {
+            if (cursor.name === "Or") {
+                hasOrOperator = true;
+                continue;
+            }
 
-    const context = getConstraintContext(view, pos);
-    console.log("Constraint context:", context);
+            const part = parseNode(cursor, view);
+            if (part) {
+                parts.push(part);
+            }
+        } while (cursor.nextSibling());
+
+        cursor.parent();
+    }
+
+    if (hasOrOperator && parts.length >= 2) {
+        return combineWithOr(parts);
+    } else if (parts.length > 0) {
+        return combineWithAnd(parts);
+    }
+
+    return null;
 }
