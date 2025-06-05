@@ -7,7 +7,12 @@ import { keymap } from "@codemirror/view";
 import { defaultKeymap, indentWithTab } from "@codemirror/commands";
 import { acceptCompletion } from "@codemirror/autocomplete";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { scrycardsFromCatalog, type ICatalog } from "codemirror-lang-scrycards";
+import {
+    astFromView,
+    astToString,
+    scrycardsFromCatalog,
+    type ICatalog,
+} from "codemirror-lang-scrycards";
 import { useLightDark } from "../(theme)/use-theme";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -34,7 +39,9 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
 
     const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
         (value, viewUpdate) => {
-            console.log("test");
+            const ast = astFromView(viewUpdate);
+            console.log(ast);
+            console.log(astToString(ast));
             onSettle();
             setDoc(value);
         },
@@ -48,7 +55,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             extensions={extensions}
             value={doc}
             theme={theme === "dark" ? "dark" : "light"}
-            onChange={(value) => {}}
+            onChange={onChange}
         />
     );
 }
