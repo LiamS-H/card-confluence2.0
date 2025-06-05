@@ -297,7 +297,16 @@ export const completeScrycards: CompletionSource = (context) => {
         // result.options = completionFromTypes(catalog);
         // return result;
         case "set":
-            result.options = catalog.sets.map((set) => ({ label: set }));
+            result.options = catalog.sets.map((set) => ({
+                label: set.code,
+                detail: set.name,
+                info: set.released,
+            }));
+            result.options = catalog.sets.map((set) => ({
+                label: set.name,
+                detail: set.code,
+                info: set.released,
+            }));
             return result;
         case "is":
             result.options = catalog.criteria.map((crit) => ({

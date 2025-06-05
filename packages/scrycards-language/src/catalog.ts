@@ -31,7 +31,7 @@ export interface ICatalog {
     "mana-costs": string[];
     otags: string[];
     atags: string[];
-    sets: string[]; // https://api.scryfall.com/sets
+    sets: { code: string; name: string; released?: string }[];
 }
 
 export function getEmptyCatalog(): ICatalog {

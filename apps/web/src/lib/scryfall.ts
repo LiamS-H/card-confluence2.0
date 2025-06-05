@@ -1,5 +1,9 @@
 import { getEmptyCatalog, type ICatalog } from "codemirror-lang-scrycards";
-import { type ScryfallList, type ScryfallCatalog } from "@scryfall/api-types";
+import {
+    type ScryfallList,
+    type ScryfallCatalog,
+    ScryfallError,
+} from "@scryfall/api-types";
 import { parse } from "node-html-parser";
 
 async function fetchWithHeaders(url: URL) {
@@ -11,9 +15,35 @@ async function fetchWithHeaders(url: URL) {
     });
 }
 
-export async function fetchSearch(query: string): Promise<ScryfallList.Cards> {
+export interface SearchSettings {
+    unique?: string; //The strategy for omitting similar cards. See below.
+    order?: string; //The method to sort returned cards. See below.
+    dir?: string; //The direction to sort cards. See below.
+    include_extras?: boolean; //If true, extra cards (tokens, planes, etc) will be included. Equivalent to adding include:extras to the fulltext search. Defaults to false.
+    include_multilingual?: boolean; //If true, cards in every language supported by Scryfall will be included. Defaults to false.
+    include_variations?: boolean; //If true, rare care variants will be included, like the Hairy Runesword. Defaults to false.
+    page?: number; //The page number to return, default 1.
+    format?: string; //The data format to return: json or csv. Defaults to json.
+    pretty?: boolean; //If true, the returned JSON will be prettified. Avoid using for production code.
+}
+
+export async function fetchSearch(
+    query: string,
+    settings?: SearchSettings
+): Promise<ScryfallList.Cards | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/search");
-    const search = new URLSearchParams({ q: query });
+    const params = settings ? { q: query } : { q: query };
+    const search = new URLSearchParams(params);
+    if (settings) {
+        for (const key in settings) {
+            const val = (settings as Record<string, string | boolean | number>)[
+                key
+            ]?.toString();
+            if (!val) continue;
+            search.set(key, val.toString());
+        }
+    }
+
     url.search = search.toString();
     const response = await fetch(url); // we don't use headers since we are inside browser
     const card_list: ScryfallList.Cards = await response.json();
@@ -27,11 +57,11 @@ export async function fetchCatalog(endpoint: string): Promise<string[]> {
     return catalog.data;
 }
 
-export async function fetchSets(): Promise<string[]> {
+export async function fetchSets(): Promise<ScryfallList.Sets | ScryfallError> {
     const url = new URL("https://api.scryfall.com/sets");
     const response = await fetchWithHeaders(url);
     const catalog: ScryfallList.Sets = await response.json();
-    return catalog.data.map((set) => set.code);
+    return catalog;
 }
 
 export async function fetchTags(): Promise<{
@@ -122,7 +152,15 @@ export async function getCatalog(): Promise<ICatalog> {
     promises.push(
         fetchSets()
             .then((list) => {
-                catalog.sets = list;
+                if (list.object === "error") {
+                    console.error(list);
+                    return [];
+                }
+                catalog.sets = list.data.map(({ code, name, released_at }) => ({
+                    code,
+                    name,
+                    released: released_at,
+                }));
             })
             .catch((e) => {
                 console.error(e);

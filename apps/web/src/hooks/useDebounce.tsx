@@ -8,15 +8,16 @@ import { useCallback, useEffect, useRef } from "react";
  */
 export function useDebounce(func: () => void, delay: number) {
     const timeoutRef = useRef<NodeJS.Timeout>(undefined);
+    const funcRef = useRef(func);
 
     useEffect(() => {
-        clearTimeout(timeoutRef.current);
+        funcRef.current = func;
     }, [delay, func]);
 
     const debouncedFunction = useCallback(() => {
         clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(func, delay);
-    }, [delay, func]);
+        timeoutRef.current = setTimeout(() => funcRef.current(), delay);
+    }, [delay, funcRef]);
 
     return debouncedFunction;
 }
