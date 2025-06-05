@@ -250,47 +250,52 @@ export const completeScrycards: CompletionSource = (context) => {
             // return result;
             return null;
         case "type":
-            if (!constraints) {
-                result.options = completionFromTypes(catalog);
-                return result;
-            }
-            constraints.required = constraints.required.filter(
-                (c) => argTypeFromString(c.argument) === "type"
-            );
-            const card_types = catalog["card-types"].map((t) =>
-                t.toLowerCase()
-            );
-            const required_types = constraints.required
-                .map((c) => c.value.toLowerCase())
-                .filter((v) => card_types.includes(v));
-            if (required_types.length > 0) {
-                const catalog_type_names = required_types
-                    .map((t) => {
-                        switch (t) {
-                            case "creature":
-                            case "artifact":
-                            case "enchantment":
-                            case "land":
-                            case "planeswalker":
-                            case "battle":
-                                // return "battle-types";
-                                return (t + "-types") as TYPE_TAG_TYPE;
-                            default:
-                                return null;
-                        }
-                    })
-                    .filter((n) => !!n);
-                catalog_type_names.push("card-types");
-                catalog_type_names.push("supertypes");
-                result.options = completionFromTypes(
-                    catalog,
-                    catalog_type_names
-                );
-                return result;
-            }
-
             result.options = completionFromTypes(catalog);
             return result;
+
+        // if (!constraints) {
+        //     result.options = completionFromTypes(catalog);
+        //     return result;
+        // }
+
+        // constraints.required = constraints.required.filter(
+        //     (c) => argTypeFromString(c.argument) === "type"
+        // );
+
+        // const card_types = catalog["card-types"].map((t) =>
+        //     t.toLowerCase()
+        // );
+        // const required_types = constraints.required
+        //     .map((c) => c.value.toLowerCase())
+        //     .filter((v) => card_types.includes(v));
+        // if (required_types.length > 0) {
+        //     const catalog_type_names = required_types
+        //         .map((t) => {
+        //             switch (t) {
+        //                 case "creature":
+        //                 case "artifact":
+        //                 case "enchantment":
+        //                 case "land":
+        //                 case "planeswalker":
+        //                 case "battle":
+        //                     return (t + "-types") as TYPE_TAG_TYPE;
+        //                 default:
+        //                     return null;
+        //             }
+        //         })
+        //         .filter((n) => !!n);
+        //     catalog_type_names.unshift("card-types");
+        //     catalog_type_names.push("supertypes");
+        //     console.log(catalog_type_names);
+        //     result.options = completionFromTypes(
+        //         catalog,
+        //         catalog_type_names
+        //     );
+        //     return result;
+        // }
+
+        // result.options = completionFromTypes(catalog);
+        // return result;
         case "set":
             result.options = catalog.sets.map((set) => ({ label: set }));
             return result;
