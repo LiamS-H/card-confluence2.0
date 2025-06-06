@@ -2,10 +2,10 @@
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
-import { FileText, Search } from "lucide-react";
+import { FileText, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 interface INavItem {
     path: string;
@@ -50,22 +50,44 @@ function NavItem({
 
 export function NavBar() {
     const current_path = usePathname();
+    const [hidden, setHidden] = useState(false);
     return (
-        <>
-            <nav className="fixed z-10 top-0 right-0">
-                <ul className="p-2 flex flex-row items-center gap-4">
+        <nav className="fixed z-40 top-0 right-0">
+            <ul className="p-2 flex flex-row items-center gap-4">
+                {hidden ? (
                     <li>
-                        <ThemeToggle />
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setHidden(false)}
+                        >
+                            <Menu />
+                        </Button>
                     </li>
-                    {paths.map((item) => (
-                        <NavItem
-                            key={item.path}
-                            current_path={current_path}
-                            item={item}
-                        />
-                    ))}
-                </ul>
-            </nav>
-        </>
+                ) : (
+                    <>
+                        <li>
+                            <ThemeToggle />
+                        </li>
+                        {paths.map((item) => (
+                            <NavItem
+                                key={item.path}
+                                current_path={current_path}
+                                item={item}
+                            />
+                        ))}
+                        <li className="md:hidden">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setHidden(true)}
+                            >
+                                <X />
+                            </Button>
+                        </li>
+                    </>
+                )}
+            </ul>
+        </nav>
     );
 }

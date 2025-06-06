@@ -12,7 +12,7 @@ export function useCard(cardName: string) {
         } else {
             setCard(request);
         }
-    }, [cardName]);
+    }, [cardName, getCard]);
 
     return card;
 }
