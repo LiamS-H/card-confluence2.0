@@ -221,12 +221,10 @@ export const completeScrycards: CompletionSource = (context) => {
         return null;
     }
 
-    // const node = nodeFromArg(argument);
-
     const arg_type = argTypeFromArg(lower_arg);
 
     const constraints = capturingTagStringsFromTree(view);
-    console.log(constraints);
+    // console.log(constraints);
 
     const result: CompletionResult = {
         from,
@@ -310,7 +308,8 @@ export const completeScrycards: CompletionSource = (context) => {
             return result;
         case "is":
             result.options = catalog.criteria.map((crit) => ({
-                label: crit,
+                label: crit.toLowerCase().replace(" ", "-"),
+                displayLabel: crit,
             }));
             return result;
         case "power":

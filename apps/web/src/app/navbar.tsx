@@ -52,7 +52,7 @@ export function NavBar() {
     const current_path = usePathname();
     return (
         <>
-            <nav className="absolute right-0">
+            <nav className="fixed z-10 top-0 right-0">
                 <ul className="p-2 flex flex-row items-center gap-4">
                     <li>
                         <ThemeToggle />
@@ -66,7 +66,6 @@ export function NavBar() {
                     ))}
                 </ul>
             </nav>
-            <div className="h-14"></div>
         </>
     );
 }

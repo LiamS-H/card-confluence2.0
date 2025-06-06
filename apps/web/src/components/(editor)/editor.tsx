@@ -18,7 +18,7 @@ import {
 import { useLightDark } from "../(theme)/use-theme";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearch } from "@/hooks/useSearch";
-import { Scrycard } from "react-scrycards";
+import { Card } from "./card";
 
 const INITIAL = `-(game:mtga or game:mtgo)
 -banned:commander
@@ -29,16 +29,15 @@ direction:desc
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [doc, setDoc] = useState(INITIAL);
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
-    const { search, result, error, warning } = useSearch();
+    const { search, result, error, warning, isLoading } = useSearch();
 
-    const onSettle = useDebounce(
+    useDebounce(
         useCallback(() => {
             const query = doc;
             if (!query) return;
-            console.log("searching:", query);
             search({ query, settings: {} });
         }, [search, doc]),
-        300
+        750
     );
 
     const extensions = useMemo(() => {
@@ -54,9 +53,8 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             viewUpdate;
             // const ast = astFromView(viewUpdate);
             setDoc(value);
-            onSettle();
         },
-        [onSettle]
+        []
     );
 
     const theme = useLightDark();
@@ -116,8 +114,12 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                 </div>
             )}
 
-            <div className="flex flex-wrap gap-1 overflow-y-auto">
-                {result?.data.map((c) => <Scrycard card={c} size="lg" />)}
+            <div className="mr-4 flex flex-wrap h-full gap-1 overflow-y-auto">
+                {isLoading ? (
+                    <p>loading...</p>
+                ) : (
+                    result?.data.map((c) => <Card id={c} key={c} />)
+                )}
             </div>
         </div>
     );

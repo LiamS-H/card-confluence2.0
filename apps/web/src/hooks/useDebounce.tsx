@@ -2,22 +2,26 @@ import { useCallback, useEffect, useRef } from "react";
 
 /**
  *
- * @param func must be memoized as function changes clear debounce timer
+ * @param func a function to call after delay when its reference changes
  * @param delay ms
  * @returns
  */
 export function useDebounce(func: () => void, delay: number) {
     const timeoutRef = useRef<NodeJS.Timeout>(undefined);
-    const funcRef = useRef(func);
 
     useEffect(() => {
-        funcRef.current = func;
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(func, delay);
     }, [delay, func]);
 
-    const debouncedFunction = useCallback(() => {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => funcRef.current(), delay);
-    }, [delay, funcRef]);
+    // const cancelDebounce = useCallback(() => {
+    //     clearTimeout(timeoutRef.current);
+    // }, [delay, func]);
 
-    return debouncedFunction;
+    // const debounce = useCallback(() => {
+    //     clearTimeout(timeoutRef.current);
+    //     timeoutRef.current = setTimeout(func, delay);
+    // }, [delay, func]);
+
+    // return { cancelDebounce, debounce };
 }
