@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  *
@@ -13,15 +13,4 @@ export function useDebounce(func: () => void, delay: number) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(func, delay);
     }, [delay, func]);
-
-    // const cancelDebounce = useCallback(() => {
-    //     clearTimeout(timeoutRef.current);
-    // }, [delay, func]);
-
-    // const debounce = useCallback(() => {
-    //     clearTimeout(timeoutRef.current);
-    //     timeoutRef.current = setTimeout(func, delay);
-    // }, [delay, func]);
-
-    // return { cancelDebounce, debounce };
 }
