@@ -11,8 +11,9 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
     const [sticky, setSticky] = useState(false);
     const [animate, setAnimate] = useState(true);
 
-    const navbarRef = useRef<HTMLElement>(null);
+    const child = useRef<HTMLElement>(null);
     const lastScrollRef = useRef(0);
+    const lastChildHeightRef = useRef(0);
 
     const memoized_children = useMemo(() => children, [children]);
 
@@ -21,8 +22,11 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
         window.addEventListener(
             "scroll",
             () => {
-                if (!navbarRef.current) return;
-                const navbarHeight = navbarRef.current.offsetHeight;
+                if (!child.current) return;
+                const childHeight = child.current.offsetHeight;
+                const lastChildHeight = lastChildHeightRef.current;
+                lastChildHeightRef.current = childHeight;
+
                 const currentScrollY =
                     window.scrollY || document.documentElement.scrollTop;
                 const lastScrollY = lastScrollRef.current;
@@ -32,11 +36,13 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
                     setSticky(false);
                 }
 
-                if (currentScrollY < navbarHeight) {
+                if (currentScrollY < childHeight) {
                     setAnimate(true);
                     setShown(true);
                     return;
                 }
+
+                if (lastChildHeight !== childHeight) return;
 
                 if (currentScrollY > lastScrollY) {
                     setShown(false);
@@ -60,7 +66,7 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
 
     return (
         <nav
-            ref={navbarRef}
+            ref={child}
             className={`
         top-0 left-0 w-full z-30
         ${shown ? "translate-y-0" : "-translate-y-full"}
