@@ -53,7 +53,7 @@ export function NavBar() {
     const [hidden, setHidden] = useState(false);
     return (
         <nav className="fixed z-40 top-0 right-0">
-            <ul className="p-2 flex flex-row items-center gap-4">
+            <ul className="p-2 flex md:flex-row flex-col items-center gap-4">
                 {hidden ? (
                     <li>
                         <Button
@@ -66,6 +66,15 @@ export function NavBar() {
                     </li>
                 ) : (
                     <>
+                        <li className="md:hidden">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setHidden(true)}
+                            >
+                                <X />
+                            </Button>
+                        </li>
                         <li>
                             <ThemeToggle />
                         </li>
@@ -76,15 +85,6 @@ export function NavBar() {
                                 item={item}
                             />
                         ))}
-                        <li className="md:hidden">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setHidden(true)}
-                            >
-                                <X />
-                            </Button>
-                        </li>
                     </>
                 )}
             </ul>

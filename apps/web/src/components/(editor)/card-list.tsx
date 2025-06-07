@@ -14,7 +14,6 @@ export function CardList({
     useDebounce(
         useCallback(() => {
             if (!query) return;
-            console.log({ query, ast });
             search({ query, ast, settings: {} });
         }, [search, query, ast]),
         750
