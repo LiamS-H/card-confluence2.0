@@ -15,24 +15,27 @@ async function fetchWithHeaders(url: URL) {
     });
 }
 
+export const SearchOrders = [
+    "name",
+    "set",
+    "released",
+    "rarity",
+    "color",
+    "usd",
+    "tix",
+    "eur",
+    "cmc",
+    "power",
+    "toughness",
+    "edhrec",
+    "penny",
+    "artist",
+    "review",
+];
+
 export interface SearchSettings {
     unique?: "cards" | "arts" | "prints"; //The strategy for omitting similar cards.
-    order?: //The method to sort returned cards.
-    | "name"
-        | "set"
-        | "released"
-        | "rarity"
-        | "color"
-        | "usd"
-        | "tix"
-        | "eur"
-        | "cmc"
-        | "power"
-        | "toughness"
-        | "edhrec"
-        | "penny"
-        | "artist"
-        | "review";
+    order?: (typeof SearchOrders)[number]; //The method to sort returned cards.
     dir?: "auto" | "asc" | "desc"; //The direction to sort cards.
     include_extras?: boolean; //If true, extra cards (tokens, planes, etc) will be included. Equivalent to adding include:extras to the fulltext search. Defaults to false.
     include_multilingual?: boolean; //If true, cards in every language supported by Scryfall will be included. Defaults to false.

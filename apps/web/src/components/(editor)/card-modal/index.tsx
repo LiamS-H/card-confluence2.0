@@ -133,7 +133,7 @@ export function CardModal() {
                         <div className="flex flex-col">
                             <h2 className="text-lg font-semibold">Printings</h2>
                             <Printing id={card.id} isSelected />
-                            {printings?.length !== 1 && (
+                            {printings && printings.length !== 1 && (
                                 <>
                                     {printingsOpen && (
                                         <ul className="max-h-52 mt-2 overflow-y-auto">

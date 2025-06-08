@@ -11,7 +11,7 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
     const [sticky, setSticky] = useState(false);
     const [animate, setAnimate] = useState(true);
 
-    const child = useRef<HTMLElement>(null);
+    const child = useRef<HTMLDivElement>(null);
     const lastScrollRef = useRef(0);
     const lastChildHeightRef = useRef(0);
 
@@ -65,9 +65,10 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
     }, [lastScrollRef]);
 
     return (
-        <nav
+        <div
             ref={child}
             className={`
+                relative
         top-0 left-0 w-full z-30
         ${shown ? "translate-y-0" : "-translate-y-full"}
         ${sticky && "sticky"}
@@ -75,6 +76,6 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
       `}
         >
             {memoized_children}
-        </nav>
+        </div>
     );
 }

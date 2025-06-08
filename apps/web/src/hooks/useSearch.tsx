@@ -1,8 +1,4 @@
-import {
-    ScryfallCached,
-    type ICachedSearchProps,
-    useSearchContext,
-} from "@/context/search";
+import { type ICachedSearchProps, useSearchContext } from "@/context/search";
 import { ScryfallError } from "@scryfall/api-types";
 import { useCallback, useRef, useState } from "react";
 
@@ -70,14 +66,14 @@ export function useSearch() {
     );
 
     const loadNextPage = useCallback(
-        async (baseQuery: string, baseAst?: string) => {
+        async ({ query, ast, settings }: ICachedSearchProps) => {
             if (!hasNextPage || isLoading) return;
 
             await search(
                 {
-                    query: baseQuery,
-                    ast: baseAst,
-                    settings: { page: currentPage + 1 },
+                    query,
+                    ast,
+                    settings: { ...settings, page: currentPage + 1 },
                 },
                 false // Don't reset data, append instead
             );

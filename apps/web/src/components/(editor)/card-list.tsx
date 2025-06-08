@@ -2,6 +2,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useSearch } from "@/hooks/useSearch";
 import { Card } from "./card";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SearchSettings } from "@/lib/scryfall";
 
 const CARD_WIDTH = 200;
 const CARD_HEIGHT = 278.55;
@@ -10,9 +11,11 @@ const GAP = 4;
 export function CardList({
     query,
     ast,
+    settings,
 }: {
     query: string;
     ast: string | undefined;
+    settings?: SearchSettings;
 }) {
     const {
         search,
@@ -34,8 +37,8 @@ export function CardList({
     useDebounce(
         useCallback(() => {
             if (!query) return;
-            search({ query, ast, settings: { page: 1 } });
-        }, [search, query, ast]),
+            search({ query, ast, settings: { ...settings, page: 1 } });
+        }, [search, query, ast, settings]),
         750
     );
 
@@ -77,7 +80,7 @@ export function CardList({
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0]?.isIntersecting) {
-                    loadNextPage(query, ast);
+                    loadNextPage({ query, ast, settings });
                 }
             },
             {
@@ -87,7 +90,7 @@ export function CardList({
 
         observer.observe(sentinelRef.current);
         return () => observer.disconnect();
-    }, [hasNextPage, isLoading, loadNextPage, query, ast]);
+    }, [hasNextPage, isLoading, loadNextPage, query, ast, settings]);
 
     const gridLayout = useMemo(() => {
         if (containerWidth === 0) return { columns: 0, visibleItems: [] };
@@ -148,7 +151,7 @@ export function CardList({
             startRow,
             endRow,
         };
-    }, [containerWidth, allData.length, allData, scrollTop, viewportHeight]);
+    }, [containerWidth, allData, scrollTop, viewportHeight]);
 
     const memoized_list = useMemo(
         () => (

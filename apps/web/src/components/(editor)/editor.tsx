@@ -5,7 +5,10 @@ import ReactCodeEditor, {
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { keymap } from "@codemirror/view";
-import { defaultKeymap, indentWithTab } from "@codemirror/commands";
+import {
+    defaultKeymap,
+    // indentWithTab
+} from "@codemirror/commands";
 import { acceptCompletion } from "@codemirror/autocomplete";
 import { useCallback, useMemo, useRef, useState } from "react";
 
@@ -16,9 +19,17 @@ import {
     scrycardsFromCatalog,
     type ICatalog,
 } from "codemirror-lang-scrycards";
-import { useLightDark } from "../(theme)/use-theme";
-import { ScrollHidden } from "../(ui)/scroll-hidden";
+import { useLightDark } from "@/components/(theme)/use-theme";
+import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
 import { CardList } from "./card-list";
+import { Button } from "@/components/(ui)/button";
+import { SearchOrders, SearchSettings } from "@/lib/scryfall";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+    DropdownMenuItem,
+} from "../(ui)/dropdown-menu";
 
 const INITIAL = `-(game:mtga or game:mtgo)
 -banned:commander
@@ -29,12 +40,16 @@ direction:desc
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [doc, setDoc] = useState(INITIAL);
     const [ast, setAst] = useState<string | undefined>(undefined);
+    const [scryfallSettings, setScryfallSettings] = useState<SearchSettings>(
+        {}
+    );
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
     const extensions = useMemo(() => {
         return [
             keymap.of(defaultKeymap),
-            keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
+            keymap.of([{ key: "Tab", run: acceptCompletion }]),
+            // keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
             scrycardsFromCatalog(catalog),
         ];
     }, [catalog]);
@@ -66,8 +81,34 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                     theme={theme === "dark" ? "dark" : "light"}
                     onChange={onChange}
                 />
+                <div className="absolute top-full p-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="sm">
+                                Order: {scryfallSettings.order ?? "select"}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            {SearchOrders.map((o) => (
+                                <DropdownMenuItem
+                                    key={o}
+                                    disabled={scryfallSettings.order === o}
+                                    onClick={() =>
+                                        setScryfallSettings((s) => ({
+                                            ...s,
+                                            order: o,
+                                        }))
+                                    }
+                                >
+                                    {o}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </ScrollHidden>
-            <CardList query={doc} ast={ast} />
+            <div className="h-9"></div>
+            <CardList query={doc} ast={ast} settings={scryfallSettings} />
         </div>
     );
 }
