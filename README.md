@@ -11,6 +11,7 @@ Add command description to highlight
 
 Add settings between search box and cards
  - scroll to top button
+ - loading bar display on how many cards
  - adjustable card sizes
  - potentially order and display setting dropdowns
 
