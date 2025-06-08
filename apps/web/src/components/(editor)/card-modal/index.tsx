@@ -30,7 +30,7 @@ export function CardModal() {
     useEffect(() => {
         if (open) return;
         setRelatedOpen(false);
-    }, [card]);
+    }, [card, open]);
 
     useEffect(() => {
         if (!open) {
@@ -71,7 +71,7 @@ export function CardModal() {
             );
             setPrintings(resp.data);
         });
-    }, [card, open, cachedSearch]);
+    }, [card, open, cachedSearch, cacheResponse, getCard, printings]);
 
     if (!open) return null;
 
