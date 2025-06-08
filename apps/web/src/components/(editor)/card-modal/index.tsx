@@ -10,39 +10,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/(ui)/dialog";
-import { Button } from "../(ui)/button";
-import { OracleText } from "./oracle-text";
+import { Button } from "../../(ui)/button";
+import { OracleText } from "../oracle-text";
 import { useSearchContext } from "@/context/search";
 import { useEffect, useState } from "react";
-
-function Printing({ id, selected }: { id: string; selected?: boolean }) {
-    const card = useCard(id);
-    if (!card) return <div>loading...</div>;
-    let price: string | undefined;
-    if (card.prices.usd) {
-        price = `$${card.prices.usd}`;
-        if (card.prices.usd_foil) {
-            price += ` / $${card.prices.usd_foil} F`;
-        }
-        // if (card.prices.usd_etched) {
-        //     price += ` / $${card.prices.usd_etched} E`;
-        // }
-    } else if (card.prices.tix) {
-        price = `${card.prices.tix} tix`;
-    }
-
-    return (
-        <div
-            className={`w-full flex justify-between rounded-sm px-2 ${selected && "bg-secondary text-secondary-foreground"}`}
-        >
-            <div className="flex gap-2">
-                <span>{card.set_name}</span>
-                <span className="font-thin">({card.set.toUpperCase()})</span>
-            </div>
-            {price && <span>{price}</span>}
-        </div>
-    );
-}
+import { Printing } from "./printing";
+import { Related } from "./related";
 
 export function CardModal() {
     const { open, selected, setOpen, setSelected } = useHighlightContext();
@@ -52,8 +25,17 @@ export function CardModal() {
     const [printings, setPrintings] = useState<string[] | null>(null);
     const [printingsOpen, setPrintingsOpen] = useState(true);
 
+    const [relatedOpen, setRelatedOpen] = useState(true);
+
     useEffect(() => {
-        if (!open) return;
+        if (open) return;
+        setRelatedOpen(false);
+    }, [card]);
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
         if (!card) return;
         if (!("oracle_id" in card)) return;
         if (printings?.includes(card.id)) return;
@@ -109,9 +91,9 @@ export function CardModal() {
                 setOpen(open);
             }}
         >
-            <DialogContent className="min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl max-h-11/12 p-2 sm:p-8 md:p-16 overflow-y-auto">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-8 overflow-y-auto">
-                    <DialogHeader className="md:flex-grow">
+            <DialogContent className="min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl h-11/12 py-2 sm:py-8 md:py-16">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto h-full">
+                    <DialogHeader className="md:flex-grow h-full px-4 md:overflow-y-auto">
                         <DialogTitle
                             className={isMultiFaced ? "hidden" : undefined}
                         >
@@ -150,59 +132,84 @@ export function CardModal() {
                         )}
                         <div className="flex flex-col">
                             <h2 className="text-lg font-semibold">Printings</h2>
-                            <Printing id={card.id} selected />
-                            {printingsOpen && (
-                                <ul className="max-h-52 my-2 overflow-y-auto">
-                                    {printings ? (
-                                        printings.map((p) => (
-                                            <li key={p}>
-                                                <Button
-                                                    className="w-full h-6"
-                                                    variant="ghost"
-                                                    onClick={() => {
-                                                        setSelected(p);
-                                                    }}
-                                                >
-                                                    <Printing
-                                                        id={p}
-                                                        selected={p === card.id}
-                                                    />
-                                                </Button>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className="w-full h-6 text-center">
-                                            loading...
-                                        </li>
+                            <Printing id={card.id} isSelected />
+                            {printings?.length !== 1 && (
+                                <>
+                                    {printingsOpen && (
+                                        <ul className="max-h-52 mt-2 overflow-y-auto">
+                                            {printings ? (
+                                                printings.map((p) => (
+                                                    <li key={p}>
+                                                        <Printing
+                                                            id={p}
+                                                            isSelected={
+                                                                p === card.id
+                                                            }
+                                                            select={() =>
+                                                                setSelected(p)
+                                                            }
+                                                        />
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <li className="w-full h-6 text-center">
+                                                    loading...
+                                                </li>
+                                            )}
+                                        </ul>
                                     )}
-                                </ul>
+                                    <Button
+                                        onClick={() => {
+                                            setPrintingsOpen((o) => !o);
+                                        }}
+                                        variant="outline"
+                                        className="w-full h-6 mt-2"
+                                    >
+                                        {printingsOpen
+                                            ? "close"
+                                            : "select printing"}
+                                    </Button>
+                                </>
                             )}
-                            {printingsOpen ? (
+                        </div>
+                        {card.all_parts && (
+                            <div className="flex flex-col">
+                                <h2 className="text-lg font-semibold">
+                                    Related Cards
+                                </h2>
+                                {relatedOpen && (
+                                    <ul className="max-h-52 my-2 overflow-y-auto">
+                                        {card.all_parts.map((c) => (
+                                            <li key={c.id}>
+                                                <Related
+                                                    card={c}
+                                                    isSelected={
+                                                        c.id === card.id
+                                                    }
+                                                    select={() =>
+                                                        setSelected(c.id)
+                                                    }
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                                 <Button
                                     onClick={() => {
-                                        setPrintingsOpen((o) => !o);
+                                        setRelatedOpen((o) => !o);
                                     }}
                                     variant="outline"
                                     className="w-full h-6"
                                 >
-                                    close
+                                    {relatedOpen ? "close" : "show related"}
                                 </Button>
-                            ) : (
-                                <Button
-                                    onClick={() => {
-                                        setPrintingsOpen((o) => !o);
-                                    }}
-                                    variant="ghost"
-                                    className="w-full h-6"
-                                >
-                                    select printing
-                                </Button>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </DialogHeader>
 
-                    <div className="w-full sm:min-w-96 sm:w-96">
+                    <div className="w-full sm:min-w-96 sm:w-96 overflow-clip">
                         <Scrycard
+                            animated
                             flippable
                             card={card}
                             size={"xl"}

@@ -14,6 +14,7 @@ export function Card({ id }: { id: string }) {
             onClick={() => {
                 setOpen(true);
             }}
+            className="overflow-clip"
         >
             <Scrycard animated card={card} size="lg" />
         </button>
