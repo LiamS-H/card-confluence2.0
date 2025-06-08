@@ -16,14 +16,29 @@ async function fetchWithHeaders(url: URL) {
 }
 
 export interface SearchSettings {
-    unique?: string; //The strategy for omitting similar cards. See below.
-    order?: string; //The method to sort returned cards. See below.
-    dir?: string; //The direction to sort cards. See below.
+    unique?: "cards" | "arts" | "prints"; //The strategy for omitting similar cards.
+    order?: //The method to sort returned cards.
+    | "name"
+        | "set"
+        | "released"
+        | "rarity"
+        | "color"
+        | "usd"
+        | "tix"
+        | "eur"
+        | "cmc"
+        | "power"
+        | "toughness"
+        | "edhrec"
+        | "penny"
+        | "artist"
+        | "review";
+    dir?: "auto" | "asc" | "desc"; //The direction to sort cards.
     include_extras?: boolean; //If true, extra cards (tokens, planes, etc) will be included. Equivalent to adding include:extras to the fulltext search. Defaults to false.
     include_multilingual?: boolean; //If true, cards in every language supported by Scryfall will be included. Defaults to false.
     include_variations?: boolean; //If true, rare care variants will be included, like the Hairy Runesword. Defaults to false.
     page?: number; //The page number to return, default 1.
-    format?: string; //The data format to return: json or csv. Defaults to json.
+    format?: "json" | "csv"; //The data format to return: json or csv. Defaults to json.
     pretty?: boolean; //If true, the returned JSON will be prettified. Avoid using for production code.
 }
 

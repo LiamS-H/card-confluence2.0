@@ -12,7 +12,7 @@ import {
 } from "@/components/(ui)/dialog";
 import { Button } from "../../(ui)/button";
 import { OracleText } from "../oracle-text";
-import { useSearchContext } from "@/context/search";
+import { ICachedSearchProps, useSearchContext } from "@/context/search";
 import { useEffect, useState } from "react";
 import { Printing } from "./printing";
 import { Related } from "./related";
@@ -40,7 +40,7 @@ export function CardModal() {
         if (!("oracle_id" in card)) return;
         if (printings?.includes(card.id)) return;
         setPrintings(null);
-        const search_props = {
+        const search_props: ICachedSearchProps = {
             query: `oracleid:${card.oracle_id}`,
             settings: { unique: "prints", order: "released" },
         };
@@ -91,7 +91,7 @@ export function CardModal() {
                 setOpen(open);
             }}
         >
-            <DialogContent className="min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl h-11/12 py-2 sm:py-8 md:py-16">
+            <DialogContent className="min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl h-11/12 px-2 sm:py-8 md:px-4 md:py-16">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto h-full">
                     <DialogHeader className="md:flex-grow h-full px-4 md:overflow-y-auto">
                         <DialogTitle
@@ -207,7 +207,7 @@ export function CardModal() {
                         )}
                     </DialogHeader>
 
-                    <div className="w-full sm:min-w-96 sm:w-96 overflow-clip">
+                    <div className="w-full sm:min-w-96 sm:w-96 overflow-clip p-2">
                         <Scrycard
                             animated
                             flippable
