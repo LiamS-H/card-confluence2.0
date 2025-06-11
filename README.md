@@ -2,8 +2,10 @@
 
 Button to quickly Copy the command
 
-Add tabs + file saving
- - A file is a group of tabs
+Jupiter notebook @query syntax to store multiple queries.
+Ai can add to queries or pull up a query based on name
+
+Ai prompting space can be toggled between query only | ai only | and mix (on mobile mixed is gone)
 
 Add autocomplete when nothing is selected to select an argument
 
