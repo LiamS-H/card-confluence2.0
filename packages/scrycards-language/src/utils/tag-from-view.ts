@@ -11,7 +11,7 @@ interface Tag {
     tag_end: number;
 }
 
-export function tagFromTree(view: EditorView, pos: number): Tag | null {
+export function tagFromView(view: EditorView, pos: number): Tag | null {
     const cursor = syntaxTree(view.state).cursorAt(pos, -1);
 
     while (cursor.name !== "Tag" && cursor.parent()) {}
@@ -41,36 +41,4 @@ export function tagFromTree(view: EditorView, pos: number): Tag | null {
         val_start,
         tag_end,
     };
-}
-
-interface TagString {
-    argument: string;
-    operator: string;
-    value: string;
-}
-
-export function capturingTagStringsFromTree(
-    view: EditorView,
-    pos: number
-): TagString[] | null {
-    const tags: TagString[] = [];
-
-    const cursor = syntaxTree(view.state).cursorAt(pos, -1);
-
-    while (cursor.name !== "Tag" && cursor.parent()) {}
-
-    if (cursor.name !== "Tag") {
-        return null;
-    }
-    cursor.firstChild();
-    if ((cursor.name as string) === "Prefix") {
-        cursor.nextSibling();
-    }
-    const argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
-    cursor.nextSibling();
-    const operator = view.state.sliceDoc(cursor.node.from, cursor.node.to);
-    cursor.nextSibling();
-    const value = view.state.sliceDoc(cursor.node.from, cursor.node.to);
-
-    return tags;
 }

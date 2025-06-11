@@ -1,10 +1,10 @@
 import { hoverTooltip } from "@codemirror/view";
 
 import { syntaxTree } from "@codemirror/language";
-import { tagFromTree } from "./utils/tag-from-tree";
+import { tagFromView } from "./utils/tag-from-view";
 
 export const ScrycardsTooltips = hoverTooltip((view, pos, side) => {
-    const tag = tagFromTree(view, pos + 1);
+    const tag = tagFromView(view, pos + 1);
 
     if (!tag) {
         const cursor = syntaxTree(view.state).cursorAt(pos + 1, -1);

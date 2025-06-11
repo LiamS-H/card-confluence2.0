@@ -5,7 +5,7 @@ import type {
     CompletionSource,
 } from "@codemirror/autocomplete";
 
-import { tagFromTree } from "./utils/tag-from-tree";
+import { tagFromView } from "./utils/tag-from-view";
 import { syntaxTree } from "@codemirror/language";
 import { scrycardsCatalogFacet } from "./catalog";
 import { EditorSelection } from "@codemirror/state";
@@ -19,7 +19,6 @@ import {
     nodeFromArg,
 } from "./utils/completion";
 import { completionFromTypes, TYPE_TAG_TYPE } from "./utils/type-completion";
-import { capturingTagStringsFromTree } from "./utils/constraint-from-tree";
 
 const BEGIN_OPERATORS = [":", "<", ">", "=", "!"] as const;
 
@@ -35,7 +34,7 @@ export const completeScrycards: CompletionSource = (context) => {
 
     const pos = context.pos;
 
-    const tag = tagFromTree(view, pos);
+    const tag = tagFromView(view, pos);
 
     const catalog = context.state.facet(scrycardsCatalogFacet);
 
@@ -222,9 +221,6 @@ export const completeScrycards: CompletionSource = (context) => {
     }
 
     const arg_type = argTypeFromArg(lower_arg);
-
-    const constraints = capturingTagStringsFromTree(view);
-    // console.log(constraints);
 
     const result: CompletionResult = {
         from,

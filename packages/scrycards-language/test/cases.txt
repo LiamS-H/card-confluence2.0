@@ -53,3 +53,17 @@ t:creature or (t:artifact t:vehicle)
 ==>
 
 Program(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String))))
+
+# Complex Multi-Query
+
+@query latest_commander_cards
+-(game:mtga or game:mtgo)
+-banned:commander
+order:release
+direction:desc
+@query elves
+t:elf
+
+==>
+
+Program(Query(QueryName,QueryBody(Clause(Prefix,Tag(Argument,Operator,Value(String)),Or,Tag(Argument,Operator,Value(String))),Tag(Prefix,Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String)))))))

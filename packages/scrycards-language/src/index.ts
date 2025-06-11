@@ -11,7 +11,8 @@ import { styleTags, tags } from "@lezer/highlight";
 import { ScrycardsTooltips } from "./tooltip";
 import { completeScrycards } from "./autocomplete";
 import { scrycardsCatalogFacet, ICatalog, getEmptyCatalog } from "./catalog";
-import { astFromView, astToString } from "./utils/ast";
+import { queriesFromView, type Query } from "./utils/queries-from-view";
+import { tagFromView } from "./utils/tag-from-view";
 
 export const scrycardsLanguage = LRLanguage.define({
     parser: parser.configure({
@@ -58,4 +59,6 @@ export { completeScrycards, ScrycardsTooltips };
 
 export type { ICatalog };
 export { scrycardsCatalogFacet, getEmptyCatalog };
-export { astFromView, astToString };
+export { tagFromView };
+export { queriesFromView };
+export type { Query };

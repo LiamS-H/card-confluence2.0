@@ -1,4 +1,18 @@
-@top Program { expression }
+@top Program { expression | Query }
+
+
+Query { space "@query" space QueryName space? QueryBody}
+
+QueryBody{ queryBody }
+
+queryBody {
+  (statement Clause) |
+  (Clause) |
+  (statement Query) |
+  (Clause Query) |
+  (statement (space queryBody)?) |
+  (Clause space? queryBody)
+}
 
 expression {
   (statement ~id (space expression)?) |
@@ -7,7 +21,7 @@ expression {
   (Clause)
 }
 
-Clause { "(" space? expression ~id space? ")" }
+Clause { Prefix? "(" space? expression ~id space? ")" }
 
 statement { Tag ~tag | conjunction | (Prefix? (Argument | StringLiteral)) ~tag }
 
@@ -30,9 +44,9 @@ And { @specialize<Argument, "and"> }
     // Number { $[0-9]+ ("." $[0-9]+)? }
     @precedence { Prefix, StringLiteral, RegExp, String }
 
+    QueryName { ![\n]+ }
 
     Prefix { "!" | "-" }
-
 
     Argument { $[a-zA-Z]+ }
 
