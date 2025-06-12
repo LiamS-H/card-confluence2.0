@@ -61,12 +61,17 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         const settings_key = JSON.stringify(settings);
         const key = query + settings_key;
 
-        let resp: Response | undefined = strMappings.current.get(key);
-        if (resp) return resp;
         // todo, could check is ast is empty to see if should even query
         const ast_key = ast + settings_key;
-        resp = ast ? astMappings.current.get(ast_key) : undefined;
+        let resp: Response | undefined = ast
+            ? astMappings.current.get(ast_key)
+            : undefined;
         if (resp) return resp;
+        // todo, check first for match then calculate ast (for now with ast placeholder ast are always generated).
+        // when scryfall local client gets made we can generate an actual semantic tree from query (which will be more accurate but expensive).
+        resp = strMappings.current.get(key);
+        if (resp) return resp;
+
         const p = responsePromises.current.get(key);
         if (p) return p;
 
