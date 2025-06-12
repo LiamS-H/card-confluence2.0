@@ -12,10 +12,12 @@ export function CardList({
     query,
     ast,
     settings,
+    fastUpdate,
 }: {
     query: string;
     ast: string | undefined;
     settings?: SearchSettings;
+    fastUpdate: boolean;
 }) {
     const {
         search,
@@ -36,11 +38,15 @@ export function CardList({
 
     useDebounce(
         useCallback(() => {
-            if (!query) return;
+            if (!query || fastUpdate) return;
             search({ query, ast, settings: { ...settings, page: 1 } });
-        }, [search, query, ast, settings]),
+        }, [search, query, ast, settings, fastUpdate]),
         750
     );
+    useEffect(() => {
+        if (!query || !fastUpdate) return;
+        search({ query, ast, settings: { ...settings, page: 1 } });
+    }, [search, query, ast, settings, fastUpdate]);
 
     useEffect(() => {
         if (!containerRef.current) return;

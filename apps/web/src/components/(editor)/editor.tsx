@@ -47,7 +47,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [scryfallSettings, setScryfallSettings] = useState<SearchSettings>(
         {}
     );
-    const { activateQuery, onChange, activeQuery, ast, queryNodes } =
+    const { activateQuery, onChange, activeQuery, queryNodes, fastUpdate } =
         useQueryDoc();
 
     const extensions = useMemo(() => {
@@ -166,9 +166,10 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             <div className="h-9"></div>
             {activeQuery && (
                 <CardList
-                    query={activeQuery.body.text}
-                    ast={ast}
+                    query={activeQuery.text}
+                    ast={activeQuery.ast}
                     settings={scryfallSettings}
+                    fastUpdate={fastUpdate}
                 />
             )}
         </div>
