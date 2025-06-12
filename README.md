@@ -3,6 +3,12 @@
 Button to quickly Copy the command
 
 Jupiter notebook @query syntax to store multiple queries.
+ - Expressions before any of the @queries are global and apply to all queries
+
+Add argument information on highlighting over args.
+
+Add history to highlighted to card to enable back button
+
 Ai can add to queries or pull up a query based on name
 
 Ai prompting space can be toggled between query only | ai only | and mix (on mobile mixed is gone)
