@@ -323,6 +323,32 @@ export async function getCatalog(): Promise<ICatalog> {
         "vintage",
     ];
     catalog.games = ["paper", "mtgo", "mtga"];
+    catalog.orders = SearchOrders;
+    catalog.products = [
+        // Core types
+        "core",
+        "expansion",
+        "draftinnovation",
+        // Series of products
+        "masters",
+        "funny",
+        "commander",
+        "duel_deck",
+        "from_the_vault",
+        "spellbook",
+        "premium_deck",
+        // More specialized types
+        "alchemy",
+        "archenemy",
+        "masterpiece",
+        "memorabilia",
+        "planechase",
+        "promo",
+        "starter",
+        "token",
+        "treasure_chest",
+        "vanguard",
+    ];
 
     return catalog;
 }

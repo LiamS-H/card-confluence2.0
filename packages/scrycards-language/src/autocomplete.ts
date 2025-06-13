@@ -96,7 +96,11 @@ export const completeScrycards: CompletionSource = (context) => {
         if (isArgument(lower_arg)) {
             const node = nodeFromArg(lower_arg);
             const operators =
-                node.operator === "assert" ? ASSERT_OPERATORS : OPERATORS;
+                node.operator === "assign"
+                    ? [":"]
+                    : node.operator === "assert"
+                      ? ASSERT_OPERATORS
+                      : OPERATORS;
             result.options = result.options.concat(
                 operators.map(
                     (tag: string): Completion => ({
@@ -155,7 +159,11 @@ export const completeScrycards: CompletionSource = (context) => {
             };
             const node = nodeFromArg(lower_arg);
             const operators =
-                node.operator === "assert" ? ASSERT_OPERATORS : OPERATORS;
+                node.operator === "assign"
+                    ? [":"]
+                    : node.operator === "assert"
+                      ? ASSERT_OPERATORS
+                      : OPERATORS;
             result.options = result.options.concat(
                 operators.map(
                     (tag: string): Completion => ({
@@ -374,6 +382,31 @@ export const completeScrycards: CompletionSource = (context) => {
         case "game":
             result.options = catalog.games.map((g) => ({ label: g }));
             return result;
+        case "product":
+            result.options = catalog["products"].map((p) => ({
+                label: p,
+            }));
+            return result;
+        case "unique":
+            result.options = ["cards", "art", "prints"].map((u) => ({
+                label: u,
+            }));
+            return result;
+        case "order":
+            result.options = catalog["orders"].map((o) => ({
+                label: o,
+            }));
+            return result;
+        case "dir":
+            result.options = ["asc", "ascending", "desc", "descending"].map(
+                (d) => ({
+                    label: d,
+                })
+            );
+            return result;
+        case "uuid":
+            return null;
+
         default:
             return null;
     }

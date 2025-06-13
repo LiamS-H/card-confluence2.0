@@ -17,6 +17,9 @@ Add autocomplete when nothing is selected to select an argument
 
 Add command description to highlight
 
+Add linting
+ - fields like order can only appear on base level
+
 Add settings between search box and cards
  - scroll to top button
  - loading bar display on how many cards

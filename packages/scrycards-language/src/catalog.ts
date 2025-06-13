@@ -32,6 +32,8 @@ export interface ICatalog {
     otags: string[];
     atags: string[];
     sets: { code: string; name: string; released?: string }[];
+    orders: string[];
+    products: string[];
 }
 
 export function getEmptyCatalog(): ICatalog {
@@ -67,6 +69,8 @@ export function getEmptyCatalog(): ICatalog {
         otags: [],
         atags: [],
         sets: [],
+        orders: [],
+        products: [],
     };
 }
 
