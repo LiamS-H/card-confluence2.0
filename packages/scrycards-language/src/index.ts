@@ -10,13 +10,25 @@ import {
 import { styleTags, tags } from "@lezer/highlight";
 import { ScrycardsTooltips } from "./tooltip";
 import { completeScrycards } from "./autocomplete";
-import { scrycardsCatalogFacet, ICatalog, getEmptyCatalog } from "./catalog";
+import {
+    scrycardsCatalogFacet,
+    type ICatalog,
+    type IDetailedCatalogEntry,
+    getEmptyCatalog,
+} from "./catalog";
 import {
     queriesFromView,
     type Query,
     type Domain,
 } from "./utils/queries-from-view";
 import { tagFromView } from "./utils/tag-from-view";
+export {
+    argTypeFromString,
+    argTypeFromArg,
+    completionInfoFromArg,
+    detailFromArg,
+    isArgument,
+} from "./utils/completion";
 
 export const scrycardsLanguage = LRLanguage.define({
     parser: parser.configure({
@@ -61,7 +73,7 @@ export function scrycardsFromCatalog(value: ICatalog) {
 
 export { completeScrycards, ScrycardsTooltips };
 
-export type { ICatalog };
+export type { ICatalog, IDetailedCatalogEntry };
 export { scrycardsCatalogFacet, getEmptyCatalog };
 export { tagFromView };
 export { queriesFromView };

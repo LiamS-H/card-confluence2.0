@@ -14,6 +14,7 @@ import {
     argTypeFromArg,
     argTypeFromString,
     ARGUMENTS,
+    completionInfoFromArg,
     detailFromArg,
     isArgument,
     nodeFromArg,
@@ -190,6 +191,15 @@ export const completeScrycards: CompletionSource = (context) => {
     if (value.at(1) === "/" && value.at(-1) === "/") {
         return null;
     }
+
+    if (!isArgument(lower_arg)) {
+        return null;
+    }
+
+    const arg_type = argTypeFromArg(lower_arg);
+    const options = completionInfoFromArg(arg_type, catalog);
+    if (!options) return null;
+
     let val;
     let to: number;
     let from: number;
@@ -224,188 +234,30 @@ export const completeScrycards: CompletionSource = (context) => {
         };
     }
 
-    if (!isArgument(lower_arg)) {
-        return null;
-    }
-
-    const arg_type = argTypeFromArg(lower_arg);
-
     const result: CompletionResult = {
         from,
         to,
-        options: [],
+        options,
         commitCharacters,
     };
 
     switch (arg_type) {
-        case "number":
-            return null;
-        case "flavor":
-            result.options = catalog["flavor-words"].map((fw) => ({
-                label: fw,
-            }));
-            return result;
-        case "oracle":
-            // result.options = catalog["ability-words"].map((fw) => ({
-            //     label: fw,
-            // }));
-            // return result;
-            return null;
-        case "type":
-            result.options = completionFromTypes(catalog);
-            return result;
-
-        // if (!constraints) {
-        //     result.options = completionFromTypes(catalog);
-        //     return result;
-        // }
-
-        // constraints.required = constraints.required.filter(
-        //     (c) => argTypeFromString(c.argument) === "type"
-        // );
-
-        // const card_types = catalog["card-types"].map((t) =>
-        //     t.toLowerCase()
-        // );
-        // const required_types = constraints.required
-        //     .map((c) => c.value.toLowerCase())
-        //     .filter((v) => card_types.includes(v));
-        // if (required_types.length > 0) {
-        //     const catalog_type_names = required_types
-        //         .map((t) => {
-        //             switch (t) {
-        //                 case "creature":
-        //                 case "artifact":
-        //                 case "enchantment":
-        //                 case "land":
-        //                 case "planeswalker":
-        //                 case "battle":
-        //                     return (t + "-types") as TYPE_TAG_TYPE;
-        //                 default:
-        //                     return null;
-        //             }
-        //         })
-        //         .filter((n) => !!n);
-        //     catalog_type_names.unshift("card-types");
-        //     catalog_type_names.push("supertypes");
-        //     console.log(catalog_type_names);
-        //     result.options = completionFromTypes(
-        //         catalog,
-        //         catalog_type_names
-        //     );
-        //     return result;
-        // }
-
-        // result.options = completionFromTypes(catalog);
-        // return result;
-        case "set":
-            result.options = catalog.sets.map((set) => ({
-                label: set.code,
-                detail: set.name,
-                info: set.released,
-            }));
-            result.options = catalog.sets.map((set) => ({
-                label: set.name,
-                detail: set.code,
-                info: set.released,
-            }));
-            return result;
-        case "is":
-            result.options = catalog.criteria.map((crit) => ({
-                label: crit.toLowerCase().replace(" ", "-"),
-                displayLabel: crit,
-            }));
-            return result;
-        case "power":
-            result.options = catalog.powers.map((po) => ({ label: po }));
-            return result;
-        case "toughness":
-            result.options = catalog.powers.map((to) => ({ label: to }));
-            return result;
-        case "powtou":
-            return null;
-        case "loyalty":
-            result.options = catalog.loyalties.map((loy) => ({ label: loy }));
-            return result;
-        case "mana":
-            return null;
         case "name":
             result.commitCharacters = undefined;
-            result.options = catalog["card-names"].map((n) => ({
-                label: n,
-                apply,
-            }));
-            return result;
-        case "color":
-            return null;
+            result.options.forEach((n) => (n.apply = apply));
+            break;
         case "keyword":
-            result.options = catalog["keyword-abilities"].map((n) => ({
-                label: n,
-                apply,
-            }));
-            return result;
-        case "cmc":
-            return null;
-        case "rarity":
-            result.options = catalog.rarities.map((r) => ({ label: r }));
-            return result;
-        case "cube":
-            result.options = catalog.cubes.map((c) => ({ label: c }));
-            return result;
+            result.options.forEach((k) => (k.apply = apply));
+            break;
         case "format":
-            result.options = catalog.formats.map((f) => ({ label: f, apply }));
-            return result;
+            result.options.forEach((f) => (f.apply = apply));
+            break;
         case "artist":
-            result.options = catalog["artist-names"].map((a) => ({
-                label: a,
-                apply,
-            }));
-            return result;
-        case "watermark":
-            result.options = catalog["artist-names"].map((a) => ({ label: a }));
-            return result;
-        case "border":
-            return null;
-        case "frame":
-            return null;
-        case "stamp":
-            result.options = catalog.stamps.map((a) => ({ label: a }));
-            return result;
-        case "date":
-            return null;
-        case "atag":
-            result.options = catalog.atags.map((at) => ({ label: at }));
-            return result;
-        case "otag":
-            result.options = catalog.otags.map((ot) => ({ label: ot }));
-            return result;
-        case "game":
-            result.options = catalog.games.map((g) => ({ label: g }));
-            return result;
-        case "product":
-            result.options = catalog["products"].map((p) => ({
-                label: p,
-            }));
-            return result;
-        case "unique":
-            result.options = catalog["uniques"].map((u) => u);
-            return result;
-        case "order":
-            result.options = catalog["orders"].map((o) => o);
-            return result;
-        case "dir":
-            result.options = ["asc", "ascending", "desc", "descending"].map(
-                (d) => ({
-                    label: d,
-                })
-            );
-            return result;
-        case "uuid":
-            return null;
-
-        default:
-            return null;
+            result.options.forEach((a) => (a.apply = apply));
+            break;
     }
+
+    return result;
 
     // return {
     //     form: val_start,

@@ -1,3 +1,7 @@
+import { Completion } from "@codemirror/autocomplete";
+import { ICatalog } from "../catalog";
+import { completionFromTypes } from "./type-completion";
+
 // prettier-ignore
 export const ARGUMENTS = [ // (to keep this list somewhat organized)
     'oracle', 'o', 'fo', 'fulloracle',
@@ -68,10 +72,6 @@ export type ARG_TYPE =
     | "unique"
     | "order"
     | "dir";
-
-export function isArgument(string: string): string is Argument {
-    return (ARGUMENTS as unknown as string[]).includes(string);
-}
 
 export const ARG_TYPE_MAP: Record<Argument, ARG_TYPE> = {
     o: "oracle",
@@ -492,6 +492,104 @@ See m: for instruction on mana symbol formatting.`,
         info: `The unique parameter specifies if Scryfall should remove “duplicate” results in your query.\n\nDefault duplicates are hidden.`,
     },
 };
+
+export function completionInfoFromArg(
+    arg_type: ARG_TYPE,
+    catalog: ICatalog
+): Completion[] | null {
+    switch (arg_type) {
+        case "number":
+            return null;
+        case "flavor":
+            return catalog["flavor-words"].map((fw) => ({
+                label: fw,
+            }));
+        case "oracle":
+            return null;
+        case "type":
+            return completionFromTypes(catalog);
+
+        case "set":
+            return catalog.sets.map((set) => ({
+                label: set.code,
+                detail: set.name,
+                info: set.released,
+            }));
+        case "is":
+            return catalog.criteria.map((crit) => ({
+                label: crit.toLowerCase().replace(" ", "-"),
+                displayLabel: crit,
+            }));
+        case "power":
+            return catalog.powers.map((po) => ({ label: po }));
+        case "toughness":
+            return catalog.powers.map((to) => ({ label: to }));
+        case "powtou":
+            return null;
+        case "loyalty":
+            return catalog.loyalties.map((loy) => ({ label: loy }));
+        case "mana":
+            return null;
+        case "name":
+            return catalog["card-names"].map((n) => ({
+                label: n,
+            }));
+        case "color":
+            return null;
+        case "keyword":
+            return catalog["keyword-abilities"].map((n) => ({
+                label: n,
+            }));
+        case "cmc":
+            return null;
+        case "rarity":
+            return catalog.rarities.map((r) => ({ label: r }));
+        case "cube":
+            return catalog.cubes.map((c) => ({ label: c }));
+        case "format":
+            return catalog.formats.map((f) => ({ label: f }));
+        case "artist":
+            return catalog["artist-names"].map((a) => ({
+                label: a,
+            }));
+        case "watermark":
+            return null;
+        case "border":
+            return null;
+        case "frame":
+            return null;
+        case "stamp":
+            return catalog.stamps.map((a) => ({ label: a }));
+        case "date":
+            return null;
+        case "atag":
+            return catalog.atags.map((at) => ({ label: at }));
+        case "otag":
+            return catalog.otags.map((ot) => ({ label: ot }));
+        case "game":
+            return catalog.games.map((g) => ({ label: g }));
+        case "product":
+            return catalog["products"].map((p) => ({
+                label: p,
+            }));
+        case "unique":
+            return catalog["uniques"].map((u) => u);
+        case "order":
+            return catalog["orders"].map((o) => o);
+        case "dir":
+            return ["asc", "ascending", "desc", "descending"].map((d) => ({
+                label: d,
+            }));
+        case "uuid":
+            return null;
+        default:
+            return null;
+    }
+}
+
+export function isArgument(string: string): string is Argument {
+    return (ARGUMENTS as unknown as string[]).includes(string);
+}
 
 export function detailFromArg(arg: Argument): IDetailNode {
     return DETAIL_MAP[arg];
