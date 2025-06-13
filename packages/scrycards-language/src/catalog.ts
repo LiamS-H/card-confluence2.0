@@ -1,5 +1,11 @@
 import { Facet } from "@codemirror/state";
 
+export interface IDetailedCatalogEntry {
+    label: string;
+    detail?: string;
+    info?: string;
+}
+
 export interface ICatalog {
     "card-names": string[];
     "artist-names": string[];
@@ -32,7 +38,8 @@ export interface ICatalog {
     otags: string[];
     atags: string[];
     sets: { code: string; name: string; released?: string }[];
-    orders: string[];
+    orders: IDetailedCatalogEntry[];
+    uniques: IDetailedCatalogEntry[];
     products: string[];
 }
 
@@ -70,6 +77,7 @@ export function getEmptyCatalog(): ICatalog {
         atags: [],
         sets: [],
         orders: [],
+        uniques: [],
         products: [],
     };
 }

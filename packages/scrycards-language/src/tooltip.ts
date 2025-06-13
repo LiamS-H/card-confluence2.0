@@ -2,6 +2,7 @@ import { hoverTooltip } from "@codemirror/view";
 
 import { syntaxTree } from "@codemirror/language";
 import { tagFromView } from "./utils/tag-from-view";
+import { detailFromArg, isArgument, nodeFromArg } from "./utils/completion";
 
 export const ScrycardsTooltips = hoverTooltip((view, pos, side) => {
     const tag = tagFromView(view, pos + 1);
@@ -24,9 +25,17 @@ export const ScrycardsTooltips = hoverTooltip((view, pos, side) => {
         pos: tag.arg_start,
         above: true,
         create(view) {
-            let dom = document.createElement("div");
-            dom.textContent = `${tag.argument}${tag.operator}${tag.value}`;
-            return { dom };
+            let node = document.createElement("p");
+            node.style =
+                "white-space:pre-wrap; max-width:400px; max-height:800px; overflow-y:auto;";
+            const arg = tag.argument;
+            if (!isArgument(arg)) {
+                node.textContent = `"${arg}" not recognized.`;
+                return { dom: node };
+            }
+            const { info, detail } = detailFromArg(arg);
+            node.textContent = `${arg} - ${detail}\n${info}`;
+            return { dom: node };
         },
     };
 });

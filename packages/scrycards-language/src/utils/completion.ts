@@ -484,44 +484,12 @@ See m: for instruction on mana symbol formatting.`,
     dir: direction_Node,
     direction: direction_Node,
     order: {
-        detail: "Sorting Method",
-        info: `name - Sort cards by name, A → Z
-
-set - Sort cards by their set and collector number: AAA/#1 → ZZZ/#999
-
-released - Sort cards by their release date: Newest → Oldest
-
-rarity - Sort cards by their rarity: Common → Mythic
-
-color - Sort cards by their color and color identity: WUBRG → multicolor → colorless
-
-usd - Sort cards by their lowest known U.S. Dollar price: 0.01 → highest, null last
-
-tix - Sort cards by their lowest known TIX price: 0.01 → highest, null last
-
-eur - Sort cards by their lowest known Euro price: 0.01 → highest, null last
-
-cmc - Sort cards by their mana value: 0 → highest
-
-power - Sort cards by their power: null → highest
-
-toughness - Sort cards by their toughness: null → highest
-
-edhrec - Sort cards by their EDHREC ranking: lowest → highest
-
-penny - Sort cards by their Penny Dreadful ranking: lowest → highest
-
-artist - Sort cards by their front-side artist name: A → Z
-
-review - Sort cards how podcasts review sets, usually color & CMC, lowest → highest, with Booster Fun cards at the end`,
+        detail: "Sorting method",
+        info: `The order parameter determines how Scryfall should sort the returned cards.\n\nDefault alphabetical by name.`,
     },
     unique: {
         detail: "Duplicate handling",
-        info: `cards - Removes duplicate gameplay objects (cards that share a name and have the same functionality). For example, if your search matches more than one print of Pacifism, only one copy of Pacifism will be returned.
-
-art - Returns only one copy of each unique artwork for matching cards. For example, if your search matches more than one print of Pacifism, one card with each different illustration for Pacifism will be returned, but any cards that duplicate artwork already in the results will be omitted.
-
-prints - Returns all prints for all cards matched (disables rollup). For example, if your search matches more than one print of Pacifism, all matching prints will be returned.`,
+        info: `The unique parameter specifies if Scryfall should remove “duplicate” results in your query.\n\nDefault duplicates are hidden.`,
     },
 };
 

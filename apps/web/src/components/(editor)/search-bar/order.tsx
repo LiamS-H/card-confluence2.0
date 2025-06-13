@@ -53,21 +53,24 @@ export function Order({
                     }
                 >
                     <span className="text-highlight-foreground">
-                        computed - {computed_order}
+                        computed <i>{computed_order}</i>
                     </span>
                 </DropdownMenuItem>
                 {SearchOrders.map((o) => (
                     <DropdownMenuItem
-                        key={o}
-                        disabled={localOrder === o}
+                        key={o.label}
+                        disabled={localOrder === o.label}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
-                                order: o,
+                                order: o.label,
                             }))
                         }
                     >
-                        {o}
+                        {o.label}
+                        {o.detail && (
+                            <i className="text-muted-foreground">{o.detail}</i>
+                        )}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

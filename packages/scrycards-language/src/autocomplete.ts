@@ -388,14 +388,10 @@ export const completeScrycards: CompletionSource = (context) => {
             }));
             return result;
         case "unique":
-            result.options = ["cards", "art", "prints"].map((u) => ({
-                label: u,
-            }));
+            result.options = catalog["uniques"].map((u) => u);
             return result;
         case "order":
-            result.options = catalog["orders"].map((o) => ({
-                label: o,
-            }));
+            result.options = catalog["orders"].map((o) => o);
             return result;
         case "dir":
             result.options = ["asc", "ascending", "desc", "descending"].map(
@@ -416,6 +412,4 @@ export const completeScrycards: CompletionSource = (context) => {
     //     to: tag_end,
     //     options: [],
     // };
-
-    return null;
 };
