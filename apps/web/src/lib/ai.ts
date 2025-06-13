@@ -1,11 +1,8 @@
 "use server";
 import {
-    Behavior,
     ContentListUnion,
-    FeatureSelectionPreference,
-    FunctionCallingConfigMode,
+    // FunctionCallingConfigMode,
     FunctionDeclaration,
-    GenerateContentResponse,
     GoogleGenAI,
     Type,
 } from "@google/genai";
@@ -29,6 +26,22 @@ const getDoc: FunctionDeclaration = {
     name: "get_doc",
     description: "gets the user's current query document.",
 };
+const getTagInfo: FunctionDeclaration = {
+    name: "get_tag_info",
+    description: "get info on an tag",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            tag: {
+                type: Type.STRING,
+            },
+            text: {
+                type: Type.STRING,
+            },
+        },
+        required: ["tag"],
+    },
+};
 
 export async function queryAI(prompt: string, doc: string) {
     const contents: ContentListUnion = [
@@ -44,16 +57,16 @@ export async function queryAI(prompt: string, doc: string) {
             config: {
                 candidateCount: 1,
                 systemInstruction: `
-Your goal is to convert natural language to Scryfall queries.
+You convert natural language to Scryfall queries.
 Scryfall queries are a way to search MTG (Magic The Gathering) cards.
-Scryfall queries use a tag syntax [tag][oeprator][value].
-Tags can be grouped into clauses
+Scryfall queries use a tag syntax [tag][operator][value].
+Tags can be grouped into clauses with ()
 Arguments are Tags/Clauses
 Arguments can be merged with "and" or "or"
 "and" is not necessary because all adjacent arguments are implied to be joined with and
 Arguments can be negated with "-"
 Values can be provided directly like 't:creature'
-Value can be provided as string literals like t:"creature"
+Values can be provided as string literals like t:"creature"
 
 Assertive tag types: (suitable with ":" or "=" operator)
     - game: "paper" | "mtgo" | "mtga"
@@ -95,7 +108,6 @@ Use function calls to set_doc to write the query instead of wriing directly.`,
         if (!response.functionCalls || !response.candidates) {
             return null;
         }
-        response;
         const candidate = response.candidates[0];
         if (!candidate?.content) {
             return null;
