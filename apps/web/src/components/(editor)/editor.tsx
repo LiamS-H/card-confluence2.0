@@ -18,40 +18,25 @@ import { useLightDark } from "@/components/(theme)/use-theme";
 import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
 import { CardList } from "./card-list";
 import { Button } from "@/components/(ui)/button";
-import { SearchOrders, SearchSettings } from "@/lib/scryfall";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-    DropdownMenuItem,
-} from "../(ui)/dropdown-menu";
-import { AIPrompter } from "./ai-prompter";
-import { Copy, Search, Sparkles, SquareCode, TextSearch } from "lucide-react";
-import { SimpleToolTip } from "../(ui)/tooltip";
-import { useQueryDoc } from "@/hooks/useQueryDoc";
 
-const INITIAL = `
-@query latest_commander_cards
--(game:mtga or game:mtgo)
--banned:commander
-order:release
-direction:desc
-@query elves
-t:elf
-`;
+import { AIPrompter } from "./ai-prompter";
+import { Copy, Search, TextSearch } from "lucide-react";
+import { useQueryDoc } from "@/hooks/useQueryDoc";
+import { SearchBar } from "./search-bar";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
-    const [doc, setDoc] = useState(INITIAL);
     const [aiOpen, setAiOpen] = useState(false);
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
-    const [scryfallSettings, setScryfallSettings] = useState<SearchSettings>(
-        {}
-    );
+
     const {
+        doc,
+        scryfallSettings,
+        setScryfallSettings,
         activateQuery,
         onChange,
-        activeQuery,
-        domain,
+        query,
+        computedSettings,
+        ast,
         queryNodes,
         fastUpdate,
     } = useQueryDoc();
@@ -66,8 +51,6 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     }, [catalog]);
 
     const theme = useLightDark();
-
-    const query = `${domain?.text ?? ""} ${activeQuery?.text ?? ""}`;
 
     return (
         <div className="flex flex-col gap-2">
@@ -134,49 +117,22 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         )}
                     </ReactCodeEditor>
                     <div className={aiOpen ? "flex-grow" : "hidden"}>
-                        <AIPrompter doc={doc} setDoc={setDoc} />
+                        <AIPrompter doc={doc} setDoc={() => {}} />
                     </div>
                 </div>
-                <div className="absolute top-full p-2 flex items-center gap-2">
-                    <SimpleToolTip text={aiOpen ? "Editor Only" : "Open GenAI"}>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setAiOpen((o) => !o)}
-                        >
-                            {aiOpen ? <SquareCode /> : <Sparkles />}
-                        </Button>
-                    </SimpleToolTip>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button size="default">
-                                Order: {scryfallSettings.order ?? "select"}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {SearchOrders.map((o) => (
-                                <DropdownMenuItem
-                                    key={o}
-                                    disabled={scryfallSettings.order === o}
-                                    onClick={() =>
-                                        setScryfallSettings((s) => ({
-                                            ...s,
-                                            order: o,
-                                        }))
-                                    }
-                                >
-                                    {o}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+                <SearchBar
+                    aiOpen={aiOpen}
+                    setAiOpen={setAiOpen}
+                    scryfallSettings={scryfallSettings}
+                    setScryfallSettings={setScryfallSettings}
+                    computedSettings={computedSettings}
+                />
             </ScrollHidden>
             <div className="h-9"></div>
-            {activeQuery && (
+            {query && (
                 <CardList
                     query={query}
-                    ast={activeQuery.ast}
+                    ast={ast}
                     settings={scryfallSettings}
                     fastUpdate={fastUpdate}
                 />

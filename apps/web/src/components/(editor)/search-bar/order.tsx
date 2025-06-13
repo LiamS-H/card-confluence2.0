@@ -1,0 +1,75 @@
+import { Button } from "@/components/(ui)/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+    DropdownMenuItem,
+} from "../../(ui)/dropdown-menu";
+import { SearchOrders, SearchSettings } from "@/lib/scryfall";
+import { useEffect, useState } from "react";
+
+export function Order({
+    scryfallSettings,
+    computedSettings,
+    setScryfallSettings,
+}: {
+    scryfallSettings: SearchSettings;
+    computedSettings?: SearchSettings;
+    setScryfallSettings: (s: (s: SearchSettings) => SearchSettings) => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const [localOrder, setLocalOrder] = useState(scryfallSettings.order);
+
+    useEffect(() => {
+        if (open) setLocalOrder(scryfallSettings.order);
+    }, [open, scryfallSettings]);
+    return (
+        <DropdownMenu onOpenChange={setOpen}>
+            <DropdownMenuTrigger asChild>
+                {localOrder ? (
+                    <Button className="relative">
+                        Order: {localOrder ?? "select"}
+                    </Button>
+                ) : (
+                    <Button variant={"highlight"}>
+                        Order: {computedSettings?.order ?? "none"}
+                    </Button>
+                )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem
+                    disabled={localOrder === undefined}
+                    // className={
+                    //     scryfallSettings.order === undefined
+                    //         ? undefined
+                    //         : " hover:bg-highlight/50"
+                    // }
+                    onClick={() =>
+                        setScryfallSettings((s) => ({
+                            ...s,
+                            order: undefined,
+                        }))
+                    }
+                >
+                    <span className="text-highlight-foreground">
+                        computed - {computedSettings?.order ?? "none"}
+                    </span>
+                </DropdownMenuItem>
+                {SearchOrders.map((o) => (
+                    <DropdownMenuItem
+                        key={o}
+                        disabled={localOrder === o}
+                        onClick={() =>
+                            setScryfallSettings((s) => ({
+                                ...s,
+                                order: o,
+                            }))
+                        }
+                    >
+                        {o}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
