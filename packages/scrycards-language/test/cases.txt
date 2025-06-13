@@ -4,7 +4,7 @@ Test
 
 ==>
 
-Program(Argument)
+Program(Domain(Argument))
 
 # Name Literal Only
 
@@ -12,7 +12,7 @@ Program(Argument)
 
 ==>
 
-Program(StringLiteral)
+Program(Domain(StringLiteral))
 
 # Tag Only
 
@@ -20,7 +20,7 @@ Program(StringLiteral)
 
 ==>
 
-Program(Tag(Prefix,Argument,Operator,Value(String)))
+Program(Domain(Tag(Prefix,Argument,Operator,Value(String))))
 
 # String Tag
 
@@ -28,7 +28,7 @@ test:"long test"
 
 ==>
 
-Program(Tag(Argument,Operator,Value(StringLiteral)))
+Program(Domain(Tag(Argument,Operator,Value(StringLiteral))))
 
 # Order Tag
 
@@ -36,7 +36,7 @@ order:cmc
 
 ==>
 
-Program(Tag(Argument,Operator,Value(String)))
+Program(Domain(Tag(Argument,Operator,Value(String))))
 
 # Compound Query
 
@@ -44,7 +44,7 @@ t:creature or t:artifact
 
 ==>
 
-Program(Tag(Argument, Operator, Value(String)), Or, Tag(Argument, Operator, Value(String)))
+Program(Domain(Tag(Argument, Operator, Value(String)), Or, Tag(Argument, Operator, Value(String))))
 
 # Complex Compound Query
 
@@ -52,7 +52,7 @@ t:creature or (t:artifact t:vehicle)
 
 ==>
 
-Program(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String))))
+Program(Domain(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)))))
 
 # Complex Multi-Query
 
@@ -61,9 +61,21 @@ Program(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Val
 -banned:commander
 order:release
 direction:desc
+
 @query elves
 t:elf
 
 ==>
 
 Program(Query(QueryName,QueryBody(Clause(Prefix,Tag(Argument,Operator,Value(String)),Or,Tag(Argument,Operator,Value(String))),Tag(Prefix,Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String)))))))
+
+# Multi-Query With Domain
+
+t:test
+
+@query test
+t:test
+
+==>
+
+Program(Domain(Tag(Argument,Operator,Value(String)),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String))))))

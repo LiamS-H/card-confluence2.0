@@ -11,7 +11,11 @@ import { styleTags, tags } from "@lezer/highlight";
 import { ScrycardsTooltips } from "./tooltip";
 import { completeScrycards } from "./autocomplete";
 import { scrycardsCatalogFacet, ICatalog, getEmptyCatalog } from "./catalog";
-import { queriesFromView, type Query } from "./utils/queries-from-view";
+import {
+    queriesFromView,
+    type Query,
+    type Domain,
+} from "./utils/queries-from-view";
 import { tagFromView } from "./utils/tag-from-view";
 
 export const scrycardsLanguage = LRLanguage.define({
@@ -27,14 +31,14 @@ export const scrycardsLanguage = LRLanguage.define({
                 Prefix: tags.logicOperator,
                 And: tags.keyword,
                 Or: tags.keyword,
+                Query: tags.keyword,
+                QueryName: tags.labelName,
                 Argument: tags.variableName,
-                // Name: t.variableName,
                 Number: tags.number,
                 String: tags.string,
                 Operator: tags.operator,
                 StringLiteral: tags.string,
                 RegExp: tags.regexp,
-                // Boolean: t.bool,
             }),
         ],
     }),
@@ -61,4 +65,4 @@ export type { ICatalog };
 export { scrycardsCatalogFacet, getEmptyCatalog };
 export { tagFromView };
 export { queriesFromView };
-export type { Query };
+export type { Query, Domain };

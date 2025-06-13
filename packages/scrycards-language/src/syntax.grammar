@@ -1,7 +1,8 @@
-@top Program { expression | Query }
+@top Program { (space? Domain) | Query }
 
+Domain { queryBody }
 
-Query { space "@query" space QueryName space? QueryBody}
+Query { space? "@query" space QueryName space? QueryBody}
 
 QueryBody{ queryBody }
 

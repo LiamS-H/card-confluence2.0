@@ -1,7 +1,7 @@
 "use client";
 import ReactCodeEditor, {
-    Transaction,
-    type ReactCodeMirrorProps,
+    // Transaction,
+    // type ReactCodeMirrorProps,
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { keymap } from "@codemirror/view";
@@ -10,7 +10,7 @@ import {
     // indentWithTab
 } from "@codemirror/commands";
 import { acceptCompletion } from "@codemirror/autocomplete";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import "react-scrycards/dist/index.css";
 import { scrycardsFromCatalog, type ICatalog } from "codemirror-lang-scrycards";
@@ -47,8 +47,14 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [scryfallSettings, setScryfallSettings] = useState<SearchSettings>(
         {}
     );
-    const { activateQuery, onChange, activeQuery, queryNodes, fastUpdate } =
-        useQueryDoc();
+    const {
+        activateQuery,
+        onChange,
+        activeQuery,
+        domain,
+        queryNodes,
+        fastUpdate,
+    } = useQueryDoc();
 
     const extensions = useMemo(() => {
         return [
@@ -60,6 +66,9 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     }, [catalog]);
 
     const theme = useLightDark();
+
+    const query = `${domain?.text ?? ""} ${activeQuery?.text ?? ""}`;
+
     return (
         <div className="flex flex-col gap-2">
             <ScrollHidden>
@@ -166,7 +175,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             <div className="h-9"></div>
             {activeQuery && (
                 <CardList
-                    query={activeQuery.text}
+                    query={query}
                     ast={activeQuery.ast}
                     settings={scryfallSettings}
                     fastUpdate={fastUpdate}

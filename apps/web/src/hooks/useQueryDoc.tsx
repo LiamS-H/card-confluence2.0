@@ -1,8 +1,11 @@
 import { ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { queriesFromView, type Query } from "codemirror-lang-scrycards";
-import { SearchSettings } from "@/lib/scryfall";
+import {
+    queriesFromView,
+    type Query,
+    type Domain,
+} from "codemirror-lang-scrycards";
 
 export function useQueryDoc() {
     const [queryNodes, setQueryNodes] = useState<
@@ -16,6 +19,7 @@ export function useQueryDoc() {
     >([]);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [fastUpdate, setFastUpdate] = useState(false);
+    const [domain, setDomain] = useState<Domain | null>(null);
     const queriesRef = useRef<Query[]>([]);
     const queryNamesRef = useRef<string[]>([]);
     const activeQueryNameRef = useRef<{ n: string; i: number }>({
@@ -57,36 +61,26 @@ export function useQueryDoc() {
 
             const old_query_name = activeQueryNameRef.current.n;
 
-            const queries = queriesFromView(viewUpdate.view);
+            const { queries, domain } = queriesFromView(viewUpdate.view);
 
-            if (!Array.isArray(queries)) {
-                const query = {
-                    name: {
-                        text: "[unnamed]",
-                        to: 0,
-                        from: 0,
-                    },
-                    body: queries.body,
-                };
-                setActiveIndex(0);
-                setFastUpdate(false);
-                activeQueryNameRef.current = {
-                    n: "[unnamed]",
-                    i: 0,
-                };
-                queriesRef.current = [query];
-                setQueryNodes([]);
-                return;
-            }
+            setDomain(domain);
 
             queriesRef.current = queries;
 
             const query_nodes = queries.map((q) => {
                 const { node, offset } = viewUpdate.view.domAtPos(q.name.to);
-                const ast = q.body.text.replace(/\s/g, "");
+                // TODO: placeholder for get-ast function
+                const ast = (domain?.text ?? "" + " " + q.body.text).replace(
+                    /\s/g,
+                    ""
+                );
                 return { node, offset, query: q, active: false, ast };
             });
+
             setQueryNodes(query_nodes);
+            if (query_nodes.length === 0) {
+                return;
+            }
 
             const new_query_names = queries.map(
                 (q) => q.name.text || "[unnamed]"
@@ -130,12 +124,7 @@ export function useQueryDoc() {
     }));
 
     let activeQuery = null;
-    if (queryNodes.length === 0 && queriesRef.current[0]) {
-        activeQuery = {
-            text: queriesRef.current[0].body.text,
-            ast: queriesRef.current[0].body.text.replace(/\s/g, ""),
-        };
-    } else if (
+    if (
         activeIndex !== null &&
         updated_query_nodes[activeIndex] !== undefined
     ) {
@@ -153,6 +142,7 @@ export function useQueryDoc() {
         onChange,
         activateQuery,
         queryNodes: updated_query_nodes,
+        domain,
         activeQuery,
         fastUpdate,
     };

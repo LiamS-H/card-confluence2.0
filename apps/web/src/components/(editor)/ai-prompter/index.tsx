@@ -22,9 +22,9 @@ export function AIPrompter({
                     return;
                 }
                 const resp = await queryAI(prompt, doc);
-                console.log("[gemini]", resp);
                 if (!resp) return;
                 const { func, text } = resp;
+                console.log(`[gemini] "${text}"`, resp);
                 if (!func.args) return;
                 if (func.name === "set_doc") {
                     setDoc((func.args as { text: string }).text);

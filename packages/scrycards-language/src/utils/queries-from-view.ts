@@ -14,23 +14,37 @@ export interface Query {
     };
 }
 
-export function queriesFromView(
-    view: EditorView
-): Query[] | { name: null; body: Query["body"] } {
+export type Domain = Query["body"];
+
+export function queriesFromView(view: EditorView): {
+    domain: Domain | null;
+    queries: Query[];
+} {
+    let domain: Domain | null = null;
     const cursor = syntaxTree(view.state).cursor();
     cursor.firstChild();
-    if (cursor.name !== "Query") {
-        cursor.parent();
+    if (cursor.name === "Domain") {
         const from = cursor.from;
-        const to = cursor.to;
-        return {
-            name: null,
-            body: {
-                text: view.state.sliceDoc(from, to),
+        cursor.lastChild();
+
+        if ((cursor.name as string) === "Query") {
+            cursor.prevSibling();
+            domain = {
+                text: view.state.sliceDoc(from, cursor.to),
                 from,
-                to,
-            },
-        };
+                to: cursor.to,
+            };
+            cursor.nextSibling();
+        } else {
+            return {
+                queries: [],
+                domain: {
+                    from,
+                    to: cursor.to,
+                    text: view.state.sliceDoc(from, cursor.to),
+                },
+            };
+        }
     }
 
     const queries: Query[] = [];
@@ -61,5 +75,8 @@ export function queriesFromView(
         if (!cursor.nextSibling()) break;
     }
 
-    return queries;
+    return {
+        domain,
+        queries,
+    };
 }
