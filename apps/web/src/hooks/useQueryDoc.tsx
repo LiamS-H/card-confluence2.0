@@ -1,4 +1,4 @@
-import { ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import { EditorView, ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { useCallback, useRef, useState } from "react";
 
 import {
@@ -43,11 +43,44 @@ export function useQueryDoc() {
 
     const [doc, setDoc] = useState(INITIAL);
 
-    const changeDomain = useCallback((new_domain: string) => {
-        setDoc(
-            `${new_domain}\n${queriesRef.current.map((q) => `\n@query ${q.name.text}\n${q.body.text}`)}\n`
-        );
-    }, []);
+    const updateDocAt = useCallback(
+        (from: number, to: number, text: string) => {
+            setDoc((doc) => doc.substring(0, from) + text + doc.substring(to));
+        },
+        []
+    );
+
+    const changeDocDomain = useCallback(
+        (new_domain: string) => {
+            if (currentDomain) {
+                updateDocAt(currentDomain.from, currentDomain.to, new_domain);
+            } else {
+                // setDoc(
+                //     `${new_domain}\n${queriesRef.current.map((q) => `\n@query ${q.name.text}\n${q.body.text}`)}\n`
+                // );
+                setDoc((doc) => `${new_domain}\n${doc}`);
+            }
+        },
+        [updateDocAt, currentDomain]
+    );
+
+    const addDocQuery = useCallback(
+        ({ name, body }: { name: string; body: string }) => {
+            setDoc((doc) => doc + `\n@query ${name}\n${body}\n`);
+        },
+        []
+    );
+
+    const setDocQuery = useCallback(
+        ({ name, body }: { name: string; body: string }) => {
+            if (!queriesRef.current || !activeIndex) return;
+            const q = queriesRef.current[activeIndex];
+            if (!q) return;
+            updateDocAt(q.name.from, q.name.to, name);
+            updateDocAt(q.body.from, q.body.to, body);
+        },
+        [updateDocAt, activeIndex]
+    );
 
     const activateQuery = useCallback((index: number | null, fast = true) => {
         setFastUpdate(fast);
@@ -70,8 +103,8 @@ export function useQueryDoc() {
         activeQueryNameRef.current = { n: name, i: count };
     }, []);
 
-    const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
-        (value, viewUpdate) => {
+    const updateQueries = useCallback(
+        (view: EditorView) => {
             // todo: only update queries that had lines within them change.
             // console.log(
             //     "from completion:",
@@ -79,18 +112,17 @@ export function useQueryDoc() {
             //         Transaction.userEvent
             //     ) === "input.complete"
             // );
-            setDoc(value);
 
             const old_query_name = activeQueryNameRef.current.n;
 
-            const { queries, domain } = queriesFromView(viewUpdate.view);
+            const { queries, domain } = queriesFromView(view);
 
             setDomain(domain);
 
             queriesRef.current = queries;
 
             const query_nodes = queries.map((q) => {
-                const { node, offset } = viewUpdate.view.domAtPos(q.name.to);
+                const { node, offset } = view.domAtPos(q.name.to);
                 // TODO: placeholder for get-ast function
                 const ast = ((domain?.text ?? "") + " " + q.body.text).replace(
                     /\s/g,
@@ -141,6 +173,23 @@ export function useQueryDoc() {
         [activateQuery]
     );
 
+    const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
+        (value, viewUpdate) => {
+            setDoc(value);
+            updateQueries(viewUpdate.view);
+        },
+        [updateQueries]
+    );
+    const onCreateEditor = useCallback<
+        NonNullable<ReactCodeMirrorProps["onCreateEditor"]>
+    >(
+        (view) => {
+            // (view,state ) => {
+            updateQueries(view);
+        },
+        [updateQueries]
+    );
+
     const updated_query_nodes = queryNodes.map((q) => {
         // TODO: use SearchCache context to test if query has been solved already
 
@@ -181,9 +230,12 @@ export function useQueryDoc() {
     return {
         doc,
         onChange,
+        onCreateEditor,
         activateQuery,
         queryNodes: updated_query_nodes,
-        changeDomain,
+        changeDocDomain,
+        addDocQuery,
+        setDocQuery,
         domain: currentDomain?.text,
         query: activeQuery?.full_query,
         ast: activeQuery?.ast,

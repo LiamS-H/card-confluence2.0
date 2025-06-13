@@ -34,6 +34,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         setScryfallSettings,
         activateQuery,
         onChange,
+        onCreateEditor,
         query,
         computedSettings,
         ast,
@@ -63,9 +64,10 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         value={doc}
                         theme={theme === "dark" ? "dark" : "light"}
                         onChange={onChange}
+                        onCreateEditor={onCreateEditor}
                     >
                         {queryNodes.map(
-                            ({ node, offset, active, query }, i) => {
+                            ({ node, offset, active, full_query }, i) => {
                                 if (!(node instanceof Text)) return null;
                                 const range = document.createRange();
                                 range.setStart(node, offset);
@@ -105,7 +107,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                                             variant="outline"
                                             onClick={() => {
                                                 navigator.clipboard.writeText(
-                                                    query.body.text
+                                                    full_query
                                                 );
                                             }}
                                         >

@@ -19,6 +19,7 @@ export function Order({
 }) {
     const [open, setOpen] = useState(false);
     const [localOrder, setLocalOrder] = useState(scryfallSettings.order);
+    const computed_order = computedSettings?.order ?? "none";
 
     useEffect(() => {
         if (open) setLocalOrder(scryfallSettings.order);
@@ -32,7 +33,7 @@ export function Order({
                     </Button>
                 ) : (
                     <Button variant={"highlight"}>
-                        Order: {computedSettings?.order ?? "none"}
+                        Order: {computed_order}
                     </Button>
                 )}
             </DropdownMenuTrigger>
@@ -52,7 +53,7 @@ export function Order({
                     }
                 >
                     <span className="text-highlight-foreground">
-                        computed - {computedSettings?.order ?? "none"}
+                        computed - {computed_order}
                     </span>
                 </DropdownMenuItem>
                 {SearchOrders.map((o) => (
