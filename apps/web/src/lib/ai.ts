@@ -6,29 +6,40 @@ import {
     GoogleGenAI,
     Type,
 } from "@google/genai";
+import {
+    argTypeFromArg,
+    completionInfoFromArg,
+    detailFromArg,
+    ICatalog,
+    isArgument,
+} from "codemirror-lang-scrycards";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const setDoc: FunctionDeclaration = {
-    name: "set_doc",
-    description: "sets the user's current query document.",
+const add_query: FunctionDeclaration = {
+    name: "add_query",
+    description: "add's a query to the document.",
     parameters: {
         type: Type.OBJECT,
         properties: {
-            text: {
+            name: {
+                type: Type.STRING,
+            },
+            body: {
                 type: Type.STRING,
             },
         },
-        required: ["text"],
+        required: ["name", "body"],
     },
 };
-const getDoc: FunctionDeclaration = {
-    name: "get_doc",
-    description: "gets the user's current query document.",
-};
-const getTagInfo: FunctionDeclaration = {
+// const getDoc: FunctionDeclaration = {
+//     name: "get_doc",
+//     description: "gets the user's current query document.",
+// };
+const get_tag_info: FunctionDeclaration = {
     name: "get_tag_info",
-    description: "get info on an tag",
+    description:
+        "get info on an tag, and 10 of its potential values, optionally provide text to search values.",
     parameters: {
         type: Type.OBJECT,
         properties: {
@@ -37,20 +48,21 @@ const getTagInfo: FunctionDeclaration = {
             },
             text: {
                 type: Type.STRING,
+                description: "",
             },
         },
         required: ["tag"],
     },
 };
 
-export async function queryAI(prompt: string, doc: string) {
+export async function queryAI(prompt: string, catalog: ICatalog, doc: string) {
     const contents: ContentListUnion = [
         {
             role: "user",
             parts: [{ text: prompt }],
         },
     ];
-    do {
+    while (true) {
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: contents,
@@ -75,14 +87,20 @@ Assertive tag types: (suitable with ":" or "=" operator)
     - oracle: MTG card rules text, ~ can be used to represent generically the name of the card, also searchable with RegExp like o://
     - set: MTG card set or set code
     - kw: Keywords "flying" | "reach" etc
+    - otag: open source function tags
+    - atag: open source art tags
+    - is: limited hard coded card attributes "is:commander" | "is:firstprinting" etc
 Numerical (suitable with numerical operator ">" "<=" etc)
     - id: Color identity "rgu" | "temur" etc
     - mana: mana used to cast the spell "2b" | "{g}{g/r}"
     - cmc: converted mana costs
 
+Tips:
+when dealing with the function of a card try using the get_tag_info function to make searches into otag: and is:
+
 Output:
 Avoid explanations.
-Use function calls to set_doc to write the query instead of wriing directly.`,
+Use function calls to add_query to write the query instead of wriing directly.`,
                 // tags to be added with the search function
                 // - is:
                 // - otag:
@@ -98,12 +116,16 @@ Use function calls to set_doc to write the query instead of wriing directly.`,
                 // },
                 tools: [
                     {
-                        functionDeclarations: [setDoc, getDoc],
+                        functionDeclarations: [
+                            add_query,
+                            // getDoc,
+                            get_tag_info,
+                        ],
                     },
                 ],
             },
         });
-        console.log(response);
+        console.log("[gemini]", response);
 
         if (!response.functionCalls || !response.candidates) {
             return null;
@@ -116,23 +138,74 @@ Use function calls to set_doc to write the query instead of wriing directly.`,
 
         for (const func of response.functionCalls) {
             switch (func.name) {
-                case "set_doc":
-                    return {
-                        text: response.text,
-                        func,
+                case "get_tag_info":
+                    console.log(func.args);
+                    if (!func.args) break;
+                    const { tag, text } = func.args as {
+                        tag: string;
+                        text?: string;
                     };
-                case "get_doc":
+                    if (!tag) continue;
+                    if (!isArgument(tag)) {
+                        contents.push({
+                            role: "user",
+                            parts: [
+                                {
+                                    functionResponse: {
+                                        name: "get_tag_info",
+                                        response: {
+                                            errorr: "tag not recognized.",
+                                        },
+                                    },
+                                },
+                            ],
+                        });
+                        continue;
+                    }
+                    let suggestions = completionInfoFromArg(
+                        argTypeFromArg(tag),
+                        catalog
+                    )?.slice(0, 10);
+                    if (text && suggestions) {
+                        suggestions = suggestions.filter(
+                            (s) =>
+                                text.startsWith(s.label) ||
+                                s.label.startsWith(text)
+                        );
+                    }
+
                     contents.push({
                         role: "user",
                         parts: [
                             {
                                 functionResponse: {
-                                    name: "get_document",
-                                    response: { text: doc },
+                                    name: "get_tag_info",
+                                    response: {
+                                        tagInfo: detailFromArg(tag),
+                                        values: suggestions,
+                                    },
                                 },
                             },
                         ],
                     });
+                    continue;
+                case "add_query":
+                    return {
+                        text: response.text,
+                        func,
+                    };
+                // case "get_doc":
+                //     contents.push({
+                //         role: "user",
+                //         parts: [
+                //             {
+                //                 functionResponse: {
+                //                     name: "get_document",
+                //                     response: { text: doc },
+                //                 },
+                //             },
+                //         ],
+                //     });
                 case "get_card":
                 // scryfall query for getting card
                 case "get_tag":
@@ -143,5 +216,5 @@ Use function calls to set_doc to write the query instead of wriing directly.`,
                     return null;
             }
         }
-    } while (true);
+    }
 }

@@ -1,15 +1,20 @@
 import { Button } from "@/components/(ui)/button";
 import { Textarea } from "@/components/(ui)/textarea";
 import { queryAI } from "@/lib/ai";
+import { ICatalog } from "codemirror-lang-scrycards";
 import { SendHorizonal } from "lucide-react";
 import { useState } from "react";
 
 export function AIPrompter({
     doc,
     setDoc,
+    addQuery,
+    catalog,
 }: {
     doc: string;
     setDoc: (doc: string) => void;
+    addQuery: (props: { name: string; body: string }) => void;
+    catalog: ICatalog;
 }) {
     const [prompt, setPrompt] = useState("");
     const disabled = prompt === "";
@@ -21,13 +26,17 @@ export function AIPrompter({
                 if (!prompt) {
                     return;
                 }
-                const resp = await queryAI(prompt, doc);
+                const resp = await queryAI(prompt, catalog, doc);
                 if (!resp) return;
                 const { func, text } = resp;
-                console.log(`[gemini] "${text}"`, resp);
+                console.log(`[gemini] "${text ?? ""}"`, resp);
                 if (!func.args) return;
-                if (func.name === "set_doc") {
-                    setDoc((func.args as { text: string }).text);
+                if (func.name === "add_query") {
+                    if (!func.args) {
+                        console.error("no args provided to add_query");
+                        return;
+                    }
+                    addQuery(func.args as { name: string; body: string });
                 }
             }}
         >

@@ -1,4 +1,8 @@
-import { EditorView, ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import {
+    EditorView,
+    ReactCodeMirrorProps,
+    Transaction,
+} from "@uiw/react-codemirror";
 import { useCallback, useRef, useState } from "react";
 
 import {
@@ -41,6 +45,27 @@ export function useQueryDoc() {
         i: 0,
     });
 
+    const activateQuery = useCallback((index: number | null, fast = true) => {
+        setFastUpdate(fast);
+        if (index === null) {
+            setActiveIndex(null);
+            return;
+        }
+        const query = queriesRef.current[index];
+        if (!query) {
+            throw Error("Invalid Query Index");
+        }
+        const name = query.name.text;
+        let count = 0;
+        for (let i = 0; i < index; i++) {
+            if (queriesRef.current[i]?.name.text === name) {
+                count++;
+            }
+        }
+        setActiveIndex(index);
+        activeQueryNameRef.current = { n: name, i: count };
+    }, []);
+
     const [doc, setDoc] = useState(INITIAL);
 
     const updateDocAt = useCallback(
@@ -66,9 +91,10 @@ export function useQueryDoc() {
 
     const addDocQuery = useCallback(
         ({ name, body }: { name: string; body: string }) => {
+            setActiveIndex(queriesRef.current.length);
             setDoc((doc) => doc + `\n@query ${name}\n${body}\n`);
         },
-        []
+        [activateQuery]
     );
 
     const setDocQuery = useCallback(
@@ -81,27 +107,6 @@ export function useQueryDoc() {
         },
         [updateDocAt, activeIndex]
     );
-
-    const activateQuery = useCallback((index: number | null, fast = true) => {
-        setFastUpdate(fast);
-        if (index === null) {
-            setActiveIndex(null);
-            return;
-        }
-        const query = queriesRef.current[index];
-        if (!query) {
-            throw Error("Invalid Query Index");
-        }
-        const name = query.name.text;
-        let count = 0;
-        for (let i = 0; i < index; i++) {
-            if (queriesRef.current[i]?.name.text === name) {
-                count++;
-            }
-        }
-        setActiveIndex(index);
-        activeQueryNameRef.current = { n: name, i: count };
-    }, []);
 
     const updateQueries = useCallback(
         (view: EditorView) => {
@@ -173,19 +178,20 @@ export function useQueryDoc() {
         [activateQuery]
     );
 
-    const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
-        (value, viewUpdate) => {
-            setDoc(value);
-            updateQueries(viewUpdate.view);
-        },
-        [updateQueries]
-    );
     const onCreateEditor = useCallback<
         NonNullable<ReactCodeMirrorProps["onCreateEditor"]>
     >(
         (view) => {
             // (view,state ) => {
             updateQueries(view);
+        },
+        [updateQueries]
+    );
+
+    const onUpdate = useCallback<NonNullable<ReactCodeMirrorProps["onUpdate"]>>(
+        (viewUpdate) => {
+            if (!viewUpdate.transactions[0]?.docChanged) return;
+            updateQueries(viewUpdate.view);
         },
         [updateQueries]
     );
@@ -229,8 +235,8 @@ export function useQueryDoc() {
 
     return {
         doc,
-        onChange,
         onCreateEditor,
+        onUpdate,
         activateQuery,
         queryNodes: updated_query_nodes,
         changeDocDomain,

@@ -33,13 +33,15 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         scryfallSettings,
         setScryfallSettings,
         activateQuery,
-        onChange,
         onCreateEditor,
+        onUpdate,
         query,
         computedSettings,
         ast,
         queryNodes,
         fastUpdate,
+        addDocQuery,
+        changeDocDomain,
     } = useQueryDoc();
 
     const extensions = useMemo(() => {
@@ -63,8 +65,8 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         extensions={extensions}
                         value={doc}
                         theme={theme === "dark" ? "dark" : "light"}
-                        onChange={onChange}
                         onCreateEditor={onCreateEditor}
+                        onUpdate={onUpdate}
                     >
                         {queryNodes.map(
                             ({ node, offset, active, full_query }, i) => {
@@ -119,7 +121,12 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         )}
                     </ReactCodeEditor>
                     <div className={aiOpen ? "flex-grow" : "hidden"}>
-                        <AIPrompter doc={doc} setDoc={() => {}} />
+                        <AIPrompter
+                            catalog={catalog}
+                            doc={doc}
+                            setDoc={() => {}}
+                            addQuery={addDocQuery}
+                        />
                     </div>
                 </div>
                 <SearchBar
