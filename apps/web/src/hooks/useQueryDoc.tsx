@@ -91,7 +91,6 @@ export function useQueryDoc() {
 
     const addDocQuery = useCallback(
         ({ name, body }: { name: string; body: string }) => {
-            setActiveIndex(queriesRef.current.length);
             setDoc((doc) => doc + `\n@query ${name}\n${body}\n`);
         },
         [activateQuery]
@@ -157,6 +156,17 @@ export function useQueryDoc() {
                 return;
             }
 
+            if (old_query_names.length + 1 === new_query_names.length) {
+                const old_query_names_set = new Set(old_query_names);
+                for (let i = 0; i < new_query_names.length; i++) {
+                    const new_query = new_query_names[i];
+                    // @ts-ignore
+                    if (old_query_names_set.has(new_query)) continue;
+                    activateQuery(i);
+                    return;
+                }
+            }
+
             if (!new_query_names_set.has(old_query_name)) {
                 activateQuery(null);
                 return;
@@ -198,7 +208,6 @@ export function useQueryDoc() {
 
     const updated_query_nodes = queryNodes.map((q) => {
         // TODO: use SearchCache context to test if query has been solved already
-
         const domain = currentDomain?.text ?? "";
         const query = q?.query.body.text ?? "";
         let full_query: string = `${domain} ${query}`;
