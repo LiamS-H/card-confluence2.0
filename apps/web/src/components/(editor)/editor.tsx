@@ -120,7 +120,9 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             }
                         )}
                     </ReactCodeEditor>
-                    <div className={aiOpen ? "flex-grow" : "hidden"}>
+                    <div
+                        className={aiOpen ? "flex-grow lg:max-w-1/2" : "hidden"}
+                    >
                         <AIPrompter
                             catalog={catalog}
                             doc={doc}
