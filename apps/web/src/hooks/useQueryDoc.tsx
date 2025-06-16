@@ -1,7 +1,6 @@
 import {
     EditorView,
     ReactCodeMirrorProps,
-    Transaction,
     // Transaction,
 } from "@uiw/react-codemirror";
 import { useCallback, useRef, useState } from "react";
