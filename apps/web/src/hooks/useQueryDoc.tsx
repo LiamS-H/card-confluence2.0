@@ -13,7 +13,8 @@ import {
 import { SearchSettings } from "@/lib/scryfall";
 
 const INITIAL = `
-@query latest_commander_cards
+order:cmc
+@query latest cards
 -(game:mtga or game:mtgo)
 -banned:commander
 order:released

@@ -23,6 +23,7 @@ import { AIPrompter } from "./ai-prompter";
 import { Copy, Search, TextSearch } from "lucide-react";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "./search-bar";
+import { SimpleToolTip } from "../(ui)/tooltip";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [aiOpen, setAiOpen] = useState(false);
@@ -44,7 +45,6 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         addDocQuery,
         // changeDocDomain,
     } = useQueryDoc();
-    console.log("query", query);
 
     const extensions = useMemo(() => {
         return [
@@ -89,36 +89,44 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                                             left: rect.x + rect.width,
                                         }}
                                     >
-                                        <Button
-                                            variant={
-                                                active ? "default" : "outline"
-                                            }
-                                            className="w-0.5 h-0.5"
-                                            onClick={
-                                                active
-                                                    ? () => {
-                                                          activateQuery(null);
-                                                      }
-                                                    : () => activateQuery(i)
-                                            }
-                                        >
-                                            {active ? (
-                                                <TextSearch />
-                                            ) : (
-                                                <Search />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            className="w-0.5 h-0.5"
-                                            variant="outline"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(
-                                                    full_query
-                                                );
-                                            }}
-                                        >
-                                            <Copy />
-                                        </Button>
+                                        <SimpleToolTip text="Activate query">
+                                            <Button
+                                                variant={
+                                                    active
+                                                        ? "default"
+                                                        : "outline"
+                                                }
+                                                className="w-0.5 h-0.5"
+                                                onClick={
+                                                    active
+                                                        ? () => {
+                                                              activateQuery(
+                                                                  null
+                                                              );
+                                                          }
+                                                        : () => activateQuery(i)
+                                                }
+                                            >
+                                                {active ? (
+                                                    <TextSearch />
+                                                ) : (
+                                                    <Search />
+                                                )}
+                                            </Button>
+                                        </SimpleToolTip>
+                                        <SimpleToolTip text="Copy">
+                                            <Button
+                                                className="w-0.5 h-0.5"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        full_query
+                                                    );
+                                                }}
+                                            >
+                                                <Copy />
+                                            </Button>
+                                        </SimpleToolTip>
                                     </div>
                                 );
                             }
