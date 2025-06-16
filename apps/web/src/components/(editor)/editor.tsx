@@ -4,7 +4,7 @@ import ReactCodeEditor, {
     // type ReactCodeMirrorProps,
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
-import { keymap } from "@codemirror/view";
+import { EditorView, keymap } from "@codemirror/view";
 import {
     defaultKeymap,
     // indentWithTab
@@ -35,13 +35,14 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         activateQuery,
         onCreateEditor,
         onUpdate,
+        onChange,
         query,
         computedSettings,
         ast,
         queryNodes,
         fastUpdate,
         addDocQuery,
-        changeDocDomain,
+        // changeDocDomain,
     } = useQueryDoc();
 
     const extensions = useMemo(() => {
@@ -50,6 +51,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             keymap.of([{ key: "Tab", run: acceptCompletion }]),
             // keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
             scrycardsFromCatalog(catalog),
+            EditorView.lineWrapping,
         ];
     }, [catalog]);
 
@@ -60,13 +62,14 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             <ScrollHidden>
                 <div className="flex flex-col lg:flex-row relative">
                     <ReactCodeEditor
-                        className={`flex-grow text-sm font-[monospace] ${aiOpen && "hidden lg:block"}`}
+                        className={`flex-grow text-sm font-[monospace] ${aiOpen && "hidden lg:block lg:w-1/2"}`}
                         ref={editorRef}
                         extensions={extensions}
                         value={doc}
                         theme={theme === "dark" ? "dark" : "light"}
                         onCreateEditor={onCreateEditor}
                         onUpdate={onUpdate}
+                        onChange={onChange}
                     >
                         {queryNodes.map(
                             ({ node, offset, active, full_query }, i) => {
@@ -120,9 +123,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             }
                         )}
                     </ReactCodeEditor>
-                    <div
-                        className={aiOpen ? "flex-grow lg:max-w-1/2" : "hidden"}
-                    >
+                    <div className={aiOpen ? "w-1/2" : "hidden"}>
                         <AIPrompter
                             catalog={catalog}
                             doc={doc}

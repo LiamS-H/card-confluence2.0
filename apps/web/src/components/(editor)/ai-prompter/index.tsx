@@ -6,8 +6,8 @@ import { SendHorizonal } from "lucide-react";
 import { useState } from "react";
 
 export function AIPrompter({
-    doc,
-    setDoc,
+    // doc,
+    // setDoc,
     addQuery,
     catalog,
 }: {
@@ -26,9 +26,17 @@ export function AIPrompter({
                 if (!prompt) {
                     return;
                 }
-                const resp = await queryAI(prompt, catalog, doc);
-                if (!resp) return;
+                const resp = await queryAI(prompt, catalog);
+                if (!resp) {
+                    console.error("[gemini] query failed");
+                    return;
+                }
                 const { func, text } = resp;
+
+                if (!func || Array.isArray(func)) {
+                    console.error("[gemini]", resp);
+                    return;
+                }
                 console.log(`[gemini] "${text ?? ""}"`, resp);
                 if (!func.args) return;
                 if (func.name === "add_query") {
@@ -40,7 +48,7 @@ export function AIPrompter({
                 }
             }}
         >
-            <div className="pl-2 pr-13 flex flex-col items-center gap-2">
+            <div className="pl-2 pr-13 flex flex-col items-center gap-2 bg-background">
                 <div className="w-full relative">
                     <Textarea
                         placeholder="Ask GenAI"

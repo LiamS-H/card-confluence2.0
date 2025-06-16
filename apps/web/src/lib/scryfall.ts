@@ -6,7 +6,7 @@ import {
 } from "@scryfall/api-types";
 import { parse } from "node-html-parser";
 
-async function fetchWithHeaders(url: URL) {
+export async function fetchWithHeaders(url: URL) {
     return fetch(url, {
         headers: {
             "User-Agent": "card-confluence/0.0",
@@ -114,7 +114,8 @@ export interface SearchSettings {
 
 export async function fetchSearch(
     query: string,
-    settings?: SearchSettings
+    settings?: SearchSettings,
+    fetch_func?: typeof fetchWithHeaders
 ): Promise<ScryfallList.Cards | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/search");
     const params = settings ? { q: query } : { q: query };
@@ -130,7 +131,7 @@ export async function fetchSearch(
     }
 
     url.search = search.toString();
-    const response = await fetch(url); // we don't use headers since we are inside browser
+    const response = await (fetch_func ? fetch_func(url) : fetch(url));
     const card_list: ScryfallList.Cards = await response.json();
     return card_list;
 }

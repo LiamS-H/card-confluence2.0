@@ -1,7 +1,7 @@
 import {
     EditorView,
     ReactCodeMirrorProps,
-    Transaction,
+    // Transaction,
 } from "@uiw/react-codemirror";
 import { useCallback, useRef, useState } from "react";
 
@@ -93,7 +93,7 @@ export function useQueryDoc() {
         ({ name, body }: { name: string; body: string }) => {
             setDoc((doc) => doc + `\n@query ${name}\n${body}\n`);
         },
-        [activateQuery]
+        []
     );
 
     const setDocQuery = useCallback(
@@ -160,7 +160,7 @@ export function useQueryDoc() {
                 const old_query_names_set = new Set(old_query_names);
                 for (let i = 0; i < new_query_names.length; i++) {
                     const new_query = new_query_names[i];
-                    // @ts-ignore
+                    // @ts-expect-error because i from from iterating the length the [i] is safe
                     if (old_query_names_set.has(new_query)) continue;
                     activateQuery(i);
                     return;
@@ -205,6 +205,12 @@ export function useQueryDoc() {
         },
         [updateQueries]
     );
+    const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
+        (value) => {
+            setDoc(value);
+        },
+        []
+    );
 
     const updated_query_nodes = queryNodes.map((q) => {
         // TODO: use SearchCache context to test if query has been solved already
@@ -246,6 +252,7 @@ export function useQueryDoc() {
         doc,
         onCreateEditor,
         onUpdate,
+        onChange,
         activateQuery,
         queryNodes: updated_query_nodes,
         changeDocDomain,

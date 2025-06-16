@@ -9,6 +9,8 @@ Add argument information on highlighting over args.
 
 Add history to highlighted to card to enable back button
 
+Ai chats are connected to individual queries and can be cycled between
+
 Ai can add to queries or pull up a query based on name
 
 Ai prompting space can be toggled between query only | ai only | and mix (on mobile mixed is gone)
