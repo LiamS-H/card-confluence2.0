@@ -1,6 +1,7 @@
 import {
     EditorView,
     ReactCodeMirrorProps,
+    Transaction,
     // Transaction,
 } from "@uiw/react-codemirror";
 import { useCallback, useRef, useState } from "react";
@@ -201,7 +202,11 @@ export function useQueryDoc() {
 
     const onUpdate = useCallback<NonNullable<ReactCodeMirrorProps["onUpdate"]>>(
         (viewUpdate) => {
-            if (!viewUpdate.transactions[0]?.docChanged) return;
+            if (
+                !viewUpdate.transactions[0]?.docChanged &&
+                !viewUpdate.heightChanged
+            )
+                return;
             updateQueries(viewUpdate.view);
         },
         [updateQueries]

@@ -63,7 +63,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
             <ScrollHidden>
                 <div className="flex flex-col lg:flex-row relative">
                     <ReactCodeEditor
-                        className={`flex-grow text-sm font-[monospace] ${aiOpen && "hidden lg:block lg:w-1/2"}`}
+                        className={`flex-grow text-sm font-[monospace] ${aiOpen && "absolute opacity-0 pointer-events-none lg:pointer-events-auto lg:static lg:opacity-100 lg:w-1/2"}`}
                         ref={editorRef}
                         extensions={extensions}
                         value={doc}
@@ -132,7 +132,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             }
                         )}
                     </ReactCodeEditor>
-                    <div className={aiOpen ? "w-1/2" : "hidden"}>
+                    <div className={aiOpen ? "lg:w-1/2" : "hidden"}>
                         <AIPrompter
                             catalog={catalog}
                             doc={doc}
