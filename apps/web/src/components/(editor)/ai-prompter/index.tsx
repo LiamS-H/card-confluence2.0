@@ -2,7 +2,7 @@ import { Button } from "@/components/(ui)/button";
 import { Textarea } from "@/components/(ui)/textarea";
 import { queryAI } from "@/lib/ai";
 import { ICatalog } from "codemirror-lang-scrycards";
-import { SendHorizonal } from "lucide-react";
+import { LoaderCircle, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 
 export function AIPrompter({
@@ -17,7 +17,9 @@ export function AIPrompter({
     catalog: ICatalog;
 }) {
     const [prompt, setPrompt] = useState("");
-    const disabled = prompt === "";
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<null | string>(null);
+    const disabled = prompt === "" || loading;
 
     return (
         <form
@@ -26,26 +28,33 @@ export function AIPrompter({
                 if (!prompt) {
                     return;
                 }
+                setLoading(true);
+                setError(null);
                 const resp = await queryAI(prompt, catalog);
+                setLoading(false);
                 if (!resp) {
-                    console.error("[gemini] query failed");
+                    setError("[gemini] request failed.");
                     return;
                 }
                 const { func, text } = resp;
 
                 if (!func || Array.isArray(func)) {
                     console.error("[gemini]", resp);
+                    setError("[gemini] didn't call add_query.");
                     return;
                 }
                 console.log(`[gemini] "${text ?? ""}"`, resp);
                 if (!func.args) return;
-                if (func.name === "add_query") {
-                    if (!func.args) {
-                        console.error("no args provided to add_query");
-                        return;
-                    }
-                    addQuery(func.args as { name: string; body: string });
+                if (func.name !== "add_query") {
+                    return;
                 }
+                if (!func.args) {
+                    console.error("[gemini] no args provided to add_query");
+                    setError("[gemini] no args provided to add_query");
+                    return;
+                }
+                setPrompt("");
+                addQuery(func.args as { name: string; body: string });
             }}
         >
             <div className="pl-2 pr-13 flex flex-col items-center gap-2 bg-background">
@@ -63,9 +72,14 @@ export function AIPrompter({
                         disabled={disabled}
                         type="submit"
                     >
-                        <SendHorizonal />
+                        {loading ? (
+                            <LoaderCircle className="animate-spin" />
+                        ) : (
+                            <SendHorizonal />
+                        )}
                     </Button>
                 </div>
+                {error && <p>{error}</p>}
             </div>
         </form>
     );
