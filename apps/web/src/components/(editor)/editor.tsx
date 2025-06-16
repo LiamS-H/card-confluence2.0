@@ -44,6 +44,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         addDocQuery,
         // changeDocDomain,
     } = useQueryDoc();
+    console.log("query", query);
 
     const extensions = useMemo(() => {
         return [

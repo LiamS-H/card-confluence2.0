@@ -246,6 +246,10 @@ export function useQueryDoc() {
     ) {
         updated_query_nodes[activeIndex].active = true;
         activeQuery = updated_query_nodes[activeIndex];
+    } else if (updated_query_nodes.length === 0) {
+        activeQuery = {
+            full_query: currentDomain?.text ?? "",
+        };
     }
 
     return {
