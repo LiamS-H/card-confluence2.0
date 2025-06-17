@@ -1,35 +1,40 @@
 # Plan
 
-Button to quickly Copy the command
+[X] Button to quickly Copy the query
 
-Jupiter notebook @query syntax to store multiple queries.
+[X] Jupiter notebook @query syntax to store multiple queries.
  - Expressions before any of the @queries are global and apply to all queries
 
-Add argument information on highlighting over args.
+[X] Add argument information on highlighting over args.
 
-Add history to highlighted to card to enable back button
+[ ] Add history to highlighted card modal to enable back button
 
-Ai chats are connected to individual queries and can be cycled between
+[ ] Save query pages
 
-Ai can add to queries or pull up a query based on name
+AI
+    [ ] chats are connected to individual queries and can be cycled between
 
-Ai prompting space can be toggled between query only | ai only | and mix (on mobile mixed is gone)
+    [ ] can add to queries or pull up a query based on name
 
-Add autocomplete when nothing is selected to select an argument
+    [X] prompting space can be toggled between query only | ai
 
-Add command description to highlight
+[ ] Add autocomplete when nothing is selected to select an argument
 
-Add linting
- - fields like order can only appear on base level
+Linting
+    [ ] fields like order can only appear on base level
+    [ ] certain arguments like t: will only accept from their own
 
 Add settings between search box and cards
- - scroll to top button
- - loading bar display on how many cards
- - adjustable card sizes
- - potentially order and display setting dropdowns
+    [ ] scroll to top button
+    [ ] loading bar display on how many cards
+    [ ] adjustable card sizes
+    [ ] potentially order and display setting dropdowns
 
+Add editor settings
+    [ ] Disable tooltips (good for mobile or if you already know everything)
 
-is:e-t-b has a space so it fucks up autocomplete
+Bugs
+    [ ] is:e-t-b has a space so it fucks up autocomplete
 
 Add docs
   Argument explanation
