@@ -34,7 +34,7 @@ Add editor settings
     [ ] Disable tooltips (good for mobile or if you already know everything)
 
 Bugs
-    [ ] is:e-t-b has a space so it fucks up autocomplete
+    [X] is:e-t-b has a space so it fucks up autocomplete
 
 Add docs
   Argument explanation

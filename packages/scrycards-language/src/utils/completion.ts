@@ -517,7 +517,7 @@ export function completionInfoFromArg(
             }));
         case "is":
             return catalog.criteria.map((crit) => ({
-                label: crit.toLowerCase().replace(" ", "-"),
+                label: crit.toLowerCase().replace(/ /g, "-"),
                 displayLabel: crit,
             }));
         case "power":
