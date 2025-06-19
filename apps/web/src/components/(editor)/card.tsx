@@ -16,8 +16,7 @@ export function Card({ id }: { id: string }) {
             }}
             className="overflow-clip"
         >
-            <Scrycard animated card={card} size="lg" />
-            {/* <Scrycard animated card={card} size="sm" width="200px" /> */}
+            <Scrycard animated card={card} size="md" width="200px" />
         </button>
     );
 }

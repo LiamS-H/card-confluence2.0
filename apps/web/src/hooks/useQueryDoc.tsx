@@ -3,7 +3,7 @@ import {
     ReactCodeMirrorProps,
     // Transaction,
 } from "@uiw/react-codemirror";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
     queriesFromView,
@@ -11,6 +11,7 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { SearchSettings } from "@/lib/scryfall";
+import { computeSettings, computeSettingsAndQuery } from "@/lib/scrycards";
 
 const INITIAL = `
 order:cmc
@@ -217,45 +218,42 @@ export function useQueryDoc() {
         []
     );
 
-    const updated_query_nodes = queryNodes.map((q) => {
-        // TODO: use SearchCache context to test if query has been solved already
-        const domain = currentDomain?.text ?? "";
-        const query = q?.query.body.text ?? "";
-        let full_query: string = `${domain} ${query}`;
-        const computed_settings: SearchSettings = {};
-        // TODO: make generic for all settings, loop over settings to extract application of settings
-        const reg = /[^a-zA-Z]?order:([a-zA-Z]*)/;
-        const setting_in_domain = (domain.match(reg) ?? []).at(1);
-        const setting_in_query = (query.match(reg) ?? []).at(1);
-        computed_settings.order =
-            setting_in_query ?? setting_in_domain ?? undefined;
-        if (setting_in_domain && setting_in_query && !scryfallSettings.order) {
-            full_query = `${domain.replace(reg, "")} ${query}`;
-        }
+    const { updated_query_nodes, activeQuery } = useMemo(() => {
+        const updated_query_nodes = queryNodes.map((q) => {
+            // TODO: use SearchCache context to test if query has been solved already
+            const domain = currentDomain?.text ?? "";
+            const query = q?.query.body.text ?? "";
+            const { computed_settings, full_query } = computeSettingsAndQuery(
+                domain,
+                query,
+                scryfallSettings
+            );
 
-        if (scryfallSettings.order && (setting_in_domain || setting_in_query)) {
-            full_query = full_query.replace(/[^a-zA-Z]?order:[a-zA-Z]+/g, "");
-        }
-        return {
-            ...q,
-            computed_settings,
-            full_query,
-            active: false,
-        };
-    });
-    let activeQuery = null;
+            return {
+                ...q,
+                computed_settings,
+                full_query,
+                active: false,
+            };
+        });
+        let activeQuery = null;
 
-    if (
-        activeIndex !== null &&
-        updated_query_nodes[activeIndex] !== undefined
-    ) {
-        updated_query_nodes[activeIndex].active = true;
-        activeQuery = updated_query_nodes[activeIndex];
-    } else if (updated_query_nodes.length === 0) {
-        activeQuery = {
-            full_query: currentDomain?.text ?? "",
-        };
-    }
+        if (
+            activeIndex !== null &&
+            updated_query_nodes[activeIndex] !== undefined
+        ) {
+            updated_query_nodes[activeIndex].active = true;
+            activeQuery = updated_query_nodes[activeIndex];
+        } else if (updated_query_nodes.length === 0) {
+            const full_query = currentDomain?.text ?? "";
+            activeQuery = {
+                full_query,
+                ast: undefined,
+                computed_settings: computeSettings(full_query),
+            };
+        }
+        return { updated_query_nodes, activeQuery };
+    }, [activeIndex, currentDomain?.text, queryNodes, scryfallSettings]);
 
     return {
         doc,
