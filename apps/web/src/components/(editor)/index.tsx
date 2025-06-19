@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 
-import "react-scrycards/dist/index.css";
 import { type ICatalog } from "codemirror-lang-scrycards";
 import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
-import { CardList } from "./card-list";
+import { CardList } from "@/components/(editor)/card-list";
 
-import { AIPrompter } from "./ai-prompter";
+import { AIPrompter } from "@/components/(editor)/ai-prompter";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
-import { SearchBar } from "./search-bar";
-import { Editor } from "./editor";
+import { SearchBar } from "@/components/(editor)/search-bar";
+import { Editor } from "@/components/(editor)/editor";
 import { useCardListSearch } from "@/components/(editor)/card-list/useSearch";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
@@ -34,7 +33,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     } = useQueryDoc();
 
     const searchObj = useCardListSearch({ query, ast, settings, fastUpdate });
-    const { gridLayout } = searchObj;
+    const { gridLayout, totalCards } = searchObj;
 
     return (
         <div className="flex flex-col gap-2">
@@ -60,6 +59,12 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                     </div>
                 </div>
                 <SearchBar
+                    progress={
+                        gridLayout
+                            ? (gridLayout.curRow * gridLayout.columns) /
+                              totalCards
+                            : null
+                    }
                     aiOpen={aiOpen}
                     setAiOpen={setAiOpen}
                     scryfallSettings={settings}
@@ -67,7 +72,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                     computedSettings={computedSettings}
                 />
             </ScrollHidden>
-            <div className="h-9"></div>
+            <div className="h-12"></div>
             <CardList search={searchObj} />
         </div>
     );

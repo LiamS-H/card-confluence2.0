@@ -26,9 +26,9 @@ Linting
 
 Add settings between search box and cards
     [ ] scroll to top button - and scroll to top when a new query is searched
-    [ ] loading bar display on how many cards
+    [X] loading bar display on how many cards
     [ ] adjustable card sizes
-    [ ] potentially order and display setting dropdowns
+    [X] potentially order and display setting dropdowns
 
 Add editor settings
     [ ] Disable tooltips (good for mobile or if you already know everything)

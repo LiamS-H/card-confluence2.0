@@ -257,6 +257,7 @@ export function useCardListSearch({
             totalHeight,
             visibleItems,
             startRow,
+            curRow: lastVisibleRow,
             endRow,
         };
     }, [containerWidth, allData, scrollTop, viewportHeight, containerRef]);
