@@ -25,7 +25,7 @@ Linting
     [ ] certain arguments like t: will only accept from their own
 
 Add settings between search box and cards
-    [ ] scroll to top button
+    [ ] scroll to top button - and scroll to top when a new query is searched
     [ ] loading bar display on how many cards
     [ ] adjustable card sizes
     [ ] potentially order and display setting dropdowns

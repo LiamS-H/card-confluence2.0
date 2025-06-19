@@ -11,13 +11,14 @@ import { AIPrompter } from "./ai-prompter";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "./search-bar";
 import { Editor } from "./editor";
+import { useCardListSearch } from "@/components/(editor)/card-list/useSearch";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [aiOpen, setAiOpen] = useState(false);
 
     const {
         doc,
-        scryfallSettings,
+        scryfallSettings: settings,
         setScryfallSettings,
         activateQuery,
         onCreateEditor,
@@ -31,6 +32,9 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         addDocQuery,
         // changeDocDomain,
     } = useQueryDoc();
+
+    const searchObj = useCardListSearch({ query, ast, settings, fastUpdate });
+    const { gridLayout } = searchObj;
 
     return (
         <div className="flex flex-col gap-2">
@@ -58,20 +62,13 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                 <SearchBar
                     aiOpen={aiOpen}
                     setAiOpen={setAiOpen}
-                    scryfallSettings={scryfallSettings}
+                    scryfallSettings={settings}
                     setScryfallSettings={setScryfallSettings}
                     computedSettings={computedSettings}
                 />
             </ScrollHidden>
             <div className="h-9"></div>
-            {query && (
-                <CardList
-                    query={query}
-                    ast={ast}
-                    settings={scryfallSettings}
-                    fastUpdate={fastUpdate}
-                />
-            )}
+            <CardList search={searchObj} />
         </div>
     );
 }
