@@ -36,6 +36,7 @@ Add editor settings
 
 Bugs
     [X] is:e-t-b has a space so it fucks up autocomplete
+    [ ] query reactivates after doc change
 
 Add docs
   Argument explanation

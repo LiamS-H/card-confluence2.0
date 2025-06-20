@@ -5,11 +5,11 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
-import { SearchOrders, ISearchSettings } from "@/lib/scryfall";
+import { SearchUniques, ISearchSettings } from "@/lib/scryfall";
 import { useEffect, useState } from "react";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 
-export function Order({
+export function Unique({
     scryfallSettings,
     computedSettings,
     setScryfallSettings,
@@ -19,30 +19,30 @@ export function Order({
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
 }) {
     const [open, setOpen] = useState(false);
-    const [localOrder, setLocalOrder] = useState(scryfallSettings.order);
-    const computed_order = computedSettings?.order ?? "name";
+    const [localUnique, setLocalUnique] = useState(scryfallSettings.unique);
+    const computed_unique = computedSettings?.unique ?? "cards";
 
     useEffect(() => {
-        if (open) setLocalOrder(scryfallSettings.order);
+        if (open) setLocalUnique(scryfallSettings.unique);
     }, [open, scryfallSettings]);
     return (
         <DropdownMenu onOpenChange={setOpen}>
-            <SimpleToolTip text="Change order">
+            <SimpleToolTip text="Change unique">
                 <DropdownMenuTrigger asChild>
-                    {localOrder ? (
+                    {localUnique ? (
                         <Button className="relative">
-                            Order: {localOrder ?? "select"}
+                            Unique: {localUnique ?? "select"}
                         </Button>
                     ) : (
                         <Button variant={"highlight"}>
-                            Order: {computed_order}
+                            Unique: {computed_unique}
                         </Button>
                     )}
                 </DropdownMenuTrigger>
             </SimpleToolTip>
             <DropdownMenuContent>
                 <DropdownMenuItem
-                    disabled={localOrder === undefined}
+                    disabled={localUnique === undefined}
                     // className={
                     //     scryfallSettings.order === undefined
                     //         ? undefined
@@ -56,24 +56,21 @@ export function Order({
                     }
                 >
                     <span className="text-highlight-foreground">
-                        computed <i>{computed_order}</i>
+                        computed <i>{computed_unique}</i>
                     </span>
                 </DropdownMenuItem>
-                {SearchOrders.map((o) => (
+                {SearchUniques.map((o) => (
                     <DropdownMenuItem
                         key={o.label}
-                        disabled={localOrder === o.label}
+                        disabled={localUnique === o.label}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
-                                order: o.label,
+                                unique: o.label,
                             }))
                         }
                     >
                         {o.label}
-                        {o.detail && (
-                            <i className="text-muted-foreground">{o.detail}</i>
-                        )}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

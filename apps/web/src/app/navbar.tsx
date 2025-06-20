@@ -53,7 +53,7 @@ export function NavBar() {
     const [hidden, setHidden] = useState(false);
     return (
         <nav className="fixed z-40 top-0 right-0">
-            <ul className="p-2 flex md:flex-row flex-col items-center gap-4">
+            <ul className="p-4 flex md:flex-row flex-col items-center gap-4">
                 {hidden ? (
                     <li>
                         <Button

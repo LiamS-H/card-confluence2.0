@@ -6,6 +6,7 @@ import { ArrowUpToLine, Sparkles, SquareCode } from "lucide-react";
 import { Order } from "./order";
 import { Progress } from "@/components/(ui)/progress";
 import { Direction } from "./direction";
+import { Unique } from "./unique";
 
 export function SearchBar({
     aiOpen,
@@ -29,7 +30,7 @@ export function SearchBar({
             ) : (
                 <div className="h-2" />
             )}
-            <div className="flex items-center gap-2 p-2">
+            <div className="flex justify-start items-center gap-2 p-2 w-full">
                 <SimpleToolTip text={aiOpen ? "Editor Only" : "Open GenAI"}>
                     <Button
                         variant="outline"
@@ -45,6 +46,11 @@ export function SearchBar({
                     computedSettings={computedSettings}
                 />
                 <Direction
+                    scryfallSettings={scryfallSettings}
+                    setScryfallSettings={setScryfallSettings}
+                    computedSettings={computedSettings}
+                />
+                <Unique
                     scryfallSettings={scryfallSettings}
                     setScryfallSettings={setScryfallSettings}
                     computedSettings={computedSettings}

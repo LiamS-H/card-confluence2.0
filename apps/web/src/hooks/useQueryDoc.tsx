@@ -237,21 +237,27 @@ export function useQueryDoc() {
 
     const { updated_query_nodes, activeQuery } = useMemo(() => {
         const updated_query_nodes = queryNodes.map((q) => ({ ...q }));
-        let activeQuery = null;
-
         if (
             activeIndex !== null &&
             updated_query_nodes[activeIndex] !== undefined
         ) {
             updated_query_nodes[activeIndex].active = true;
-            activeQuery = updated_query_nodes[activeIndex];
-        } else if (updated_query_nodes.length === 0) {
-            activeQuery = {
+            const activeQuery = updated_query_nodes[activeIndex];
+            return { updated_query_nodes, activeQuery };
+        }
+        if (updated_query_nodes.length === 0) {
+            const activeQuery = {
                 ast: undefined,
                 noSettings: currentDomain?.noSettingText,
                 computed_settings: currentDomain?.settings,
             };
+            return { updated_query_nodes, activeQuery };
         }
+        const activeQuery = {
+            ast: undefined,
+            noSettings: undefined,
+            computed_settings: currentDomain?.settings,
+        };
         return { updated_query_nodes, activeQuery };
     }, [activeIndex, queryNodes]);
 

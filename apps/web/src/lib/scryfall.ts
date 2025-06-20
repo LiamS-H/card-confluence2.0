@@ -99,18 +99,18 @@ export const SearchOrders = [
 
 export const SearchUniques = [
     {
-        unique: "cards",
+        label: "cards",
         info: "Removes duplicate gameplay objects (cards that share a name and have the same functionality). For example, if your search matches more than one print of Pacifism, only one copy of Pacifism will be returned.",
     },
     {
-        unique: "art",
+        label: "art",
         info: "Returns only one copy of each unique artwork for matching cards. For example, if your search matches more than one print of Pacifism, one card with each different illustration for Pacifism will be returned, but any cards that duplicate artwork already in the results will be omitted.",
     },
     {
-        unique: "prints",
+        label: "prints",
         info: "Returns all prints for all cards matched (disables rollup). For example, if your search matches more than one print of Pacifism, all matching prints will be returned.",
     },
-];
+] as const;
 
 export const SearchOptions = [
     "unique",
@@ -125,7 +125,7 @@ export const SearchOptions = [
 ] as const;
 
 export interface ISearchSettings {
-    unique?: "cards" | "arts" | "prints"; //The strategy for omitting similar cards.
+    unique?: "cards" | "art" | "prints"; //The strategy for omitting similar cards.
     order?: (typeof SearchOrders)[number]["label"]; //The method to sort returned cards.
     dir?: "auto" | "asc" | "desc"; //The direction to sort cards.
     include_extras?: boolean; //If true, extra cards (tokens, planes, etc) will be included. Equivalent to adding include:extras to the fulltext search. Defaults to false.
@@ -416,6 +416,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
     ];
     catalog.games = ["paper", "mtgo", "mtga"];
     (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchOrders;
+    (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchUniques;
     catalog.products = [
         // Core types
         "core",
