@@ -11,7 +11,7 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { computeSettings, computeSettingsAndQuery } from "@/lib/scrycards";
+import { mergeSettings, settingsToText } from "@/lib/scrycards";
 
 const INITIAL = `
 order:cmc
@@ -33,8 +33,11 @@ export function useQueryDoc() {
             node: Node;
             offset: number;
             query: Query;
+            computed_query: string;
+            noSettings: string;
             active: boolean;
             ast: string;
+            computed_settings: ISearchSettings;
         }[]
     >([]);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -122,7 +125,6 @@ export function useQueryDoc() {
             const old_query_name = activeQueryNameRef.current.n;
 
             const { queries, domain } = queriesFromView(view);
-
             setDomain(domain);
 
             queriesRef.current = queries;
@@ -134,7 +136,22 @@ export function useQueryDoc() {
                     /\s/g,
                     ""
                 );
-                return { node, offset, query: q, active: false, ast };
+                const computed_settings = mergeSettings(
+                    q.body.settings as ISearchSettings,
+                    domain?.settings as ISearchSettings
+                );
+                return {
+                    node,
+                    offset,
+                    query: q,
+                    computed_query:
+                        settingsToText(computed_settings) +
+                        q.body.mergedTextNoSetting,
+                    noSettings: q.body.mergedTextNoSetting,
+                    active: false,
+                    ast,
+                    computed_settings,
+                };
             });
 
             setQueryNodes(query_nodes);
@@ -219,21 +236,7 @@ export function useQueryDoc() {
     );
 
     const { updated_query_nodes, activeQuery } = useMemo(() => {
-        const updated_query_nodes = queryNodes.map((q) => {
-            // TODO: use SearchCache context to test if query has been solved already
-            const domain = currentDomain?.text ?? "";
-            const query = q?.query.body.text ?? "";
-            const { full_query, crop_query, computed_settings } =
-                computeSettingsAndQuery(domain, query);
-
-            return {
-                ...q,
-                full_query,
-                crop_query,
-                active: false,
-                computed_settings,
-            };
-        });
+        const updated_query_nodes = queryNodes.map((q) => ({ ...q }));
         let activeQuery = null;
 
         if (
@@ -243,17 +246,14 @@ export function useQueryDoc() {
             updated_query_nodes[activeIndex].active = true;
             activeQuery = updated_query_nodes[activeIndex];
         } else if (updated_query_nodes.length === 0) {
-            const { full_query, crop_query, computed_settings } =
-                computeSettingsAndQuery(currentDomain?.text ?? "");
             activeQuery = {
-                full_query,
-                crop_query,
                 ast: undefined,
-                computed_settings,
+                noSettings: currentDomain?.noSettingText,
+                computed_settings: currentDomain?.settings,
             };
         }
         return { updated_query_nodes, activeQuery };
-    }, [activeIndex, currentDomain?.text, queryNodes, scryfallSettings]);
+    }, [activeIndex, queryNodes]);
 
     return {
         doc,
@@ -265,10 +265,9 @@ export function useQueryDoc() {
         changeDocDomain,
         addDocQuery,
         setDocQuery,
-        domain: currentDomain?.text,
-        query: activeQuery?.crop_query,
+        computedQuery: activeQuery?.noSettings,
         ast: activeQuery?.ast,
-        computedSettings: activeQuery?.computed_settings,
+        computedSettings: activeQuery?.computed_settings as ISearchSettings,
         fastUpdate,
         scryfallSettings,
         setScryfallSettings,

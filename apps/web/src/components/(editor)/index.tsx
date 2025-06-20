@@ -24,7 +24,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         onCreateEditor,
         onUpdate,
         onChange,
-        query,
+        computedQuery: query,
         computedSettings,
         ast,
         queryNodes,

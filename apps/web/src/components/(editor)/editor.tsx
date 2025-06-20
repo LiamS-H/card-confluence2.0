@@ -53,7 +53,7 @@ export function Editor({
 
     const queryComponents = useMemo(
         () =>
-            queryNodes.map(({ node, offset, active, full_query }, i) => {
+            queryNodes.map(({ node, offset, active, computed_query }, i) => {
                 if (!(node instanceof Text)) return null;
                 const range = document.createRange();
                 range.setStart(node, offset);
@@ -95,7 +95,9 @@ export function Editor({
                                 className="w-0.5 h-0.5"
                                 variant="outline"
                                 onClick={() => {
-                                    navigator.clipboard.writeText(full_query);
+                                    navigator.clipboard.writeText(
+                                        computed_query
+                                    );
                                 }}
                             >
                                 <Copy />

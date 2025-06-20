@@ -152,6 +152,7 @@ export type OPERATOR_TYPE = "assign" | "assert" | "all";
 
 export interface ICompletionNode {
     operator: OPERATOR_TYPE;
+    setting?: "order" | "dir" | "unique";
     // arg_type: ARG_TYPE;
 }
 
@@ -196,9 +197,9 @@ export const COMPLETION_MAP: ICompletionMap = {
         otag: { operator: "assert" },
         game: { operator: "assert" },
         uuid: { operator: "assert" },
-        order: { operator: "assign" },
-        dir: { operator: "assign" },
-        unique: { operator: "assign" },
+        order: { operator: "assign", setting: "order" },
+        dir: { operator: "assign", setting: "dir" },
+        unique: { operator: "assign", setting: "unique" },
     },
 };
 
