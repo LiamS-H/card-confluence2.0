@@ -416,7 +416,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
     ];
     catalog.games = ["paper", "mtgo", "mtga"];
     (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchOrders;
-    (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchUniques;
+    (catalog.uniques as readonly IDetailedCatalogEntry[]) = SearchUniques;
     catalog.products = [
         // Core types
         "core",
