@@ -73,8 +73,10 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                 <SearchBar
                     progress={
                         gridLayout
-                            ? (gridLayout.curRow * gridLayout.columns) /
-                              totalCards
+                            ? gridLayout.rows > 3
+                                ? (gridLayout.curRow * gridLayout.columns) /
+                                  totalCards
+                                : null
                             : null
                     }
                     aiOpen={aiOpen}
