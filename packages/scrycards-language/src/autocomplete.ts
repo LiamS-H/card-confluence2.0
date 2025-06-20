@@ -12,14 +12,12 @@ import { EditorSelection } from "@codemirror/state";
 
 import {
     argTypeFromArg,
-    argTypeFromString,
     ARGUMENTS,
     completionInfoFromArg,
     detailFromArg,
     isArgument,
     nodeFromArg,
 } from "./utils/completion";
-import { completionFromTypes, TYPE_TAG_TYPE } from "./utils/type-completion";
 
 const BEGIN_OPERATORS = [":", "<", ">", "=", "!"] as const;
 
@@ -53,7 +51,18 @@ export const completeScrycards: CompletionSource = (context) => {
         }
 
         if (cursor.name !== "Argument") {
-            return null;
+            return {
+                from: cursor.from,
+                options: ARGUMENTS.map((tag): Completion => {
+                    const { detail, info } = detailFromArg(tag);
+                    return {
+                        label: tag,
+                        detail,
+                        info,
+                    };
+                }),
+                commitCharacters: BEGIN_OPERATORS,
+            };
         }
 
         const argument = view.state.sliceDoc(cursor.node.from, cursor.node.to);
