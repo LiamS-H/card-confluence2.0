@@ -57,7 +57,9 @@ function extractSettingsFromCursor(
         cursor.nextSibling();
         cursor.nextSibling();
         const val = view.state.sliceDoc(cursor.from, cursor.to);
-        settings[setting] = val;
+        if (val !== "") {
+            settings[setting] = val;
+        }
         cursor.parent();
         noSettingText += view.state.sliceDoc(from, cursor.from);
         from = cursor.to;
