@@ -10,7 +10,7 @@ import {
     type Query,
     type Domain,
 } from "codemirror-lang-scrycards";
-import { SearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/scryfall";
 import { computeSettings, computeSettingsAndQuery } from "@/lib/scrycards";
 
 const INITIAL = `
@@ -25,7 +25,7 @@ t:elf
 `;
 
 export function useQueryDoc() {
-    const [scryfallSettings, setScryfallSettings] = useState<SearchSettings>(
+    const [scryfallSettings, setScryfallSettings] = useState<ISearchSettings>(
         {}
     );
     const [queryNodes, setQueryNodes] = useState<
@@ -223,17 +223,15 @@ export function useQueryDoc() {
             // TODO: use SearchCache context to test if query has been solved already
             const domain = currentDomain?.text ?? "";
             const query = q?.query.body.text ?? "";
-            const { computed_settings, full_query } = computeSettingsAndQuery(
-                domain,
-                query,
-                scryfallSettings
-            );
+            const { full_query, crop_query, computed_settings } =
+                computeSettingsAndQuery(domain, query);
 
             return {
                 ...q,
-                computed_settings,
                 full_query,
+                crop_query,
                 active: false,
+                computed_settings,
             };
         });
         let activeQuery = null;
@@ -245,11 +243,13 @@ export function useQueryDoc() {
             updated_query_nodes[activeIndex].active = true;
             activeQuery = updated_query_nodes[activeIndex];
         } else if (updated_query_nodes.length === 0) {
-            const full_query = currentDomain?.text ?? "";
+            const { full_query, crop_query, computed_settings } =
+                computeSettingsAndQuery(currentDomain?.text ?? "");
             activeQuery = {
                 full_query,
+                crop_query,
                 ast: undefined,
-                computed_settings: computeSettings(full_query),
+                computed_settings,
             };
         }
         return { updated_query_nodes, activeQuery };
@@ -266,7 +266,7 @@ export function useQueryDoc() {
         addDocQuery,
         setDocQuery,
         domain: currentDomain?.text,
-        query: activeQuery?.full_query,
+        query: activeQuery?.crop_query,
         ast: activeQuery?.ast,
         computedSettings: activeQuery?.computed_settings,
         fastUpdate,

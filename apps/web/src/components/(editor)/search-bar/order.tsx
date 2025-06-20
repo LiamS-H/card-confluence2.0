@@ -5,17 +5,18 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "../../(ui)/dropdown-menu";
-import { SearchOrders, SearchSettings } from "@/lib/scryfall";
+import { SearchOrders, ISearchSettings } from "@/lib/scryfall";
 import { useEffect, useState } from "react";
+import { SimpleToolTip } from "@/components/(ui)/tooltip";
 
 export function Order({
     scryfallSettings,
     computedSettings,
     setScryfallSettings,
 }: {
-    scryfallSettings: SearchSettings;
-    computedSettings?: SearchSettings;
-    setScryfallSettings: (s: (s: SearchSettings) => SearchSettings) => void;
+    scryfallSettings: ISearchSettings;
+    computedSettings?: ISearchSettings;
+    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
 }) {
     const [open, setOpen] = useState(false);
     const [localOrder, setLocalOrder] = useState(scryfallSettings.order);
@@ -26,17 +27,19 @@ export function Order({
     }, [open, scryfallSettings]);
     return (
         <DropdownMenu onOpenChange={setOpen}>
-            <DropdownMenuTrigger asChild>
-                {localOrder ? (
-                    <Button className="relative">
-                        Order: {localOrder ?? "select"}
-                    </Button>
-                ) : (
-                    <Button variant={"highlight"}>
-                        Order: {computed_order}
-                    </Button>
-                )}
-            </DropdownMenuTrigger>
+            <SimpleToolTip text="Change order">
+                <DropdownMenuTrigger asChild>
+                    {localOrder ? (
+                        <Button className="relative">
+                            Order: {localOrder ?? "select"}
+                        </Button>
+                    ) : (
+                        <Button variant={"highlight"}>
+                            Order: {computed_order}
+                        </Button>
+                    )}
+                </DropdownMenuTrigger>
+            </SimpleToolTip>
             <DropdownMenuContent>
                 <DropdownMenuItem
                     disabled={localOrder === undefined}

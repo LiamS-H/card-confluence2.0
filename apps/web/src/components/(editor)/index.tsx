@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { type ICatalog } from "codemirror-lang-scrycards";
 import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
@@ -11,6 +11,7 @@ import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "@/components/(editor)/search-bar";
 import { Editor } from "@/components/(editor)/editor";
 import { useCardListSearch } from "@/components/(editor)/card-list/useSearch";
+import { mergeSettings } from "@/lib/scrycards";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [aiOpen, setAiOpen] = useState(false);
@@ -32,7 +33,18 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         // changeDocDomain,
     } = useQueryDoc();
 
-    const searchObj = useCardListSearch({ query, ast, settings, fastUpdate });
+    const merged_settings = useMemo(
+        () => mergeSettings(settings, computedSettings),
+        [settings, computedSettings]
+    );
+
+    const searchObj = useCardListSearch({
+        query,
+        ast,
+        settings: merged_settings,
+        // settings,
+        fastUpdate,
+    });
     const { gridLayout, totalCards } = searchObj;
 
     return (

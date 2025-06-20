@@ -1,5 +1,5 @@
 import { type ICachedSearchProps, useSearchContext } from "@/context/search";
-import { SearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/scryfall";
 import { ScryfallError } from "@scryfall/api-types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -113,7 +113,7 @@ export function useCardListSearch({
 }: {
     query?: string;
     ast?: string;
-    settings?: SearchSettings;
+    settings?: ISearchSettings;
     fastUpdate: boolean;
 }) {
     const {

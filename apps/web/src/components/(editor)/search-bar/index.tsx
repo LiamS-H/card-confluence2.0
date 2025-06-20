@@ -1,10 +1,11 @@
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { Button } from "@/components/(ui)/button";
-import { SearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/scryfall";
 
 import { ArrowUpToLine, Sparkles, SquareCode } from "lucide-react";
 import { Order } from "./order";
 import { Progress } from "@/components/(ui)/progress";
+import { Direction } from "./direction";
 
 export function SearchBar({
     aiOpen,
@@ -16,13 +17,13 @@ export function SearchBar({
 }: {
     aiOpen: boolean;
     setAiOpen: (s: (o: boolean) => boolean) => void;
-    scryfallSettings: SearchSettings;
-    computedSettings?: SearchSettings;
-    setScryfallSettings: (s: (s: SearchSettings) => SearchSettings) => void;
+    scryfallSettings: ISearchSettings;
+    computedSettings?: ISearchSettings;
+    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
     progress: number | null;
 }) {
     return (
-        <div className="absolute top-full w-full backdrop-blur-md">
+        <div className="absolute top-full w-full">
             {progress !== null ? (
                 <Progress className="w-full rounded-none" value={progress} />
             ) : (
@@ -43,16 +44,23 @@ export function SearchBar({
                     setScryfallSettings={setScryfallSettings}
                     computedSettings={computedSettings}
                 />
+                <Direction
+                    scryfallSettings={scryfallSettings}
+                    setScryfallSettings={setScryfallSettings}
+                    computedSettings={computedSettings}
+                />
                 {progress && (
-                    <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() =>
-                            window.scrollTo({ top: 0, behavior: "instant" })
-                        }
-                    >
-                        <ArrowUpToLine />
-                    </Button>
+                    <SimpleToolTip text="Scroll to top">
+                        <Button
+                            size="icon"
+                            variant="outline"
+                            onClick={() =>
+                                window.scrollTo({ top: 0, behavior: "instant" })
+                            }
+                        >
+                            <ArrowUpToLine />
+                        </Button>
+                    </SimpleToolTip>
                 )}
             </div>
         </div>

@@ -1,5 +1,5 @@
 "use client";
-import { fetchSearch, type SearchSettings } from "@/lib/scryfall";
+import { fetchSearch, type ISearchSettings } from "@/lib/scryfall";
 import type {
     ScryfallCard,
     ScryfallError,
@@ -17,7 +17,7 @@ import { useScrycardsContext } from "react-scrycards";
 export interface ICachedSearchProps {
     query: string;
     ast?: string;
-    settings?: SearchSettings;
+    settings?: ISearchSettings;
 }
 
 export type ScryfallCached = Omit<ScryfallList.Cards, "data"> & {

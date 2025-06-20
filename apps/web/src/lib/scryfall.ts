@@ -1,4 +1,8 @@
-import { getEmptyCatalog, type ICatalog } from "codemirror-lang-scrycards";
+import {
+    getEmptyCatalog,
+    IDetailedCatalogEntry,
+    type ICatalog,
+} from "codemirror-lang-scrycards";
 import {
     type ScryfallList,
     type ScryfallCatalog,
@@ -18,6 +22,7 @@ export async function fetchWithHeaders(url: URL) {
 export const SearchOrders = [
     {
         label: "name",
+        detail: undefined,
         info: "Sort cards by name, A → Z",
     },
     {
@@ -32,10 +37,12 @@ export const SearchOrders = [
     },
     {
         label: "rarity",
+        detail: undefined,
         info: "Sort cards by their rarity: Common → Mythic",
     },
     {
         label: "color",
+        detail: undefined,
         info: "Sort cards by their color and color identity: WUBRG → multicolor → colorless",
     },
     {
@@ -55,14 +62,17 @@ export const SearchOrders = [
     },
     {
         label: "cmc",
+        detail: undefined,
         info: "Sort cards by their mana value: 0 → highest",
     },
     {
         label: "power",
+        detail: undefined,
         info: "Sort cards by their power: null → highest",
     },
     {
         label: "toughness",
+        detail: undefined,
         info: "Sort cards by their toughness: null → highest",
     },
     {
@@ -77,13 +87,15 @@ export const SearchOrders = [
     },
     {
         label: "artist",
+        detail: undefined,
         info: "Sort cards by their front-side artist name: A → Z",
     },
     {
         label: "review",
+        detail: undefined,
         info: "Sort cards how podcasts review sets, usually color & CMC, lowest → highest, with Booster Fun cards at the end",
     },
-];
+] as const;
 
 export const SearchUniques = [
     {
@@ -100,7 +112,19 @@ export const SearchUniques = [
     },
 ];
 
-export interface SearchSettings {
+export const SearchOptions = [
+    "unique",
+    "order",
+    "dir",
+    "include_extras",
+    "include_multilingual",
+    "include_variations",
+    "page",
+    "format",
+    "pretty",
+] as const;
+
+export interface ISearchSettings {
     unique?: "cards" | "arts" | "prints"; //The strategy for omitting similar cards.
     order?: (typeof SearchOrders)[number]["label"]; //The method to sort returned cards.
     dir?: "auto" | "asc" | "desc"; //The direction to sort cards.
@@ -114,7 +138,7 @@ export interface SearchSettings {
 
 export async function fetchSearch(
     query: string,
-    settings?: SearchSettings,
+    settings?: ISearchSettings,
     fetch_func?: typeof fetchWithHeaders
 ): Promise<ScryfallList.Cards | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/search");
@@ -186,7 +210,7 @@ export async function fetchTags(): Promise<{
     return { otags, atags };
 }
 
-export async function getCatalog(): Promise<ICatalog> {
+export async function getCatalog(): Promise<Readonly<ICatalog>> {
     const catalogEndpoints = [
         "card-names",
         "artist-names",
@@ -391,7 +415,7 @@ export async function getCatalog(): Promise<ICatalog> {
         "vintage",
     ];
     catalog.games = ["paper", "mtgo", "mtga"];
-    catalog.orders = SearchOrders;
+    (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchOrders;
     catalog.products = [
         // Core types
         "core",
