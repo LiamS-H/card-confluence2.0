@@ -8,6 +8,7 @@ import {
     ArrowDownNarrowWide,
     ArrowDownWideNarrow,
     ArrowDownZA,
+    BadgeAlert,
     CalendarArrowDown,
     CalendarArrowUp,
 } from "lucide-react";
@@ -92,6 +93,8 @@ export function Direction({
         case "review":
             Icon = asc ? ArrowDownNarrowWide : ArrowDownWideNarrow;
             break;
+        default:
+            Icon = BadgeAlert;
     }
 
     return (
