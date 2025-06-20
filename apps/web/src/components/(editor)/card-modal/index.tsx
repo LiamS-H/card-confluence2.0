@@ -16,9 +16,11 @@ import { ICachedSearchProps, useSearchContext } from "@/context/search";
 import { useEffect, useState } from "react";
 import { Printing } from "./printing";
 import { Related } from "./related";
+import { UndoButton } from "./undo-button";
 
 export function CardModal() {
-    const { open, selected, setOpen, setSelected } = useHighlightContext();
+    const { open, selected, previous, setOpen, pushSelected, popSelected } =
+        useHighlightContext();
     const card = useCard(selected);
     const { cachedSearch, cacheResponse, getCard } = useSearchContext();
 
@@ -146,7 +148,7 @@ export function CardModal() {
                                                                 p === card.id
                                                             }
                                                             select={() =>
-                                                                setSelected(p)
+                                                                pushSelected(p)
                                                             }
                                                         />
                                                     </li>
@@ -187,7 +189,7 @@ export function CardModal() {
                                                         c.id === card.id
                                                     }
                                                     select={() =>
-                                                        setSelected(c.id)
+                                                        pushSelected(c.id)
                                                     }
                                                 />
                                             </li>
@@ -218,6 +220,9 @@ export function CardModal() {
                     </div>
                 </div>
                 <DialogFooter>
+                    {popSelected && previous && (
+                        <UndoButton undo={popSelected} prevId={previous} />
+                    )}
                     <DialogClose asChild>
                         <Button variant="outline">Close</Button>
                     </DialogClose>

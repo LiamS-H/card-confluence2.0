@@ -4,14 +4,15 @@ import { Scrycard } from "react-scrycards";
 
 export function Card({ id }: { id: string }) {
     const card = useCard(id);
-    const { setSelected, setOpen } = useHighlightContext();
+    const { pushSelected, setHovered, setOpen } = useHighlightContext();
 
     return (
         <button
             onMouseEnter={() => {
-                setSelected(id);
+                setHovered(id);
             }}
             onClick={() => {
+                pushSelected(id);
                 setOpen(true);
             }}
             className="overflow-clip"

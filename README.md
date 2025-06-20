@@ -7,7 +7,7 @@
 
 [X] Add argument information on highlighting over args.
 
-[ ] Add history to highlighted card modal to enable back button
+[X] Add history to highlighted card modal to enable back button
 
 [ ] Save query pages
 
