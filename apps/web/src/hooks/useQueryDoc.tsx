@@ -259,7 +259,7 @@ export function useQueryDoc() {
             computed_settings: currentDomain?.settings,
         };
         return { updated_query_nodes, activeQuery };
-    }, [activeIndex, queryNodes]);
+    }, [activeIndex, queryNodes, currentDomain]);
 
     return {
         doc,

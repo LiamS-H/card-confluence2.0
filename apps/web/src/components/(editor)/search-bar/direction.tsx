@@ -62,7 +62,7 @@ export function Direction({
             ...s,
             dir: undefined,
         }));
-    }, [order, computedSettings]);
+    }, [order, computedSettings, setScryfallSettings]);
 
     const asc = dir === "asc";
 

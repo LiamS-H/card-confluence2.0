@@ -1,7 +1,7 @@
 import { type ICachedSearchProps, useSearchContext } from "@/context/search";
 import { ISearchSettings } from "@/lib/scryfall";
 import { ScryfallError } from "@scryfall/api-types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const CARD_WIDTH = 200;
 export const CARD_HEIGHT = 278.55;
@@ -281,7 +281,7 @@ export function useCardListSearch({
             animationFrameRef.current = null;
             setGridLayout(calcGrid(dataRef.current));
         });
-    }, []);
+    }, [calcGrid]);
 
     useEffect(() => {
         debouncedCalcGrid();
