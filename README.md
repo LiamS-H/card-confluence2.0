@@ -18,14 +18,15 @@ AI
 
     [X] prompting space can be toggled between query only | ai
 
-[ ] Add autocomplete when nothing is selected to select an argument
+Autocomplete
+    [ ] Add autocomplete when nothing is selected to select an argument
 
 Linting
     [ ] fields like order can only appear on base level
     [ ] certain arguments like t: will only accept from their own
 
 Add settings between search box and cards
-    [ ] scroll to top button - and scroll to top when a new query is searched
+    [X] scroll to top button - and scroll to top when a new query is searched
     [X] loading bar display on how many cards
     [ ] adjustable card sizes
     [X] potentially order and display setting dropdowns

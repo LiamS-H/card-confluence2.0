@@ -78,7 +78,13 @@ export function Editor({
                                         ? () => {
                                               activateQuery(null);
                                           }
-                                        : () => activateQuery(i)
+                                        : () => {
+                                              activateQuery(i);
+                                              window.scrollTo({
+                                                  top: 0,
+                                                  behavior: "instant",
+                                              });
+                                          }
                                 }
                             >
                                 {active ? <TextSearch /> : <Search />}

@@ -34,6 +34,11 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
 
                 if (currentScrollY === 0) {
                     setSticky(false);
+                    if (lastScrollY > childHeight) {
+                        setAnimate(false);
+                        setShown(true);
+                        return;
+                    }
                 }
 
                 if (currentScrollY < childHeight) {
