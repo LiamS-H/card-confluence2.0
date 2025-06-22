@@ -178,6 +178,7 @@ export function useCardListSearch({
     editorSettingsRef.current = editorSettings;
 
     const lastRect = useRef<DOMRect | null>(null);
+    const lastDif = useRef<number | null>(null);
 
     const debouncedCalcGrid = useCallback((force?: boolean) => {
         if (animationFrameRef.current !== null) {
@@ -186,14 +187,15 @@ export function useCardListSearch({
         animationFrameRef.current = requestAnimationFrame(() => {
             if (!containerRef.current) return;
             const rect = containerRef.current.getBoundingClientRect();
-            if (lastRect.current && !force) {
+            const dif = rect.top - window.scrollY;
+            if (lastRect.current && lastDif.current && !force) {
                 if (
-                    // rect.top === lastRect.current.top &&
+                    lastDif.current === dif &&
                     rect.width === lastRect.current.width
                 )
                     return;
             }
-
+            lastDif.current = dif;
             lastRect.current = rect;
             animationFrameRef.current = null;
             setGridLayout(
@@ -204,22 +206,21 @@ export function useCardListSearch({
 
     useEffect(() => {
         debouncedCalcGrid(true);
-        // setGridLayout(calcGrid(dataRef.current));
     }, [allData, editorSettings, debouncedCalcGrid]);
 
-    // useEffect(() => {
-    //     const controller = new AbortController();
+    useEffect(() => {
+        const controller = new AbortController();
 
-    //     window.addEventListener("scroll", () => debouncedCalcGrid, {
-    //         signal: controller.signal,
-    //     });
-    //     window.addEventListener("resize", () => debouncedCalcGrid, {
-    //         signal: controller.signal,
-    //     });
-    //     return () => {
-    //         controller.abort;
-    //     };
-    // }, [debouncedCalcGrid]);
+        window.addEventListener("scroll", () => debouncedCalcGrid(), {
+            signal: controller.signal,
+        });
+        window.addEventListener("resize", () => debouncedCalcGrid(), {
+            signal: controller.signal,
+        });
+        return () => {
+            controller.abort;
+        };
+    }, [debouncedCalcGrid]);
 
     return {
         search,
