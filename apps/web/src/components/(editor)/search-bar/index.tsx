@@ -2,16 +2,18 @@ import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { Button } from "@/components/(ui)/button";
 import { ISearchSettings } from "@/lib/scryfall";
 
-import { ArrowUpToLine, Sparkles, SquareCode } from "lucide-react";
+import { Sparkles, SquareCode } from "lucide-react";
 import { Order } from "./order";
 import { Progress } from "@/components/(ui)/progress";
 import { Direction } from "./direction";
 import { Unique } from "./unique";
+import { ScrollTop } from "./scrolltop";
+import { useCompareMemo } from "@/hooks/useCompareMemo";
 
 export function SearchBar({
     aiOpen,
     setAiOpen,
-    scryfallSettings,
+    scryfallSettings: _scryfallSettings,
     computedSettings,
     setScryfallSettings,
     progress,
@@ -23,6 +25,8 @@ export function SearchBar({
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
     progress: number | null;
 }) {
+    const scryfallSettings = useCompareMemo(_scryfallSettings);
+
     return (
         <div className="absolute top-full w-full">
             {progress !== null ? (
@@ -55,19 +59,7 @@ export function SearchBar({
                     setScryfallSettings={setScryfallSettings}
                     computedSettings={computedSettings}
                 />
-                {progress && (
-                    <SimpleToolTip text="Scroll to top">
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() =>
-                                window.scrollTo({ top: 0, behavior: "instant" })
-                            }
-                        >
-                            <ArrowUpToLine />
-                        </Button>
-                    </SimpleToolTip>
-                )}
+                {progress && <ScrollTop />}
             </div>
         </div>
     );

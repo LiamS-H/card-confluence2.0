@@ -238,26 +238,8 @@ export function useQueryDoc() {
         []
     );
 
-<<<<<<< Updated upstream
-    // const domain = useCompareMemo(_domain, (v1, v2) => v1?.text == v2?.text);
-    const domain = _domain;
-
-    // const _queryNodesMemoized = useCompareMemo(_queryNodes, (v1, v2) => {
-    //     if (v1.length !== v2.length) return false;
-    //     for (let i = 0; i < v1.length; i++) {
-    //         if (v1[i]?.query.body !== v2[i]?.query.body) return false;
-    //         if (v1[i]?.query.name !== v2[i]?.query.name) return false;
-    //     }
-    //     return true;
-    // });
-    const _queryNodesMemoized = _queryNodes;
-
-    const { queryNodes, activeQuery } = useMemo(() => {
-        const updated_query_nodes = _queryNodesMemoized.map((q) => ({ ...q }));
-=======
     const { queryNodes, activeQuery } = useMemo(() => {
         const updated_query_nodes = _queryNodes.map((q) => ({ ...q }));
->>>>>>> Stashed changes
         if (
             activeIndex !== null &&
             updated_query_nodes[activeIndex] !== undefined
@@ -266,19 +248,11 @@ export function useQueryDoc() {
             const activeQuery = updated_query_nodes[activeIndex];
             return { queryNodes: updated_query_nodes, activeQuery };
         }
-<<<<<<< Updated upstream
-        const computed_settings = domain?.settings ?? {};
-        if (updated_query_nodes.length === 0) {
-            const activeQuery = {
-                ast: undefined,
-                noSettings: domain?.noSettingText,
-=======
         const computed_settings = _domain?.settings ?? {};
         if (updated_query_nodes.length === 0) {
             const activeQuery = {
                 ast: undefined,
                 noSettings: _domain?.noSettingText,
->>>>>>> Stashed changes
                 computed_settings,
             };
             return { queryNodes: updated_query_nodes, activeQuery };
@@ -289,11 +263,7 @@ export function useQueryDoc() {
             computed_settings,
         };
         return { queryNodes: updated_query_nodes, activeQuery };
-<<<<<<< Updated upstream
-    }, [activeIndex, _queryNodesMemoized, domain]);
-=======
     }, [activeIndex, _queryNodes, _domain]);
->>>>>>> Stashed changes
 
     // const computedSettings = useCompareMemo<Settings>(
     //     (prev) => {
@@ -312,7 +282,7 @@ export function useQueryDoc() {
         activeQuery.computed_settings,
         isSettingsEqual
     );
-    const computed_settings = activeQuery.computed_settings;
+    // const computedSettings = activeQuery.computed_settings;
 
     return {
         doc,

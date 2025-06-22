@@ -6,8 +6,8 @@ import {
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
 import { SearchOrders, ISearchSettings } from "@/lib/scryfall";
-import { useEffect, useState } from "react";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { useMemo } from "react";
 
 export function Order({
     scryfallSettings,
@@ -18,21 +18,37 @@ export function Order({
     computedSettings?: ISearchSettings;
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
 }) {
-    const [open, setOpen] = useState(false);
-    const [localOrder, setLocalOrder] = useState(scryfallSettings.order);
     const computed_order = computedSettings?.order ?? "name";
+    const order = scryfallSettings.order;
 
-    useEffect(() => {
-        if (open) setLocalOrder(scryfallSettings.order);
-    }, [open, scryfallSettings]);
+    const options = useMemo(
+        () =>
+            SearchOrders.map((o) => (
+                <DropdownMenuItem
+                    key={o.label}
+                    disabled={order === o.label}
+                    onClick={() =>
+                        setScryfallSettings((s) => ({
+                            ...s,
+                            order: o.label,
+                        }))
+                    }
+                >
+                    {o.label}
+                    {o.detail && (
+                        <i className="text-muted-foreground">{o.detail}</i>
+                    )}
+                </DropdownMenuItem>
+            )),
+        [order, setScryfallSettings]
+    );
+
     return (
-        <DropdownMenu onOpenChange={setOpen}>
+        <DropdownMenu>
             <SimpleToolTip text="Change order">
                 <DropdownMenuTrigger asChild>
-                    {localOrder ? (
-                        <Button className="relative">
-                            Order: {localOrder ?? "select"}
-                        </Button>
+                    {order ? (
+                        <Button className="relative">Order: {order}</Button>
                     ) : (
                         <Button variant={"highlight"}>
                             Order: {computed_order}
@@ -42,12 +58,7 @@ export function Order({
             </SimpleToolTip>
             <DropdownMenuContent>
                 <DropdownMenuItem
-                    disabled={localOrder === undefined}
-                    // className={
-                    //     scryfallSettings.order === undefined
-                    //         ? undefined
-                    //         : " hover:bg-highlight/50"
-                    // }
+                    disabled={order === undefined}
                     onClick={() =>
                         setScryfallSettings((s) => ({
                             ...s,
@@ -59,23 +70,7 @@ export function Order({
                         computed <i>{computed_order}</i>
                     </span>
                 </DropdownMenuItem>
-                {SearchOrders.map((o) => (
-                    <DropdownMenuItem
-                        key={o.label}
-                        disabled={localOrder === o.label}
-                        onClick={() =>
-                            setScryfallSettings((s) => ({
-                                ...s,
-                                order: o.label,
-                            }))
-                        }
-                    >
-                        {o.label}
-                        {o.detail && (
-                            <i className="text-muted-foreground">{o.detail}</i>
-                        )}
-                    </DropdownMenuItem>
-                ))}
+                {options}
             </DropdownMenuContent>
         </DropdownMenu>
     );

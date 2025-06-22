@@ -6,7 +6,6 @@ import {
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
 import { SearchUniques, ISearchSettings } from "@/lib/scryfall";
-import { useEffect, useState } from "react";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 
 export function Unique({
@@ -18,20 +17,16 @@ export function Unique({
     computedSettings?: ISearchSettings;
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
 }) {
-    const [open, setOpen] = useState(false);
-    const [localUnique, setLocalUnique] = useState(scryfallSettings.unique);
     const computed_unique = computedSettings?.unique ?? "cards";
+    const unique = scryfallSettings.unique;
 
-    useEffect(() => {
-        if (open) setLocalUnique(scryfallSettings.unique);
-    }, [open, scryfallSettings]);
     return (
-        <DropdownMenu onOpenChange={setOpen}>
+        <DropdownMenu>
             <SimpleToolTip text="Change unique">
                 <DropdownMenuTrigger asChild>
-                    {localUnique ? (
+                    {unique ? (
                         <Button className="relative">
-                            Unique: {localUnique ?? "select"}
+                            Unique: {unique ?? "select"}
                         </Button>
                     ) : (
                         <Button variant={"highlight"}>
@@ -42,7 +37,7 @@ export function Unique({
             </SimpleToolTip>
             <DropdownMenuContent>
                 <DropdownMenuItem
-                    disabled={localUnique === undefined}
+                    disabled={unique === undefined}
                     // className={
                     //     scryfallSettings.order === undefined
                     //         ? undefined
@@ -62,7 +57,7 @@ export function Unique({
                 {SearchUniques.map((o) => (
                     <DropdownMenuItem
                         key={o.label}
-                        disabled={localUnique === o.label}
+                        disabled={unique === o.label}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
