@@ -8,12 +8,11 @@ import { Progress } from "@/components/(ui)/progress";
 import { Direction } from "./direction";
 import { Unique } from "./unique";
 import { ScrollTop } from "./scrolltop";
-import { useCompareMemo } from "@/hooks/useCompareMemo";
 
 export function SearchBar({
     aiOpen,
     setAiOpen,
-    scryfallSettings: _scryfallSettings,
+    scryfallSettings,
     computedSettings,
     setScryfallSettings,
     progress,
@@ -25,8 +24,6 @@ export function SearchBar({
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
     progress: number | null;
 }) {
-    const scryfallSettings = useCompareMemo(_scryfallSettings);
-
     return (
         <div className="absolute top-full w-full">
             {progress !== null ? (
