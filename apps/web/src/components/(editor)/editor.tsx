@@ -28,25 +28,26 @@ function QueryWrapper({
 }) {
     if (!(node instanceof Text)) return null;
 
-    // const rect = useMemo(() => {
-    const range = document.createRange();
-    range.setStart(node, offset);
-    range.setEnd(node, node.length);
-    const rect = range.getBoundingClientRect();
-    range.collapse();
-    // return rect;
-    // }, [node, offset]);
-    return (
-        <div
-            className="absolute z-30 flex gap-1"
-            style={{
-                top: rect.top,
-                left: rect.x + rect.width,
-            }}
-        >
-            {children}
-        </div>
-    );
+    try {
+        const range = document.createRange();
+        range.setStart(node, offset);
+        range.setEnd(node, node.length);
+        const rect = range.getBoundingClientRect();
+        range.collapse();
+        return (
+            <div
+                className="absolute z-30 flex gap-1"
+                style={{
+                    top: rect.top,
+                    left: rect.x + rect.width,
+                }}
+            >
+                {children}
+            </div>
+        );
+    } catch {
+        return null;
+    }
 }
 
 function QueryNode({
