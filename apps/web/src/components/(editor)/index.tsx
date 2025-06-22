@@ -10,8 +10,9 @@ import { AIPrompter } from "@/components/(editor)/ai-prompter";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "@/components/(editor)/search-bar";
 import { Editor } from "@/components/(editor)/editor";
-import { useCardListSearch } from "@/components/(editor)/card-list/useCardListSearch";
-import { mergeSettings } from "@/lib/scrycards";
+import { useCardListSearch } from "./card-list/useCardListSearch";
+import { mergeObjects } from "@/lib/utils";
+import { ISearchSettings } from "@/lib/scryfall";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [aiOpen, setAiOpen] = useState(false);
@@ -33,10 +34,9 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         // changeDocDomain,
     } = useQueryDoc();
 
-    const merged_settings = useMemo(
-        () => mergeSettings(settings, computedSettings),
-        [settings, computedSettings]
-    );
+    const merged_settings = useMemo(() => {
+        return mergeObjects(settings, computedSettings);
+    }, [settings, computedSettings]);
 
     const searchObj = useCardListSearch({
         query,
@@ -83,7 +83,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                     setAiOpen={setAiOpen}
                     scryfallSettings={settings}
                     setScryfallSettings={setScryfallSettings}
-                    computedSettings={computedSettings}
+                    computedSettings={computedSettings as ISearchSettings}
                 />
             </ScrollHidden>
             <div className="h-12"></div>

@@ -9,9 +9,12 @@ import {
     queriesFromView,
     type Query,
     type Domain,
+    type Settings,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { mergeSettings, settingsToText } from "@/lib/scrycards";
+import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
+import { mergeObjects } from "@/lib/utils";
+import { useCompareMemo } from "./useCompareMemo";
 
 const INITIAL = `
 order:cmc
@@ -28,7 +31,7 @@ export function useQueryDoc() {
     const [scryfallSettings, setScryfallSettings] = useState<ISearchSettings>(
         {}
     );
-    const [queryNodes, setQueryNodes] = useState<
+    const [_queryNodes, _setQueryNodes] = useState<
         {
             node: Node;
             offset: number;
@@ -37,12 +40,12 @@ export function useQueryDoc() {
             noSettings: string;
             active: boolean;
             ast: string;
-            computed_settings: ISearchSettings;
+            computed_settings: Settings;
         }[]
     >([]);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [fastUpdate, setFastUpdate] = useState(false);
-    const [currentDomain, setDomain] = useState<Domain | null>(null);
+    const [_domain, _setDomain] = useState<Domain | null>(null);
     const queriesRef = useRef<Query[]>([]);
     const queryNamesRef = useRef<string[]>([]);
     const activeQueryNameRef = useRef<{ n: string; i: number }>({
@@ -82,8 +85,8 @@ export function useQueryDoc() {
 
     const changeDocDomain = useCallback(
         (new_domain: string) => {
-            if (currentDomain) {
-                updateDocAt(currentDomain.from, currentDomain.to, new_domain);
+            if (_domain) {
+                updateDocAt(_domain.from, _domain.to, new_domain);
             } else {
                 // setDoc(
                 //     `${new_domain}\n${queriesRef.current.map((q) => `\n@query ${q.name.text}\n${q.body.text}`)}\n`
@@ -91,7 +94,7 @@ export function useQueryDoc() {
                 setDoc((doc) => `${new_domain}\n${doc}`);
             }
         },
-        [updateDocAt, currentDomain]
+        [updateDocAt, _domain]
     );
 
     const addDocQuery = useCallback(
@@ -125,7 +128,7 @@ export function useQueryDoc() {
             const old_query_name = activeQueryNameRef.current.n;
 
             const { queries, domain } = queriesFromView(view);
-            setDomain(domain);
+            _setDomain(domain);
 
             queriesRef.current = queries;
 
@@ -136,9 +139,9 @@ export function useQueryDoc() {
                     /\s/g,
                     ""
                 );
-                const computed_settings = mergeSettings(
-                    q.body.settings as ISearchSettings,
-                    domain?.settings as ISearchSettings
+                const computed_settings = mergeObjects(
+                    q.body.settings,
+                    domain?.settings
                 );
                 return {
                     node,
@@ -154,7 +157,7 @@ export function useQueryDoc() {
                 };
             });
 
-            setQueryNodes(query_nodes);
+            _setQueryNodes(query_nodes);
 
             if (query_nodes.length === 0) {
                 return;
@@ -235,31 +238,81 @@ export function useQueryDoc() {
         []
     );
 
-    const { updated_query_nodes, activeQuery } = useMemo(() => {
-        const updated_query_nodes = queryNodes.map((q) => ({ ...q }));
+<<<<<<< Updated upstream
+    // const domain = useCompareMemo(_domain, (v1, v2) => v1?.text == v2?.text);
+    const domain = _domain;
+
+    // const _queryNodesMemoized = useCompareMemo(_queryNodes, (v1, v2) => {
+    //     if (v1.length !== v2.length) return false;
+    //     for (let i = 0; i < v1.length; i++) {
+    //         if (v1[i]?.query.body !== v2[i]?.query.body) return false;
+    //         if (v1[i]?.query.name !== v2[i]?.query.name) return false;
+    //     }
+    //     return true;
+    // });
+    const _queryNodesMemoized = _queryNodes;
+
+    const { queryNodes, activeQuery } = useMemo(() => {
+        const updated_query_nodes = _queryNodesMemoized.map((q) => ({ ...q }));
+=======
+    const { queryNodes, activeQuery } = useMemo(() => {
+        const updated_query_nodes = _queryNodes.map((q) => ({ ...q }));
+>>>>>>> Stashed changes
         if (
             activeIndex !== null &&
             updated_query_nodes[activeIndex] !== undefined
         ) {
             updated_query_nodes[activeIndex].active = true;
             const activeQuery = updated_query_nodes[activeIndex];
-            return { updated_query_nodes, activeQuery };
+            return { queryNodes: updated_query_nodes, activeQuery };
         }
+<<<<<<< Updated upstream
+        const computed_settings = domain?.settings ?? {};
         if (updated_query_nodes.length === 0) {
             const activeQuery = {
                 ast: undefined,
-                noSettings: currentDomain?.noSettingText,
-                computed_settings: currentDomain?.settings,
+                noSettings: domain?.noSettingText,
+=======
+        const computed_settings = _domain?.settings ?? {};
+        if (updated_query_nodes.length === 0) {
+            const activeQuery = {
+                ast: undefined,
+                noSettings: _domain?.noSettingText,
+>>>>>>> Stashed changes
+                computed_settings,
             };
-            return { updated_query_nodes, activeQuery };
+            return { queryNodes: updated_query_nodes, activeQuery };
         }
         const activeQuery = {
             ast: undefined,
             noSettings: undefined,
-            computed_settings: currentDomain?.settings,
+            computed_settings,
         };
-        return { updated_query_nodes, activeQuery };
-    }, [activeIndex, queryNodes, currentDomain]);
+        return { queryNodes: updated_query_nodes, activeQuery };
+<<<<<<< Updated upstream
+    }, [activeIndex, _queryNodesMemoized, domain]);
+=======
+    }, [activeIndex, _queryNodes, _domain]);
+>>>>>>> Stashed changes
+
+    // const computedSettings = useCompareMemo<Settings>(
+    //     (prev) => {
+    //         const next = activeQuery.computed_settings;
+    //         if (prev && isSettingsEqual(prev, next)) {
+    //             // console.log("are the same no update", prev, next);
+    //             return prev;
+    //         }
+    //         // console.log("are updating", prev, next);
+    //         return next;
+    //     },
+    //     [activeQuery]
+    // );
+    // console.log("computed settings", computedSettings);
+    const computedSettings = useCompareMemo(
+        activeQuery.computed_settings,
+        isSettingsEqual
+    );
+    const computed_settings = activeQuery.computed_settings;
 
     return {
         doc,
@@ -267,13 +320,13 @@ export function useQueryDoc() {
         onUpdate,
         onChange,
         activateQuery,
-        queryNodes: updated_query_nodes,
+        queryNodes,
         changeDocDomain,
         addDocQuery,
         setDocQuery,
         computedQuery: activeQuery?.noSettings,
         ast: activeQuery?.ast,
-        computedSettings: activeQuery?.computed_settings as ISearchSettings,
+        computedSettings: computedSettings,
         fastUpdate,
         scryfallSettings,
         setScryfallSettings,
