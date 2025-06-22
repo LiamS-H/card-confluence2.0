@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/(ui)/tooltip";
 import { SearchContextProvider } from "@/context/search";
 import { ScrycardsContextProvider } from "react-scrycards";
 import { HighlightContextProvider } from "@/context/highlight";
+import { EditorContextProvider } from "@/context/editor-settings";
 
 export function Providers({ children }: { children: ReactNode }) {
     return (
@@ -19,9 +20,11 @@ export function Providers({ children }: { children: ReactNode }) {
                 <TooltipProvider>
                     <ScrycardsContextProvider>
                         <SearchContextProvider>
-                            <HighlightContextProvider>
-                                {children}
-                            </HighlightContextProvider>
+                            <EditorContextProvider>
+                                <HighlightContextProvider>
+                                    {children}
+                                </HighlightContextProvider>
+                            </EditorContextProvider>
                         </SearchContextProvider>
                     </ScrycardsContextProvider>
                 </TooltipProvider>

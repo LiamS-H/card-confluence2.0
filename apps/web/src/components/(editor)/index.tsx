@@ -10,7 +10,7 @@ import { AIPrompter } from "@/components/(editor)/ai-prompter";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "@/components/(editor)/search-bar";
 import { Editor } from "@/components/(editor)/editor";
-import { useCardListSearch } from "@/components/(editor)/card-list/useSearch";
+import { useCardListSearch } from "@/components/(editor)/card-list/useCardListSearch";
 import { mergeSettings } from "@/lib/scrycards";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {

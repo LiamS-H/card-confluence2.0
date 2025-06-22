@@ -1,10 +1,6 @@
 import { useMemo } from "react";
 import { Card } from "../card";
-import {
-    CARD_HEIGHT,
-    CARD_WIDTH,
-    useCardListSearch,
-} from "@/components/(editor)/card-list/useSearch";
+import { useCardListSearch } from "./useCardListSearch";
 
 export function CardList({
     search: {
@@ -95,11 +91,11 @@ export function CardList({
                                 style={{
                                     left: item.x,
                                     top: item.y,
-                                    width: CARD_WIDTH,
-                                    height: CARD_HEIGHT,
+                                    width: gridLayout.cardW,
+                                    height: gridLayout.cardH,
                                 }}
                             >
-                                <Card id={item.id} />
+                                <Card id={item.id} width={gridLayout.cardW} />
                             </div>
                         ))}
 
@@ -121,8 +117,10 @@ export function CardList({
                                 style={{
                                     top: Math.max(
                                         0,
-                                        (gridLayout?.totalHeight || 0) -
-                                            CARD_HEIGHT
+                                        gridLayout
+                                            ? gridLayout.totalHeight -
+                                                  gridLayout?.cardH
+                                            : 0
                                     ),
                                 }}
                             />
