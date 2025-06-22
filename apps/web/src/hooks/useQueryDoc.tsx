@@ -48,15 +48,13 @@ export function useQueryDoc() {
     const [_domain, _setDomain] = useState<Domain | null>(null);
     const queriesRef = useRef<Query[]>([]);
     const queryNamesRef = useRef<string[]>([]);
-    const activeQueryNameRef = useRef<{ n: string; i: number }>({
-        n: "",
-        i: 0,
-    });
+    const activeQueryNameRef = useRef<{ n: string; i: number } | null>(null);
 
     const activateQuery = useCallback((index: number | null, fast = true) => {
         setFastUpdate(fast);
         if (index === null) {
             setActiveIndex(null);
+            activeQueryNameRef.current = null;
             return;
         }
         const query = queriesRef.current[index];
@@ -125,8 +123,6 @@ export function useQueryDoc() {
             //     ) === "input.complete"
             // );
 
-            const old_query_name = activeQueryNameRef.current.n;
-
             const { queries, domain } = queriesFromView(view);
             _setDomain(domain);
 
@@ -163,6 +159,8 @@ export function useQueryDoc() {
                 return;
             }
 
+            if (activeQueryNameRef.current === null) return;
+
             const new_query_names = queries.map(
                 (q) => q.name.text || "[unnamed]"
             );
@@ -170,6 +168,8 @@ export function useQueryDoc() {
             queryNamesRef.current = new_query_names;
 
             const new_query_names_set = new Set(new_query_names);
+
+            const old_query_name = activeQueryNameRef.current.n;
             const repeat_index = activeQueryNameRef.current.i;
 
             if (old_query_names.length === new_query_names.length) {
@@ -265,19 +265,6 @@ export function useQueryDoc() {
         return { queryNodes: updated_query_nodes, activeQuery };
     }, [activeIndex, _queryNodes, _domain]);
 
-    // const computedSettings = useCompareMemo<Settings>(
-    //     (prev) => {
-    //         const next = activeQuery.computed_settings;
-    //         if (prev && isSettingsEqual(prev, next)) {
-    //             // console.log("are the same no update", prev, next);
-    //             return prev;
-    //         }
-    //         // console.log("are updating", prev, next);
-    //         return next;
-    //     },
-    //     [activeQuery]
-    // );
-    // console.log("computed settings", computedSettings);
     const computedSettings = useCompareMemo(
         activeQuery.computed_settings,
         isSettingsEqual
