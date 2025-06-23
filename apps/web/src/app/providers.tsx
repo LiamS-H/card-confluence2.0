@@ -7,6 +7,7 @@ import { SearchContextProvider } from "@/context/search";
 import { ScrycardsContextProvider } from "react-scrycards";
 import { HighlightContextProvider } from "@/context/highlight";
 import { EditorContextProvider } from "@/context/editor-settings";
+import { ChatsContextProvider } from "@/context/chat";
 
 export function Providers({ children }: { children: ReactNode }) {
     return (
@@ -22,7 +23,9 @@ export function Providers({ children }: { children: ReactNode }) {
                         <SearchContextProvider>
                             <EditorContextProvider>
                                 <HighlightContextProvider>
-                                    {children}
+                                    <ChatsContextProvider>
+                                        {children}
+                                    </ChatsContextProvider>
                                 </HighlightContextProvider>
                             </EditorContextProvider>
                         </SearchContextProvider>
