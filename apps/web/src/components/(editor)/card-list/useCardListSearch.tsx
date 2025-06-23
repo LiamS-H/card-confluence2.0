@@ -80,8 +80,8 @@ function calcGrid(
                 visibleItems.push({
                     index,
                     id,
-                    x: col * (CARD_WIDTH + GAP),
-                    y: row * (CARD_HEIGHT + GAP),
+                    x: GAP + col * (CARD_WIDTH + GAP),
+                    y: GAP + row * (CARD_HEIGHT + GAP),
                 });
             }
         }

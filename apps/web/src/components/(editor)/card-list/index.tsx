@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card } from "../card";
+import { Card } from "@/components/(editor)/card";
 import { useCardListSearch } from "./useCardListSearch";
 
 export function CardList({
@@ -75,7 +75,7 @@ export function CardList({
         return (
             <div
                 ref={containerRef}
-                className="mr-4 relative"
+                className="relative w-full"
                 style={{
                     minHeight: gridLayout?.totalHeight || "auto",
                 }}
