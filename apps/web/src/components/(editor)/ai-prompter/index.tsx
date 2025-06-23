@@ -1,88 +1,96 @@
 import { Button } from "@/components/(ui)/button";
-import { Textarea } from "@/components/(ui)/textarea";
-import { queryAI } from "@/lib/ai";
+import { ChatId, useChatsContext } from "@/context/chat";
 import { ICatalog } from "codemirror-lang-scrycards";
-import { LoaderCircle, SendHorizonal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { EditorChat } from "./chat";
+import { X } from "lucide-react";
 
 export function AIPrompter({
-    // doc,
-    // setDoc,
-    addQuery,
     catalog,
+    addQuery,
 }: {
-    doc: string;
-    setDoc: (doc: string) => void;
-    addQuery: (props: { name: string; body: string }) => void;
     catalog: ICatalog;
+    addQuery: (props: { name: string; body: string }) => void;
 }) {
-    const [prompt, setPrompt] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<null | string>(null);
-    const disabled = prompt === "" || loading;
+    const { addChat, removeChat, chats, nameChat } = useChatsContext();
+
+    const [activeChat, setActiveChat] = useState<ChatId | null>(null);
+    const [emptyChat, setEmptyChat] = useState<ChatId | null>(null);
+
+    useEffect(() => {
+        if (emptyChat === null && activeChat === null) {
+            setEmptyChat(addChat({ name: null, contents: [] }));
+        }
+    }, [emptyChat, addChat, setEmptyChat, activeChat]);
+
+    const activeId = activeChat ?? emptyChat;
+
+    const chatThumbnails = useMemo(() => {
+        const chatThumbnails = [];
+        for (const [chatId, chat] of chats) {
+            chatThumbnails.push(
+                <li key={chatId} className="flex items-center gap-2">
+                    {chatId !== emptyChat && (
+                        <Button
+                            onClick={() => {
+                                if (activeId === chatId) {
+                                    setActiveChat(null);
+                                }
+                                removeChat(chatId);
+                            }}
+                        >
+                            <X />
+                        </Button>
+                    )}
+                    <Button
+                        className="flex-grow"
+                        disabled={activeId === chatId}
+                        onClick={() => {
+                            setActiveChat(chatId);
+                        }}
+                    >
+                        {chat.name || "New Chat"}
+                    </Button>
+                </li>
+            );
+        }
+        return chatThumbnails;
+    }, [chats, activeId, emptyChat, removeChat]);
 
     return (
-        <div className="mr-13 md:mr-0 mt-2 md:mt-0 w-full xl:w-2xl flex flex-col items-center gap-2 bg-background">
-            <div className="w-full relative">
-                <form
-                    onSubmit={async (e) => {
-                        e.preventDefault();
-                        if (!prompt) {
-                            return;
-                        }
-                        setLoading(true);
-                        setError(null);
-                        const resp = await queryAI(prompt, catalog);
-                        setLoading(false);
-                        if (!resp) {
-                            setError("[gemini] request failed.");
-                            return;
-                        }
-                        const { func, text } = resp;
-
-                        if (!func || Array.isArray(func)) {
-                            console.error("[gemini]", resp);
-                            setError("[gemini] didn't call add_query.");
-                            return;
-                        }
-                        console.log(`[gemini] "${text ?? ""}"`, resp);
-                        if (!func.args) return;
-                        if (func.name !== "add_query") {
-                            return;
-                        }
-                        if (!func.args) {
-                            console.error(
-                                "[gemini] no args provided to add_query"
-                            );
-                            setError("[gemini] no args provided to add_query");
-                            return;
-                        }
-                        setPrompt("");
-                        addQuery(func.args as { name: string; body: string });
-                    }}
-                >
-                    <Textarea
-                        placeholder="Ask GenAI"
-                        className="min-h-24"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                    />
-                    <Button
-                        className="absolute bottom-2 right-2"
-                        size="icon"
-                        variant={disabled ? "outline" : "default"}
-                        disabled={disabled}
-                        type="submit"
-                    >
-                        {loading ? (
-                            <LoaderCircle className="animate-spin" />
-                        ) : (
-                            <SendHorizonal />
-                        )}
-                    </Button>
-                </form>
+        <div className="flex w-full">
+            <div className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-2">
+                    {chatThumbnails}
+                    {!emptyChat && (
+                        <li className="w-full">
+                            <Button
+                                disabled={activeChat === null}
+                                onClick={() => {
+                                    if (activeChat === null) return;
+                                    setActiveChat(null);
+                                }}
+                            >
+                                New Chat
+                            </Button>
+                        </li>
+                    )}
+                </ul>
             </div>
-            {error && <p>{error}</p>}
+            <div className="mr-13 md:mr-0 mt-2 md:mt-0 w-full flex flex-col flex-grow items-center gap-2 bg-background">
+                {activeId && (
+                    <EditorChat
+                        commitChat={() => {
+                            setEmptyChat(null);
+                            setActiveChat(activeId);
+                            nameChat(activeId, "loading...");
+                        }}
+                        addQuery={addQuery}
+                        catalog={catalog}
+                        chatId={activeId}
+                    />
+                )}
+            </div>
         </div>
     );
 }

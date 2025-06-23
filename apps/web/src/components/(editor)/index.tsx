@@ -6,7 +6,6 @@ import { type ICatalog } from "codemirror-lang-scrycards";
 import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
 import { CardList } from "@/components/(editor)/card-list";
 
-import { AIPrompter } from "@/components/(editor)/ai-prompter";
 import { useQueryDoc } from "@/hooks/useQueryDoc";
 import { SearchBar } from "@/components/(editor)/search-bar";
 import { Editor } from "@/components/(editor)/editor";
@@ -16,6 +15,7 @@ import { ISearchSettings } from "@/lib/scryfall";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { Button } from "@/components/(ui)/button";
 import { Sparkles, SquareCode } from "lucide-react";
+import { AIPrompter } from "./ai-prompter";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const [aiOpen, setAiOpen] = useState(false);
@@ -86,12 +86,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                     <div
                         className={`w-full flex justify-center p-2 ${aiOpen ? "lg:w-1/2" : "hidden"}`}
                     >
-                        <AIPrompter
-                            catalog={catalog}
-                            doc={doc}
-                            setDoc={() => {}}
-                            addQuery={addDocQuery}
-                        />
+                        <AIPrompter catalog={catalog} addQuery={addDocQuery} />
                     </div>
                 </div>
                 <SearchBar

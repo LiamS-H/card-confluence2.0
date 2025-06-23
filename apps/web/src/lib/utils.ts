@@ -47,3 +47,12 @@ export function getWindowSize(): "xs" | "sm" | "md" | "lg" | "xl" | "2xl" {
     if (width >= 640) return "sm";
     return "xs";
 }
+
+declare const __brand: unique symbol;
+export type Brand<T, K> = T & { [__brand]: K };
+
+export function getContents<T>(val: T | (() => T)) {
+    if (typeof val === "function") {
+        return (val as () => T)();
+    } else return val;
+}

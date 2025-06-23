@@ -8,9 +8,9 @@ Deck builder
     [ ] save query page with a deck, rerun the queries and detect new card additions
 
 AI
-    [ ] chats are separate like copilot on vscode, you can run multiple queries from one chat or start a new chat with the + button (start with this because it will be easier)
+    [X] chats are separate like copilot on vscode, you can run multiple queries from one chat or start a new chat with the + button (start with this because it will be easier)
     [ ] ai can add to queries or pull up a query based on name
-    [ ] ai can run local commands
+    [X] ai can run local commands
     [X] prompting space can be toggled between query only | ai
 
 Autocomplete
