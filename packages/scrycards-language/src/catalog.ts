@@ -30,7 +30,7 @@ export interface ICatalog {
 
     stamps: string[];
     games: string[];
-    formats: string[];
+    formats: IDetailedCatalogEntry[];
     cubes: string[];
     rarities: string[];
     criteria: string[]; // used for the is: tag

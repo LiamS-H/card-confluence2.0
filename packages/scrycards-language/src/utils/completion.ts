@@ -556,10 +556,7 @@ export function completionInfoFromArg(
                 displayLabel: c,
             }));
         case "format":
-            return catalog.formats.map((f) => ({
-                label: f.toLowerCase(),
-                displayLabel: f,
-            }));
+            return catalog.formats.map((f) => f);
         case "artist":
             return catalog["artist-names"].map((a) => ({
                 label: a,
