@@ -1,22 +1,10 @@
-import { ISearchSettings } from "@/lib/scryfall";
-
 import { Order } from "./order";
 import { Progress } from "@/components/(ui)/progress";
 import { Direction } from "./direction";
 import { Unique } from "./unique";
 import { ScrollTop } from "./scrolltop";
 
-export function SearchBar({
-    scryfallSettings,
-    computedSettings,
-    setScryfallSettings,
-    progress,
-}: {
-    scryfallSettings: ISearchSettings;
-    computedSettings?: ISearchSettings;
-    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
-    progress: number | null;
-}) {
+export function SearchBar({ progress }: { progress: number | null }) {
     return (
         <div className="absolute top-full w-full">
             {progress !== null ? (
@@ -25,21 +13,9 @@ export function SearchBar({
                 <div className="h-2" />
             )}
             <div className="flex justify-start items-center gap-2 p-2 w-full">
-                <Order
-                    scryfallSettings={scryfallSettings}
-                    setScryfallSettings={setScryfallSettings}
-                    computedSettings={computedSettings}
-                />
-                <Direction
-                    scryfallSettings={scryfallSettings}
-                    setScryfallSettings={setScryfallSettings}
-                    computedSettings={computedSettings}
-                />
-                <Unique
-                    scryfallSettings={scryfallSettings}
-                    setScryfallSettings={setScryfallSettings}
-                    computedSettings={computedSettings}
-                />
+                <Order />
+                <Direction />
+                <Unique />
 
                 {progress && <ScrollTop />}
             </div>

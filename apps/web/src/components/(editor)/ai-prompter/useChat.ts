@@ -11,6 +11,7 @@ import {
 } from "codemirror-lang-scrycards";
 import { fetchSearch } from "@/lib/scryfall";
 import { getContents } from "@/lib/utils";
+import { useEditorQueriesContext } from "@/context/editor-queries";
 
 const MAX_CALLS = 10;
 
@@ -43,12 +44,11 @@ let message = 0;
 export function useChat({
     chatId,
     catalog,
-    addQuery,
 }: {
     chatId: ChatId;
     catalog: ICatalog;
-    addQuery: (props: { name: string; body: string }) => void;
 }) {
+    const { addDocQuery } = useEditorQueriesContext();
     const { chat, addContents, removeChat } = useChatId(chatId);
 
     const contents = getContents(chat.contents);
@@ -198,7 +198,7 @@ export function useChat({
                             });
                             continue;
                         case "add_query":
-                            addQuery(
+                            addDocQuery(
                                 func.args as { name: string; body: string }
                             );
                             i = -1;
@@ -277,7 +277,7 @@ export function useChat({
 
             setLoading(false);
         },
-        [loading, poll, contents, addQuery, addContents, catalog]
+        [loading, poll, contents, addDocQuery, addContents, catalog]
     );
 
     //TODO: add chat stopping that actually removes / flags messages

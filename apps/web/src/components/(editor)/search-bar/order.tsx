@@ -5,19 +5,14 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
-import { SearchOrders, ISearchSettings } from "@/lib/scryfall";
+import { SearchOrders } from "@/lib/scryfall";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { useMemo } from "react";
+import { useEditorQueriesContext } from "@/context/editor-queries";
 
-export function Order({
-    scryfallSettings,
-    computedSettings,
-    setScryfallSettings,
-}: {
-    scryfallSettings: ISearchSettings;
-    computedSettings?: ISearchSettings;
-    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
-}) {
+export function Order() {
+    const { scryfallSettings, computedSettings, setScryfallSettings } =
+        useEditorQueriesContext();
     const computed_order = computedSettings?.order ?? "name";
     const order = scryfallSettings.order;
 

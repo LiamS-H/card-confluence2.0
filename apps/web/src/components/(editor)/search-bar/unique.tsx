@@ -5,19 +5,14 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
-import { SearchUniques, ISearchSettings } from "@/lib/scryfall";
+import { SearchUniques } from "@/lib/scryfall";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { useEditorQueriesContext } from "@/context/editor-queries";
 
-export function Unique({
-    scryfallSettings,
-    computedSettings,
-    setScryfallSettings,
-}: {
-    scryfallSettings: ISearchSettings;
-    computedSettings?: ISearchSettings;
-    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
-}) {
-    const computed_unique = computedSettings?.unique ?? "cards";
+export function Unique() {
+    const { scryfallSettings, computedSettings, setScryfallSettings } =
+        useEditorQueriesContext();
+    const computed_unique = computedSettings.unique ?? "cards";
     const unique = scryfallSettings.unique;
 
     return (
@@ -25,9 +20,7 @@ export function Unique({
             <SimpleToolTip text="Change unique">
                 <DropdownMenuTrigger asChild>
                     {unique ? (
-                        <Button className="relative">
-                            Unique: {unique ?? "select"}
-                        </Button>
+                        <Button className="relative">Unique: {unique}</Button>
                     ) : (
                         <Button variant={"highlight"}>
                             Unique: {computed_unique}
@@ -46,7 +39,7 @@ export function Unique({
                     onClick={() =>
                         setScryfallSettings((s) => ({
                             ...s,
-                            order: undefined,
+                            unique: undefined,
                         }))
                     }
                 >
@@ -54,18 +47,18 @@ export function Unique({
                         computed <i>{computed_unique}</i>
                     </span>
                 </DropdownMenuItem>
-                {SearchUniques.map((o) => (
+                {SearchUniques.map((u) => (
                     <DropdownMenuItem
-                        key={o.label}
-                        disabled={unique === o.label}
+                        key={u.label}
+                        disabled={unique === u.label}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
-                                unique: o.label,
+                                unique: u.label,
                             }))
                         }
                     >
-                        {o.label}
+                        {u.label}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

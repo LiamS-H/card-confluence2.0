@@ -9,12 +9,12 @@ import {
     queriesFromView,
     type Query,
     type Domain,
-    type Settings,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
 import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
 import { useCompareMemo } from "./useCompareMemo";
+import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
 order:cmc
@@ -32,16 +32,7 @@ export function useQueryDoc() {
         {}
     );
     const [_queryNodes, _setQueryNodes] = useState<
-        {
-            node: Node;
-            offset: number;
-            query: Query;
-            computed_query: string;
-            noSettings: string;
-            active: boolean;
-            ast: string;
-            computed_settings: Settings;
-        }[]
+        IEditorQueriesContext["queryNodes"]
     >([]);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [fastUpdate, setFastUpdate] = useState(false);
@@ -50,8 +41,8 @@ export function useQueryDoc() {
     const queryNamesRef = useRef<string[]>([]);
     const activeQueryNameRef = useRef<{ n: string; i: number } | null>(null);
 
-    const activateQuery = useCallback((index: number | null, fast = true) => {
-        setFastUpdate(fast);
+    const activateQuery = useCallback((index: number | null) => {
+        setFastUpdate(true);
         if (index === null) {
             setActiveIndex(null);
             activeQueryNameRef.current = null;
@@ -159,24 +150,11 @@ export function useQueryDoc() {
                 return;
             }
 
-            if (activeQueryNameRef.current === null) return;
-
             const new_query_names = queries.map(
                 (q) => q.name.text || "[unnamed]"
             );
             const old_query_names = queryNamesRef.current;
             queryNamesRef.current = new_query_names;
-
-            const new_query_names_set = new Set(new_query_names);
-
-            const old_query_name = activeQueryNameRef.current.n;
-            const repeat_index = activeQueryNameRef.current.i;
-
-            if (old_query_names.length === new_query_names.length) {
-                const index = old_query_names.indexOf(old_query_name);
-                activateQuery(index === -1 ? null : index, false);
-                return;
-            }
 
             if (old_query_names.length + 1 === new_query_names.length) {
                 const old_query_names_set = new Set(old_query_names);
@@ -187,6 +165,19 @@ export function useQueryDoc() {
                     activateQuery(i);
                     return;
                 }
+            }
+
+            if (activeQueryNameRef.current === null) return;
+
+            const new_query_names_set = new Set(new_query_names);
+
+            const old_query_name = activeQueryNameRef.current.n;
+            const repeat_index = activeQueryNameRef.current.i;
+
+            if (old_query_names.length === new_query_names.length) {
+                const index = old_query_names.indexOf(old_query_name);
+                activateQuery(index === -1 ? null : index);
+                return;
             }
 
             if (!new_query_names_set.has(old_query_name)) {
@@ -269,14 +260,13 @@ export function useQueryDoc() {
         activeQuery.computed_settings,
         isSettingsEqual
     );
-    // const computedSettings = activeQuery.computed_settings;
+    const mergedSettings = useMemo(() => {
+        return mergeObjects(scryfallSettings, computedSettings);
+    }, [scryfallSettings, computedSettings]);
 
-    return {
-        doc,
-        onCreateEditor,
-        onUpdate,
-        onChange,
+    const context: IEditorQueriesContext = {
         activateQuery,
+        fastUpdate,
         queryNodes,
         changeDocDomain,
         addDocQuery,
@@ -284,8 +274,16 @@ export function useQueryDoc() {
         computedQuery: activeQuery?.noSettings,
         ast: activeQuery?.ast,
         computedSettings: computedSettings,
-        fastUpdate,
         scryfallSettings,
+        mergedSettings,
         setScryfallSettings,
+    };
+
+    return {
+        doc,
+        onCreateEditor,
+        onUpdate,
+        onChange,
+        context,
     };
 }

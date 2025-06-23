@@ -1,6 +1,7 @@
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
-import { SearchOrders, ISearchSettings } from "@/lib/scryfall";
+import { useEditorQueriesContext } from "@/context/editor-queries";
+import { SearchOrders } from "@/lib/scryfall";
 import {
     ArrowDown01,
     ArrowDown10,
@@ -35,24 +36,13 @@ const autoOrders: Record<
     review: "asc",
 } as const;
 
-export function Direction({
-    scryfallSettings,
-    computedSettings,
-    setScryfallSettings,
-}: {
-    scryfallSettings: ISearchSettings;
-    computedSettings?: ISearchSettings;
-    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
-}) {
-    const order = scryfallSettings.order ?? computedSettings?.order ?? "name";
+export function Direction() {
+    const { mergedSettings, setScryfallSettings } = useEditorQueriesContext();
+
+    const order = mergedSettings.order ?? "name";
+    const auto = autoOrders[order];
 
     const lastOrder = useRef<typeof order | null>(null);
-
-    const computed_dir =
-        scryfallSettings.dir ?? computedSettings?.dir ?? "auto";
-
-    const dir: "asc" | "desc" =
-        computed_dir === "auto" ? autoOrders[order] : computed_dir;
 
     useEffect(() => {
         const last_order = lastOrder.current;
@@ -62,9 +52,9 @@ export function Direction({
             ...s,
             dir: undefined,
         }));
-    }, [order, computedSettings, setScryfallSettings]);
+    }, [order, setScryfallSettings]);
 
-    const asc = dir === "asc";
+    const asc = mergedSettings.dir ?? auto === "asc";
 
     let Icon;
     switch (order) {
@@ -105,7 +95,7 @@ export function Direction({
                 onClick={() =>
                     setScryfallSettings((s) => ({
                         ...s,
-                        dir: dir === "asc" ? "desc" : "asc",
+                        dir: s.dir ? undefined : asc ? "desc" : "asc",
                     }))
                 }
             >

@@ -28,12 +28,10 @@ export interface ProcessedMessage {
 }
 
 export function EditorChat({
-    addQuery: _addQuery,
     catalog: _catalog,
     chatId: _chatId,
     commitChat,
 }: {
-    addQuery: (props: { name: string; body: string }) => void;
     catalog: ICatalog;
     chatId: ChatId;
     commitChat: () => void;
@@ -42,7 +40,6 @@ export function EditorChat({
     const { chat, loading, query } = useChat({
         chatId: _chatId,
         catalog: _catalog,
-        addQuery: _addQuery,
     });
 
     const processedMessages = useMemo(() => {

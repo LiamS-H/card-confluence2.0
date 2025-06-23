@@ -8,14 +8,14 @@ import {
     // indentWithTab
 } from "@codemirror/commands";
 import { acceptCompletion } from "@codemirror/autocomplete";
-import React, { type ReactNode, useCallback, useMemo, useRef } from "react";
+import React, { type ReactNode, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
 import { type ICatalog, scrycardsFromCatalog } from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
 import { Copy, Search, TextSearch } from "lucide-react";
 import { SimpleToolTip } from "../(ui)/tooltip";
-import { type useQueryDoc } from "@/hooks/useQueryDoc";
 import { cn } from "@/lib/utils";
+import { useEditorQueriesContext } from "@/context/editor-queries";
 
 function QueryWrapper({
     children,
@@ -52,7 +52,6 @@ function QueryWrapper({
 
 function QueryNode({
     query: { node, offset, active, computed_query },
-    activateQuery,
     i,
 }: {
     query: {
@@ -61,9 +60,9 @@ function QueryNode({
         active: boolean;
         computed_query: string;
     };
-    activateQuery: (i: number | null) => void;
     i: number;
 }) {
+    const { activateQuery } = useEditorQueriesContext();
     return (
         <QueryWrapper node={node} offset={offset}>
             <SimpleToolTip text="Activate query">
@@ -108,8 +107,6 @@ export function Editor({
     onCreateEditor,
     onUpdate,
     onChange,
-    queryNodes,
-    activateQuery,
     className,
     children,
 }: {
@@ -118,11 +115,10 @@ export function Editor({
     onCreateEditor: ReactCodeMirrorProps["onCreateEditor"];
     onUpdate: ReactCodeMirrorProps["onUpdate"];
     onChange: ReactCodeMirrorProps["onChange"];
-    queryNodes: ReturnType<typeof useQueryDoc>["queryNodes"];
-    activateQuery: ReturnType<typeof useQueryDoc>["activateQuery"];
     className?: string;
     children?: ReactNode;
 }) {
+    const { queryNodes } = useEditorQueriesContext();
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
@@ -136,13 +132,6 @@ export function Editor({
         ];
     }, [catalog]);
 
-    const activateFast = useCallback(
-        (i: number | null) => {
-            activateQuery(i, true);
-        },
-        [activateQuery]
-    );
-
     const queryComponents = useMemo(
         () =>
             queryNodes.map(({ node, offset, active, computed_query }, i) => (
@@ -150,10 +139,9 @@ export function Editor({
                     key={i}
                     query={{ node, offset, active, computed_query }}
                     i={i}
-                    activateQuery={activateFast}
                 />
             )),
-        [queryNodes, activateFast]
+        [queryNodes]
     );
 
     return (

@@ -5,13 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EditorChat } from "./chat";
 import { X } from "lucide-react";
 
-export function AIPrompter({
-    catalog,
-    addQuery,
-}: {
-    catalog: ICatalog;
-    addQuery: (props: { name: string; body: string }) => void;
-}) {
+export function AIPrompter({ catalog }: { catalog: ICatalog }) {
     const { addChat, removeChat, chats, nameChat } = useChatsContext();
 
     const [activeChat, setActiveChat] = useState<ChatId | null>(null);
@@ -85,7 +79,6 @@ export function AIPrompter({
                             setActiveChat(activeId);
                             nameChat(activeId, "loading...");
                         }}
-                        addQuery={addQuery}
                         catalog={catalog}
                         chatId={activeId}
                     />
