@@ -35,7 +35,7 @@ function calcGrid(
     const containerTop = rect.top + scrollTop;
 
     const columns =
-        editorSettings.cardColumns ??
+        editorSettings.cardColumns ||
         Math.floor((containerWidth - GAP) / (200 + GAP));
 
     const CARD_WIDTH = Math.floor(

@@ -1,12 +1,20 @@
-import { type ReactNode, createContext, useContext, useState } from "react";
+import { EditorSettingsModal } from "@/components/(editor)/settings";
+import { createContext, useContext, useState } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 export interface IEditorSettings {
     cardColumns?: number;
+    disableTooltips?: boolean;
+    disableAutocomplete?: boolean;
+    disableAutocompleteInfo?: boolean;
+    hideSillyCards?: boolean;
 }
 
 export interface IEditorSettingsContext {
     settings: IEditorSettings;
-    setSettings: (settings: IEditorSettings) => void;
+    setSettings: Dispatch<SetStateAction<IEditorSettings>>;
+    open: boolean;
+    setOpen: (o: boolean) => void;
 }
 
 const editorSettingsContext = createContext<IEditorSettingsContext | null>(
@@ -22,10 +30,14 @@ export function useEditorSettingsContext() {
 
 export function EditorContextProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<IEditorSettings>({});
+    const [open, setOpen] = useState<boolean>(false);
 
     return (
-        <editorSettingsContext.Provider value={{ settings, setSettings }}>
+        <editorSettingsContext.Provider
+            value={{ settings, setSettings, open, setOpen }}
+        >
             {children}
+            <EditorSettingsModal />
         </editorSettingsContext.Provider>
     );
 }

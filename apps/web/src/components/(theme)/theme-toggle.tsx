@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { SimpleToolTip } from "../(ui)/tooltip";
 
-export function ThemeToggle() {
+export function ThemeToggle(props: Parameters<typeof Button>[0]) {
     const { setTheme, themes, theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [currentTheme, setCurrentTheme] = useState<string | undefined>(theme);
@@ -25,7 +25,7 @@ export function ThemeToggle() {
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <SimpleToolTip text="Change theme">
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
+                    <Button variant="outline" size="icon" {...props}>
                         <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                         <span className="sr-only">Toggle theme</span>

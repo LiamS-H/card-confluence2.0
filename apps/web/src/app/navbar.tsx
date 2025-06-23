@@ -2,7 +2,8 @@
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
-import { FileText, Menu, Search, X } from "lucide-react";
+import { useEditorSettingsContext } from "@/context/editor-settings";
+import { FileText, Menu, Search, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -51,31 +52,47 @@ function NavItem({
 export function NavBar() {
     const current_path = usePathname();
     const [hidden, setHidden] = useState(false);
+    const { setOpen } = useEditorSettingsContext();
     return (
         <nav className="fixed z-40 top-0 right-0">
             <ul className="p-4 flex md:flex-row flex-col items-center gap-4">
                 {hidden ? (
                     <li>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setHidden(false)}
-                        >
-                            <Menu />
-                        </Button>
+                        <SimpleToolTip text="Menu">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setHidden(false)}
+                            >
+                                <Menu />
+                            </Button>
+                        </SimpleToolTip>
                     </li>
                 ) : (
                     <>
                         <li className="md:hidden">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setHidden(true)}
-                            >
-                                <X />
-                            </Button>
+                            <SimpleToolTip text="Collapse">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => setHidden(true)}
+                                >
+                                    <X />
+                                </Button>
+                            </SimpleToolTip>
                         </li>
                         <li>
+                            <SimpleToolTip text="Settings">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => setOpen(true)}
+                                >
+                                    <Settings />
+                                </Button>
+                            </SimpleToolTip>
+                        </li>
+                        <li className="hidden sm:block">
                             <ThemeToggle />
                         </li>
                         {paths.map((item) => (

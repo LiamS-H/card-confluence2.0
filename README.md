@@ -28,7 +28,7 @@ Search Bar
     [X] potentially order and display setting dropdowns
 
 Editor Settings
-    [ ] Adjust number of card columns (settings page should be transparent or small so that you can see this as you apply settings)
+    [X] Adjust number of card columns (settings page should be transparent or small so that you can see this as you apply settings)
     [ ] Disable tooltips / autocomplete (good for mobile or if you already know everything)
     [ ] Disable info / detail on 
     [ ] Setting to Always hide silly cards (vanguard, unsets, etc.)
