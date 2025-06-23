@@ -22,43 +22,45 @@ export function AIPrompter({
     const disabled = prompt === "" || loading;
 
     return (
-        <form
-            onSubmit={async (e) => {
-                e.preventDefault();
-                if (!prompt) {
-                    return;
-                }
-                setLoading(true);
-                setError(null);
-                const resp = await queryAI(prompt, catalog);
-                setLoading(false);
-                if (!resp) {
-                    setError("[gemini] request failed.");
-                    return;
-                }
-                const { func, text } = resp;
+        <div className="mr-13 md:mr-0 mt-2 md:mt-0 w-full xl:w-2xl flex flex-col items-center gap-2 bg-background">
+            <div className="w-full relative">
+                <form
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!prompt) {
+                            return;
+                        }
+                        setLoading(true);
+                        setError(null);
+                        const resp = await queryAI(prompt, catalog);
+                        setLoading(false);
+                        if (!resp) {
+                            setError("[gemini] request failed.");
+                            return;
+                        }
+                        const { func, text } = resp;
 
-                if (!func || Array.isArray(func)) {
-                    console.error("[gemini]", resp);
-                    setError("[gemini] didn't call add_query.");
-                    return;
-                }
-                console.log(`[gemini] "${text ?? ""}"`, resp);
-                if (!func.args) return;
-                if (func.name !== "add_query") {
-                    return;
-                }
-                if (!func.args) {
-                    console.error("[gemini] no args provided to add_query");
-                    setError("[gemini] no args provided to add_query");
-                    return;
-                }
-                setPrompt("");
-                addQuery(func.args as { name: string; body: string });
-            }}
-        >
-            <div className="pl-2 pr-13 flex flex-col items-center gap-2 bg-background">
-                <div className="w-full relative">
+                        if (!func || Array.isArray(func)) {
+                            console.error("[gemini]", resp);
+                            setError("[gemini] didn't call add_query.");
+                            return;
+                        }
+                        console.log(`[gemini] "${text ?? ""}"`, resp);
+                        if (!func.args) return;
+                        if (func.name !== "add_query") {
+                            return;
+                        }
+                        if (!func.args) {
+                            console.error(
+                                "[gemini] no args provided to add_query"
+                            );
+                            setError("[gemini] no args provided to add_query");
+                            return;
+                        }
+                        setPrompt("");
+                        addQuery(func.args as { name: string; body: string });
+                    }}
+                >
                     <Textarea
                         placeholder="Ask GenAI"
                         className="min-h-24"
@@ -78,9 +80,9 @@ export function AIPrompter({
                             <SendHorizonal />
                         )}
                     </Button>
-                </div>
-                {error && <p>{error}</p>}
+                </form>
             </div>
-        </form>
+            {error && <p>{error}</p>}
+        </div>
     );
 }

@@ -26,7 +26,6 @@ export function ScrollTop() {
         <SimpleToolTip text="Scroll to top">
             <Button
                 size="icon"
-                className="absolute top-16 left-2 sm:static"
                 variant="outline"
                 onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
             >

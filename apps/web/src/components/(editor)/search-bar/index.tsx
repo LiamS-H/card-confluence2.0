@@ -10,15 +10,11 @@ import { Unique } from "./unique";
 import { ScrollTop } from "./scrolltop";
 
 export function SearchBar({
-    aiOpen,
-    setAiOpen,
     scryfallSettings,
     computedSettings,
     setScryfallSettings,
     progress,
 }: {
-    aiOpen: boolean;
-    setAiOpen: (s: (o: boolean) => boolean) => void;
     scryfallSettings: ISearchSettings;
     computedSettings?: ISearchSettings;
     setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
@@ -32,15 +28,6 @@ export function SearchBar({
                 <div className="h-2" />
             )}
             <div className="flex justify-start items-center gap-2 p-2 w-full">
-                <SimpleToolTip text={aiOpen ? "Editor Only" : "Open GenAI"}>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setAiOpen((o) => !o)}
-                    >
-                        {aiOpen ? <SquareCode /> : <Sparkles />}
-                    </Button>
-                </SimpleToolTip>
                 <Order
                     scryfallSettings={scryfallSettings}
                     setScryfallSettings={setScryfallSettings}
@@ -56,6 +43,7 @@ export function SearchBar({
                     setScryfallSettings={setScryfallSettings}
                     computedSettings={computedSettings}
                 />
+
                 {progress && <ScrollTop />}
             </div>
         </div>
