@@ -38,7 +38,7 @@ function ToggleButton({
                 onCheckedChange={(checked) =>
                     setSettings((s) => {
                         const s2 = { ...s };
-                        //@ts-expect-error
+                        //@ts-expect-error ts is angry about this for some reason
                         s2[setting] = !checked;
                         return s2;
                     })
@@ -54,13 +54,7 @@ function ToggleButton({
 export function EditorSettingsModal() {
     const { open, setOpen, settings, setSettings } = useEditorSettingsContext();
     const { theme } = useTheme();
-    const {
-        cardColumns,
-        disableAutocomplete,
-        disableAutocompleteInfo,
-        disableTooltips,
-        hideSillyCards,
-    } = settings;
+    const { cardColumns } = settings;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

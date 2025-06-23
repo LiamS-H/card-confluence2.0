@@ -13,7 +13,7 @@ export function useCompareMemo<T>(
             setV((old) => (compare ? (compare(old, val) ? old : val) : val));
             timeoutRef.current = null;
         });
-    }, [val]);
+    }, [val, compare]);
 
     return v;
 }

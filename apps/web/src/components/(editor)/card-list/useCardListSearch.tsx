@@ -218,7 +218,7 @@ export function useCardListSearch({
             signal: controller.signal,
         });
         return () => {
-            controller.abort;
+            controller.abort();
         };
     }, [debouncedCalcGrid]);
 

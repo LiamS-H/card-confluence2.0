@@ -136,9 +136,12 @@ export function Editor({
         ];
     }, [catalog]);
 
-    const activateFast = useCallback((i: number | null) => {
-        activateQuery(i, true);
-    }, []);
+    const activateFast = useCallback(
+        (i: number | null) => {
+            activateQuery(i, true);
+        },
+        [activateQuery]
+    );
 
     const queryComponents = useMemo(
         () =>
@@ -150,7 +153,7 @@ export function Editor({
                     activateQuery={activateFast}
                 />
             )),
-        [activateQuery, queryNodes]
+        [queryNodes, activateFast]
     );
 
     return (
