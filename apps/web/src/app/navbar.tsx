@@ -3,10 +3,11 @@ import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { useEditorSettingsContext } from "@/context/editor-settings";
+import { getWindowSize } from "@/lib/utils";
 import { FileText, Menu, Search, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useRef, useEffect, useState, type ReactNode } from "react";
 
 interface INavItem {
     path: string;
@@ -53,8 +54,27 @@ export function NavBar() {
     const current_path = usePathname();
     const [hidden, setHidden] = useState(false);
     const { setOpen } = useEditorSettingsContext();
+    const navRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (hidden) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (getWindowSize() !== "xs") return;
+            if (
+                navRef.current &&
+                !navRef.current.contains(event.target as Node)
+            ) {
+                setHidden(true);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [hidden]);
+
     return (
-        <nav className="fixed z-40 top-0 right-0">
+        <nav ref={navRef} className="fixed z-40 top-0 right-0">
             <ul className="p-4 flex md:flex-row flex-col items-center gap-4">
                 {hidden ? (
                     <li>
