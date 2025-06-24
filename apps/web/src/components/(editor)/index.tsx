@@ -17,9 +17,11 @@ import { AIOpenButton } from "./ai-open-button";
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const { doc, onCreateEditor, onUpdate, onChange, context } = useQueryDoc();
     const {
-        settings: { hideAiPrompter },
+        settings: { window },
     } = useEditorSettingsContext();
-    const aiOpen = !hideAiPrompter;
+    const aiOpen = window === "genai" || window === "split";
+    const editorOpen = window === "editor" || window === "split";
+    const split = window === "split";
 
     const { mergedSettings, computedQuery: query, ast, fastUpdate } = context;
 
@@ -37,19 +39,22 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                 <ScrollHidden>
                     <div className="flex flex-col lg:flex-row relative">
                         <div
-                            className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
+                            // className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
+                            className={`absolute bottom-[1] left-1 z-20`}
                         >
-                            <AIOpenButton
-                                className="w-4 h-4"
-                                variant="outline"
-                                size="icon"
-                            >
-                                {aiOpen ? (
-                                    <SquareCode className="h-[2px] w-[2px]" />
-                                ) : (
-                                    <Sparkles />
-                                )}
-                            </AIOpenButton>
+                            {editorOpen && (
+                                <AIOpenButton
+                                    className="w-4 h-4"
+                                    variant="outline"
+                                    size="icon"
+                                >
+                                    {aiOpen ? (
+                                        <SquareCode className="h-[2px] w-[2px]" />
+                                    ) : (
+                                        <Sparkles />
+                                    )}
+                                </AIOpenButton>
+                            )}
                         </div>
 
                         <Editor
@@ -58,10 +63,10 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             onCreateEditor={onCreateEditor}
                             onUpdate={onUpdate}
                             onChange={onChange}
-                            className={`flex-grow text-sm bg-white dark:bg-[#292c34] ${aiOpen && "absolute opacity-0 pointer-events-none lg:pointer-events-auto lg:static lg:opacity-100 lg:w-1/2"}`}
+                            className={`flex-grow text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-1/2" : ""}`}
                         />
                         <div
-                            className={`w-full flex justify-center ${aiOpen ? "lg:w-1/2" : "hidden"}`}
+                            className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"}`}
                         >
                             <AIPrompter catalog={catalog} />
                         </div>

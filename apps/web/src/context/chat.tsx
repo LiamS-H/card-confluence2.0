@@ -41,20 +41,20 @@ export function useChatsContext() {
 export function ChatsContextProvider({ children }: { children: ReactNode }) {
     const [chats, setChats] = useState<Map<ChatId, Chat>>(() => {
         const chats: ChatsContext["chats"] = new Map();
-        chats.set(crypto.randomUUID() as ChatId, {
-            id: crypto.randomUUID() as ChatId,
-            name: "Welcome",
-            contents: [
-                {
-                    role: "system",
-                    parts: [
-                        {
-                            text: "test",
-                        },
-                    ],
-                },
-            ],
-        });
+        // chats.set(crypto.randomUUID() as ChatId, {
+        //     id: crypto.randomUUID() as ChatId,
+        //     name: "Welcome",
+        //     contents: [
+        //         {
+        //             role: "system",
+        //             parts: [
+        //                 {
+        //                     text: "test",
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // });
         return chats;
     });
 

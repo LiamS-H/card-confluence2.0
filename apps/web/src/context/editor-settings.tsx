@@ -4,7 +4,7 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 export interface IEditorSettings {
     cardColumns?: number;
-    hideAiPrompter?: boolean;
+    window: "editor" | "genai" | "split";
     disableTooltips?: boolean;
     disableAutocomplete?: boolean;
     disableAutocompleteInfo?: boolean;
@@ -30,7 +30,9 @@ export function useEditorSettingsContext() {
 }
 
 export function EditorContextProvider({ children }: { children: ReactNode }) {
-    const [settings, setSettings] = useState<IEditorSettings>({});
+    const [settings, setSettings] = useState<IEditorSettings>({
+        window: "split",
+    });
     const [open, setOpen] = useState<boolean>(false);
 
     return (

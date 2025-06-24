@@ -1,6 +1,6 @@
 import { Button } from "@/components/(ui)/button";
 import { ChatId, useChatsContext } from "@/context/chat";
-import { Lock, Menu, SquareCode, SquarePen, X } from "lucide-react";
+import { Layout, Lock, Menu, SquarePen, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AIOpenButton } from "../ai-open-button";
 
@@ -108,11 +108,15 @@ export function ChatsSidebar({
                 >
                     {chatThumbnails}
                 </ul>
-                <div className="lg:hidden">
-                    <AIOpenButton variant={"outline"} className="w-full gap-0">
-                        <SquareCode />
+                <div>
+                    <AIOpenButton
+                        variant={"outline"}
+                        className="w-full gap-0 p-3"
+                        onClick={() => setOpen(true)}
+                    >
+                        <Layout />
                         <span className="overflow-ellipsis overflow-hidden">
-                            Editor Only
+                            Change View
                         </span>
                     </AIOpenButton>
                 </div>

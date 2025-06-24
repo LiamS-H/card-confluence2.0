@@ -1,28 +1,49 @@
 import { useEditorSettingsContext } from "@/context/editor-settings";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
 import { Button } from "@/components/(ui)/button";
-import { useCallback } from "react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/(ui)/dropdown-menu";
 
 export function AIOpenButton({
     children,
+    onClick,
     ...props
-}: Parameters<typeof Button>[0]) {
+}: Omit<Parameters<typeof Button>[0], "onClick"> & { onClick?: () => void }) {
     const {
-        settings: { hideAiPrompter },
+        settings: { window },
         setSettings,
     } = useEditorSettingsContext();
 
-    const aiOpen = !hideAiPrompter;
-
-    const toggleAIOpen = useCallback(() => {
-        setSettings((s) => ({ ...s, hideAiPrompter: !s.hideAiPrompter }));
-    }, [setSettings]);
-
     return (
-        <SimpleToolTip text={aiOpen ? "Editor Only" : "Open GenAI"}>
-            <Button {...props} onClick={toggleAIOpen}>
-                {children}
-            </Button>
-        </SimpleToolTip>
+        <DropdownMenu
+            onOpenChange={() => {
+                onClick?.();
+            }}
+        >
+            <DropdownMenuTrigger asChild>
+                <Button {...props} variant="outline" size="icon">
+                    {children}
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {(["genai", "split", "editor"] as const).map((mode) => (
+                    <DropdownMenuItem
+                        onClick={() =>
+                            setSettings((s) => ({
+                                ...s,
+                                window: mode,
+                            }))
+                        }
+                        key={mode}
+                        disabled={window === mode}
+                    >
+                        <span>{mode}</span>
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }
