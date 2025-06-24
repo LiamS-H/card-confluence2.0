@@ -4,6 +4,7 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 export interface IEditorSettings {
     cardColumns?: number;
+    hideAiPrompter?: boolean;
     disableTooltips?: boolean;
     disableAutocomplete?: boolean;
     disableAutocompleteInfo?: boolean;

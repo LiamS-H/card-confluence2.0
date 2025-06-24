@@ -20,6 +20,7 @@ export function useChatId(chatId: ChatId) {
         addContents: _addContents,
         chats: _chats,
         removeChat: _removeChat,
+        nameChat: _nameChat,
     } = useChatsContext();
     const chat = _chats.get(chatId); // TODO: double check this doesn't change ref when other chats change
     if (!chat) {
@@ -35,8 +36,9 @@ export function useChatId(chatId: ChatId) {
             addContents: (contents: Content[]) =>
                 _addContents(chatId, contents),
             removeChat: () => _removeChat(chatId),
+            nameChat: (name: string) => _nameChat(chatId, name),
         }),
-        [chat, _addContents, _removeChat, chatId]
+        [chat, _addContents, _removeChat, _nameChat, chatId]
     );
 }
 
@@ -49,7 +51,7 @@ export function useChat({
     catalog: ICatalog;
 }) {
     const { addDocQuery } = useEditorQueriesContext();
-    const { chat, addContents, removeChat } = useChatId(chatId);
+    const { chat, addContents, removeChat, nameChat } = useChatId(chatId);
 
     const contents = getContents(chat.contents);
 
@@ -94,7 +96,7 @@ export function useChat({
             addContent(new_content);
 
             let i = 0;
-            while (i < MAX_CALLS && i >= 0) {
+            while (i < MAX_CALLS) {
                 i++;
                 if (canceledMessages.current.has(curMessage)) {
                     break;
@@ -112,7 +114,7 @@ export function useChat({
                 const resp: GenerateContentResponse = JSON.parse(raw);
 
                 const { candidates } = resp;
-                if (!candidates) return;
+                if (!candidates) break;
                 const candidate = candidates[0];
                 if (!candidate?.content) {
                     break;
@@ -125,7 +127,7 @@ export function useChat({
                     candidate.content.parts
                         ?.map((p) => p.functionCall || null)
                         .filter((f) => f !== null);
-                if (!functionCalls) break;
+                if (!functionCalls || functionCalls.length === 0) break;
 
                 for (const func of functionCalls) {
                     console.log(
@@ -198,11 +200,15 @@ export function useChat({
                             });
                             continue;
                         case "add_query":
-                            addDocQuery(
-                                func.args as { name: string; body: string }
-                            );
-                            i = -1;
-                            continue;
+                            const args = func.args as {
+                                name: string;
+                                body: string;
+                            };
+                            addDocQuery(args);
+                            if (chat.name === null) {
+                                nameChat(args.name);
+                            }
+                            break;
                         case "get_cards":
                             if (!func.args) break;
                             const { name } = func.args as {
@@ -277,7 +283,16 @@ export function useChat({
 
             setLoading(false);
         },
-        [loading, poll, contents, addDocQuery, addContents, catalog]
+        [
+            loading,
+            poll,
+            contents,
+            addDocQuery,
+            addContents,
+            nameChat,
+            catalog,
+            chat.name,
+        ]
     );
 
     //TODO: add chat stopping that actually removes / flags messages

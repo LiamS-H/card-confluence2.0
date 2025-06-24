@@ -12,6 +12,7 @@ AI
     [ ] ai can add to queries or pull up a query based on name
     [X] ai can run local commands
     [X] prompting space can be toggled between query only | ai
+    [ ] include domain in ai card search + add ability to modify domain
 
 Autocomplete
     [X] Add autocomplete when nothing is selected to select an argument
@@ -42,6 +43,7 @@ Bugs
     [ ] tabautocomplete doesn't work
     [ ] make scryhover work on mobile
     [ ] quickly toggling a query and disabling while loading leaves the loading state on
+    [ ] queries symbols run away when you scroll down
 
 Add docs
   Argument explanation

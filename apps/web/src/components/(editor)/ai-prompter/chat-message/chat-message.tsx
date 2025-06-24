@@ -11,8 +11,8 @@ export function ChatMessage({ message }: { message: ProcessedMessage }) {
             <div
                 className={`max-w-[80%] p-3 rounded-lg ${
                     message.isUser
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        ? "bg-highlight text-highlight-foreground"
+                        : "bg-secondary  text-secondary-foreground"
                 }`}
             >
                 <div className="text-sm space-y-2">

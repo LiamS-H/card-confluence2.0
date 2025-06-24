@@ -7,11 +7,8 @@ import { ScrollTop } from "./scrolltop";
 export function SearchBar({ progress }: { progress: number | null }) {
     return (
         <div className="absolute top-full w-full">
-            {progress !== null ? (
-                <Progress className="w-full rounded-none" value={progress} />
-            ) : (
-                <div className="h-2" />
-            )}
+            <Progress className="w-full rounded-none" value={progress} />
+
             <div className="flex justify-start items-center gap-2 p-2 w-full">
                 <Order />
                 <Direction />
