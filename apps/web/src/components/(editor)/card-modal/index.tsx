@@ -1,6 +1,5 @@
 import { useHighlightContext } from "@/context/highlight";
 import { useCard } from "@/hooks/useCard";
-import { Scrycard } from "react-scrycards";
 import {
     Dialog,
     DialogClose,

@@ -11,9 +11,9 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
+import { settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
-import { useCompareMemo } from "./useCompareMemo";
+// import { useCompareMemo } from "./useCompareMemo";
 import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
