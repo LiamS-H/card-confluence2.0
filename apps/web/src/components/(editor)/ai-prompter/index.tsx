@@ -1,86 +1,40 @@
-import { Button } from "@/components/(ui)/button";
-import { Textarea } from "@/components/(ui)/textarea";
-import { queryAI } from "@/lib/ai";
+import { ChatId, useChatsContext } from "@/context/chat";
 import { ICatalog } from "codemirror-lang-scrycards";
-import { LoaderCircle, SendHorizonal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { EditorChat } from "./chat";
+import { ChatsSidebar } from "./sidebar";
 
-export function AIPrompter({
-    // doc,
-    // setDoc,
-    addQuery,
-    catalog,
-}: {
-    doc: string;
-    setDoc: (doc: string) => void;
-    addQuery: (props: { name: string; body: string }) => void;
-    catalog: ICatalog;
-}) {
-    const [prompt, setPrompt] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<null | string>(null);
-    const disabled = prompt === "" || loading;
+export function AIPrompter({ catalog }: { catalog: ICatalog }) {
+    const { addChat } = useChatsContext();
+
+    const [activeChat, setActiveChat] = useState<ChatId | null>(null);
+    const [emptyChat, setEmptyChat] = useState<ChatId | null>(null);
+
+    useEffect(() => {
+        if (emptyChat === null && activeChat === null) {
+            setEmptyChat(addChat({ name: null, contents: [] }));
+        }
+    }, [emptyChat, addChat, setEmptyChat, activeChat]);
+
+    const activeId = activeChat ?? emptyChat;
 
     return (
-        <form
-            onSubmit={async (e) => {
-                e.preventDefault();
-                if (!prompt) {
-                    return;
-                }
-                setLoading(true);
-                setError(null);
-                const resp = await queryAI(prompt, catalog);
-                setLoading(false);
-                if (!resp) {
-                    setError("[gemini] request failed.");
-                    return;
-                }
-                const { func, text } = resp;
-
-                if (!func || Array.isArray(func)) {
-                    console.error("[gemini]", resp);
-                    setError("[gemini] didn't call add_query.");
-                    return;
-                }
-                console.log(`[gemini] "${text ?? ""}"`, resp);
-                if (!func.args) return;
-                if (func.name !== "add_query") {
-                    return;
-                }
-                if (!func.args) {
-                    console.error("[gemini] no args provided to add_query");
-                    setError("[gemini] no args provided to add_query");
-                    return;
-                }
-                setPrompt("");
-                addQuery(func.args as { name: string; body: string });
-            }}
-        >
-            <div className="pl-2 pr-13 flex flex-col items-center gap-2 bg-background">
-                <div className="w-full relative">
-                    <Textarea
-                        placeholder="Ask GenAI"
-                        className="min-h-24"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                    />
-                    <Button
-                        className="absolute bottom-2 right-2"
-                        size="icon"
-                        variant={disabled ? "outline" : "default"}
-                        disabled={disabled}
-                        type="submit"
-                    >
-                        {loading ? (
-                            <LoaderCircle className="animate-spin" />
-                        ) : (
-                            <SendHorizonal />
-                        )}
-                    </Button>
-                </div>
-                {error && <p>{error}</p>}
-            </div>
-        </form>
+        <div className="flex w-full bg-background relative">
+            <ChatsSidebar
+                activeId={activeId}
+                emptyChat={emptyChat}
+                setActiveChat={setActiveChat}
+            />
+            {activeId && (
+                <EditorChat
+                    commitChat={() => {
+                        setEmptyChat(null);
+                        setActiveChat(activeId);
+                    }}
+                    catalog={catalog}
+                    chatId={activeId}
+                />
+            )}
+        </div>
     );
 }

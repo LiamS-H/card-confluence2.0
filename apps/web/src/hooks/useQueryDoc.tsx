@@ -11,7 +11,10 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { mergeSettings, settingsToText } from "@/lib/scrycards";
+import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
+import { mergeObjects } from "@/lib/utils";
+import { useCompareMemo } from "./useCompareMemo";
+import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
 order:cmc
@@ -28,32 +31,21 @@ export function useQueryDoc() {
     const [scryfallSettings, setScryfallSettings] = useState<ISearchSettings>(
         {}
     );
-    const [queryNodes, setQueryNodes] = useState<
-        {
-            node: Node;
-            offset: number;
-            query: Query;
-            computed_query: string;
-            noSettings: string;
-            active: boolean;
-            ast: string;
-            computed_settings: ISearchSettings;
-        }[]
+    const [_queryNodes, _setQueryNodes] = useState<
+        IEditorQueriesContext["queryNodes"]
     >([]);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [fastUpdate, setFastUpdate] = useState(false);
-    const [currentDomain, setDomain] = useState<Domain | null>(null);
+    const [_domain, _setDomain] = useState<Domain | null>(null);
     const queriesRef = useRef<Query[]>([]);
     const queryNamesRef = useRef<string[]>([]);
-    const activeQueryNameRef = useRef<{ n: string; i: number }>({
-        n: "",
-        i: 0,
-    });
+    const activeQueryNameRef = useRef<{ n: string; i: number } | null>(null);
 
-    const activateQuery = useCallback((index: number | null, fast = true) => {
-        setFastUpdate(fast);
+    const activateQuery = useCallback((index: number | null) => {
+        setFastUpdate(true);
         if (index === null) {
             setActiveIndex(null);
+            activeQueryNameRef.current = null;
             return;
         }
         const query = queriesRef.current[index];
@@ -82,8 +74,8 @@ export function useQueryDoc() {
 
     const changeDocDomain = useCallback(
         (new_domain: string) => {
-            if (currentDomain) {
-                updateDocAt(currentDomain.from, currentDomain.to, new_domain);
+            if (_domain) {
+                updateDocAt(_domain.from, _domain.to, new_domain);
             } else {
                 // setDoc(
                 //     `${new_domain}\n${queriesRef.current.map((q) => `\n@query ${q.name.text}\n${q.body.text}`)}\n`
@@ -91,7 +83,7 @@ export function useQueryDoc() {
                 setDoc((doc) => `${new_domain}\n${doc}`);
             }
         },
-        [updateDocAt, currentDomain]
+        [updateDocAt, _domain]
     );
 
     const addDocQuery = useCallback(
@@ -122,10 +114,8 @@ export function useQueryDoc() {
             //     ) === "input.complete"
             // );
 
-            const old_query_name = activeQueryNameRef.current.n;
-
             const { queries, domain } = queriesFromView(view);
-            setDomain(domain);
+            _setDomain(domain);
 
             queriesRef.current = queries;
 
@@ -136,9 +126,9 @@ export function useQueryDoc() {
                     /\s/g,
                     ""
                 );
-                const computed_settings = mergeSettings(
-                    q.body.settings as ISearchSettings,
-                    domain?.settings as ISearchSettings
+                const computed_settings = mergeObjects(
+                    q.body.settings,
+                    domain?.settings
                 );
                 return {
                     node,
@@ -154,7 +144,7 @@ export function useQueryDoc() {
                 };
             });
 
-            setQueryNodes(query_nodes);
+            _setQueryNodes(query_nodes);
 
             if (query_nodes.length === 0) {
                 return;
@@ -166,15 +156,6 @@ export function useQueryDoc() {
             const old_query_names = queryNamesRef.current;
             queryNamesRef.current = new_query_names;
 
-            const new_query_names_set = new Set(new_query_names);
-            const repeat_index = activeQueryNameRef.current.i;
-
-            if (old_query_names.length === new_query_names.length) {
-                const index = old_query_names.indexOf(old_query_name);
-                activateQuery(index === -1 ? null : index, false);
-                return;
-            }
-
             if (old_query_names.length + 1 === new_query_names.length) {
                 const old_query_names_set = new Set(old_query_names);
                 for (let i = 0; i < new_query_names.length; i++) {
@@ -184,6 +165,19 @@ export function useQueryDoc() {
                     activateQuery(i);
                     return;
                 }
+            }
+
+            if (activeQueryNameRef.current === null) return;
+
+            const new_query_names_set = new Set(new_query_names);
+
+            const old_query_name = activeQueryNameRef.current.n;
+            const repeat_index = activeQueryNameRef.current.i;
+
+            if (old_query_names.length === new_query_names.length) {
+                const index = old_query_names.indexOf(old_query_name);
+                activateQuery(index === -1 ? null : index);
+                return;
             }
 
             if (!new_query_names_set.has(old_query_name)) {
@@ -235,47 +229,61 @@ export function useQueryDoc() {
         []
     );
 
-    const { updated_query_nodes, activeQuery } = useMemo(() => {
-        const updated_query_nodes = queryNodes.map((q) => ({ ...q }));
+    const { queryNodes, activeQuery } = useMemo(() => {
+        const updated_query_nodes = _queryNodes.map((q) => ({ ...q }));
         if (
             activeIndex !== null &&
             updated_query_nodes[activeIndex] !== undefined
         ) {
             updated_query_nodes[activeIndex].active = true;
             const activeQuery = updated_query_nodes[activeIndex];
-            return { updated_query_nodes, activeQuery };
+            return { queryNodes: updated_query_nodes, activeQuery };
         }
+        const computed_settings = _domain?.settings ?? {};
         if (updated_query_nodes.length === 0) {
             const activeQuery = {
                 ast: undefined,
-                noSettings: currentDomain?.noSettingText,
-                computed_settings: currentDomain?.settings,
+                noSettings: _domain?.noSettingText,
+                computed_settings,
             };
-            return { updated_query_nodes, activeQuery };
+            return { queryNodes: updated_query_nodes, activeQuery };
         }
         const activeQuery = {
             ast: undefined,
             noSettings: undefined,
-            computed_settings: currentDomain?.settings,
+            computed_settings,
         };
-        return { updated_query_nodes, activeQuery };
-    }, [activeIndex, queryNodes, currentDomain]);
+        return { queryNodes: updated_query_nodes, activeQuery };
+    }, [activeIndex, _queryNodes, _domain]);
+
+    const computedSettings = useCompareMemo(
+        activeQuery.computed_settings,
+        isSettingsEqual
+    );
+    const mergedSettings = useMemo(() => {
+        return mergeObjects(scryfallSettings, computedSettings);
+    }, [scryfallSettings, computedSettings]);
+
+    const context: IEditorQueriesContext = {
+        activateQuery,
+        fastUpdate,
+        queryNodes,
+        changeDocDomain,
+        addDocQuery,
+        setDocQuery,
+        computedQuery: activeQuery?.noSettings,
+        ast: activeQuery?.ast,
+        computedSettings: computedSettings,
+        scryfallSettings,
+        mergedSettings,
+        setScryfallSettings,
+    };
 
     return {
         doc,
         onCreateEditor,
         onUpdate,
         onChange,
-        activateQuery,
-        queryNodes: updated_query_nodes,
-        changeDocDomain,
-        addDocQuery,
-        setDocQuery,
-        computedQuery: activeQuery?.noSettings,
-        ast: activeQuery?.ast,
-        computedSettings: activeQuery?.computed_settings as ISearchSettings,
-        fastUpdate,
-        scryfallSettings,
-        setScryfallSettings,
+        context,
     };
 }

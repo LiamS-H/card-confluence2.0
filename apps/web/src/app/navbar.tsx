@@ -2,10 +2,11 @@
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
-import { FileText, Menu, Search, X } from "lucide-react";
+import { useEditorSettingsContext } from "@/context/editor-settings";
+import { FileText, Search, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 
 interface INavItem {
     path: string;
@@ -50,43 +51,35 @@ function NavItem({
 
 export function NavBar() {
     const current_path = usePathname();
-    const [hidden, setHidden] = useState(false);
+    const { setOpen } = useEditorSettingsContext();
+    const navRef = useRef<HTMLDivElement>(null);
+
     return (
-        <nav className="fixed z-40 top-0 right-0">
-            <ul className="p-4 flex md:flex-row flex-col items-center gap-4">
-                {hidden ? (
+        <nav ref={navRef} className="fixed z-40 top-0 right-0">
+            <ul className="p-4 flex md:flex-row flex-col-reverse items-center gap-4">
+                <>
                     <li>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setHidden(false)}
-                        >
-                            <Menu />
-                        </Button>
-                    </li>
-                ) : (
-                    <>
-                        <li className="md:hidden">
+                        <SimpleToolTip text="Settings">
                             <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => setHidden(true)}
+                                onClick={() => setOpen(true)}
                             >
-                                <X />
+                                <Settings />
                             </Button>
-                        </li>
-                        <li>
-                            <ThemeToggle />
-                        </li>
-                        {paths.map((item) => (
-                            <NavItem
-                                key={item.path}
-                                current_path={current_path}
-                                item={item}
-                            />
-                        ))}
-                    </>
-                )}
+                        </SimpleToolTip>
+                    </li>
+                    <li className="hidden md:block">
+                        <ThemeToggle />
+                    </li>
+                    {paths.map((item) => (
+                        <NavItem
+                            key={item.path}
+                            current_path={current_path}
+                            item={item}
+                        />
+                    ))}
+                </>
             </ul>
         </nav>
     );

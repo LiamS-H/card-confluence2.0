@@ -1,34 +1,6 @@
-import { ISearchSettings, SearchOptions } from "./scryfall";
+import { Settings } from "codemirror-lang-scrycards";
 
-export function mergeSettings(
-    base: ISearchSettings,
-    settings?: ISearchSettings
-): ISearchSettings {
-    if (!settings) return base;
-    //@ts-expect-error Object.keys does not preserve string union types
-    const allKeys: Set<(typeof SearchOptions)[number]> = new Set([
-        ...Object.keys(base),
-        ...Object.keys(settings),
-    ]);
-    const merged: ISearchSettings = {};
-    Array.from(allKeys).reduce((acc, key) => {
-        const v1 = base[key];
-        const v2 = settings[key];
-
-        if (v1 !== undefined) {
-            //@ts-expect-error since key was in base key is valid
-            acc[key] = v1;
-        } else if (v2 !== undefined) {
-            //@ts-expect-error since key was in settings key is valid
-            acc[key] = v2;
-        }
-
-        return acc;
-    }, merged);
-    return merged;
-}
-
-export function settingsToText(settings: ISearchSettings): string {
+export function settingsToText(settings: Settings): string {
     let out = "";
     if (settings.order) {
         out += `order:${settings.order} `;
@@ -40,4 +12,11 @@ export function settingsToText(settings: ISearchSettings): string {
         out += `unique:${settings.unique} `;
     }
     return out;
+}
+
+export function isSettingsEqual(s1: Settings, s2: Settings): boolean {
+    if (s1?.dir !== s2?.dir) return false;
+    if (s1?.order !== s2?.order) return false;
+    if (s1?.unique !== s2?.unique) return false;
+    return true;
 }

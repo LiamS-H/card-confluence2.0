@@ -20,6 +20,7 @@ import {
     queriesFromView,
     type Query,
     type Domain,
+    type Settings,
 } from "./utils/queries-from-view";
 import { tagFromView } from "./utils/tag-from-view";
 export {
@@ -77,4 +78,4 @@ export type { ICatalog, IDetailedCatalogEntry };
 export { scrycardsCatalogFacet, getEmptyCatalog };
 export { tagFromView };
 export { queriesFromView };
-export type { Query, Domain };
+export type { Query, Domain, Settings };

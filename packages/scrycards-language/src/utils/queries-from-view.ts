@@ -3,7 +3,7 @@ import { syntaxTree } from "@codemirror/language";
 import { detailFromArg, isArgument, nodeFromArg } from "./completion";
 import { TreeCursor } from "../types";
 
-interface Settings {
+export interface Settings {
     order?: string;
     dir?: string;
     unique?: string;

@@ -5,34 +5,22 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
-import { SearchUniques, ISearchSettings } from "@/lib/scryfall";
-import { useEffect, useState } from "react";
+import { SearchUniques } from "@/lib/scryfall";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { useEditorQueriesContext } from "@/context/editor-queries";
 
-export function Unique({
-    scryfallSettings,
-    computedSettings,
-    setScryfallSettings,
-}: {
-    scryfallSettings: ISearchSettings;
-    computedSettings?: ISearchSettings;
-    setScryfallSettings: (s: (s: ISearchSettings) => ISearchSettings) => void;
-}) {
-    const [open, setOpen] = useState(false);
-    const [localUnique, setLocalUnique] = useState(scryfallSettings.unique);
-    const computed_unique = computedSettings?.unique ?? "cards";
+export function Unique() {
+    const { scryfallSettings, computedSettings, setScryfallSettings } =
+        useEditorQueriesContext();
+    const computed_unique = computedSettings.unique ?? "cards";
+    const unique = scryfallSettings.unique;
 
-    useEffect(() => {
-        if (open) setLocalUnique(scryfallSettings.unique);
-    }, [open, scryfallSettings]);
     return (
-        <DropdownMenu onOpenChange={setOpen}>
+        <DropdownMenu>
             <SimpleToolTip text="Change unique">
                 <DropdownMenuTrigger asChild>
-                    {localUnique ? (
-                        <Button className="relative">
-                            Unique: {localUnique ?? "select"}
-                        </Button>
+                    {unique ? (
+                        <Button className="relative">Unique: {unique}</Button>
                     ) : (
                         <Button variant={"highlight"}>
                             Unique: {computed_unique}
@@ -42,7 +30,7 @@ export function Unique({
             </SimpleToolTip>
             <DropdownMenuContent>
                 <DropdownMenuItem
-                    disabled={localUnique === undefined}
+                    disabled={unique === undefined}
                     // className={
                     //     scryfallSettings.order === undefined
                     //         ? undefined
@@ -51,7 +39,7 @@ export function Unique({
                     onClick={() =>
                         setScryfallSettings((s) => ({
                             ...s,
-                            order: undefined,
+                            unique: undefined,
                         }))
                     }
                 >
@@ -59,18 +47,18 @@ export function Unique({
                         computed <i>{computed_unique}</i>
                     </span>
                 </DropdownMenuItem>
-                {SearchUniques.map((o) => (
+                {SearchUniques.map((u) => (
                     <DropdownMenuItem
-                        key={o.label}
-                        disabled={localUnique === o.label}
+                        key={u.label}
+                        disabled={unique === u.label}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
-                                unique: o.label,
+                                unique: u.label,
                             }))
                         }
                     >
-                        {o.label}
+                        {u.label}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
