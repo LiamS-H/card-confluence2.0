@@ -1,8 +1,9 @@
 import { Button } from "@/components/(ui)/button";
 import { ChatId, useChatsContext } from "@/context/chat";
 import { Layout, Lock, Menu, SquarePen, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AIOpenButton } from "../ai-open-button";
+import { getWindowSize } from "@/lib/utils";
 
 export function ChatsSidebar({
     activeId,
@@ -17,6 +18,25 @@ export function ChatsSidebar({
     const [_open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const open = _open || hovered;
+
+    const barRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        function handleClickOutside(event: MouseEvent) {
+            if (getWindowSize() !== "xs") return;
+            if (
+                barRef.current &&
+                !barRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [open]);
 
     const chatThumbnails = useMemo(() => {
         const chatThumbnails = [];
@@ -58,6 +78,7 @@ export function ChatsSidebar({
             className={`${open ? "w-60" : "w-13"} bg-background/60 backdrop-blur-sm h-full absolute sm:static left-0 bottom-0 top-0 z-10 p-2 transition-width duration-300 ease-in-out`}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
+            ref={barRef}
         >
             <div className="flex flex-col gap-4 h-full">
                 <ul className={`flex flex-col gap-2`}>
