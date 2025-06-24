@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { Printing } from "./printing";
 import { Related } from "./related";
 import { UndoButton } from "./undo-button";
+import Card from "./card";
 
 export function CardModal() {
     const { open, selected, previous, setOpen, pushSelected, popSelected } =
@@ -210,13 +211,7 @@ export function CardModal() {
                     </DialogHeader>
 
                     <div className="w-full sm:min-w-96 sm:w-96 overflow-clip p-2">
-                        <Scrycard
-                            animated
-                            flippable
-                            card={card}
-                            size={"xl"}
-                            width="full"
-                        />
+                        <Card card={card} />
                     </div>
                 </div>
                 <DialogFooter>
