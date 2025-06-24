@@ -11,18 +11,21 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
+import { settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
-import { useCompareMemo } from "./useCompareMemo";
+// import { useCompareMemo } from "./useCompareMemo";
 import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
 order:cmc
+game:paper
+(legal:commander or year>=${new Date().toISOString().slice(0, 10)})
+
 @query latest cards
--(game:mtga or game:mtgo)
--banned:commander
 order:released
 direction:desc
+is:firstprinting
+
 @query elves
 t:elf
 `;
@@ -256,10 +259,11 @@ export function useQueryDoc() {
         return { queryNodes: updated_query_nodes, activeQuery };
     }, [activeIndex, _queryNodes, _domain]);
 
-    const computedSettings = useCompareMemo(
-        activeQuery.computed_settings,
-        isSettingsEqual
-    );
+    // const computedSettings = useCompareMemo(
+    //     activeQuery.computed_settings,
+    //     isSettingsEqual
+    // );
+    const computedSettings = activeQuery.computed_settings;
     const mergedSettings = useMemo(() => {
         return mergeObjects(scryfallSettings, computedSettings);
     }, [scryfallSettings, computedSettings]);
