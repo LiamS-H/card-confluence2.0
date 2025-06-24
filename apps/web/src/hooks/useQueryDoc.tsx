@@ -18,11 +18,14 @@ import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
 order:cmc
+game:paper
+(legal:commander or year>=${new Date().toISOString().slice(0, 10)}
+
 @query latest cards
--(game:mtga or game:mtgo)
--banned:commander
 order:released
 direction:desc
+is:firstprinting
+
 @query elves
 t:elf
 `;

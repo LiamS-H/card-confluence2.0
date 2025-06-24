@@ -63,10 +63,10 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             onCreateEditor={onCreateEditor}
                             onUpdate={onUpdate}
                             onChange={onChange}
-                            className={`flex-grow text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-1/2" : ""}`}
+                            className={`flex-grow text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-full lg:w-1/2" : ""}`}
                         />
                         <div
-                            className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"}`}
+                            className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"} ${split ? "hidden lg:block" : ""}`}
                         >
                             <AIPrompter catalog={catalog} />
                         </div>

@@ -31,6 +31,7 @@ export function AIOpenButton({
             <DropdownMenuContent>
                 {(["genai", "split", "editor"] as const).map((mode) => (
                     <DropdownMenuItem
+                        className={mode === "split" ? "hidden lg:block" : ""}
                         onClick={() =>
                             setSettings((s) => ({
                                 ...s,
