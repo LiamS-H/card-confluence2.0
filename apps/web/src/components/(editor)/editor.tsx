@@ -5,9 +5,11 @@ import ReactCodeEditor, {
 import { EditorView, keymap } from "@codemirror/view";
 import {
     defaultKeymap,
+    indentLess,
+    indentMore,
     // indentWithTab
 } from "@codemirror/commands";
-import { acceptCompletion } from "@codemirror/autocomplete";
+import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import React, { type ReactNode, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
 import { type ICatalog, scrycardsFromCatalog } from "codemirror-lang-scrycards";
@@ -16,6 +18,7 @@ import { Copy, Search, TextSearch } from "lucide-react";
 import { SimpleToolTip } from "../(ui)/tooltip";
 import { cn } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
+import { useEditorSettingsContext } from "@/context/editor-settings";
 
 function QueryWrapper({
     children,
@@ -118,19 +121,30 @@ export function Editor({
     className?: string;
     children?: ReactNode;
 }) {
+    const { settings } = useEditorSettingsContext();
     const { queryNodes } = useEditorQueriesContext();
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
     const extensions = useMemo(() => {
-        return [
-            keymap.of(defaultKeymap),
-            keymap.of([{ key: "Tab", run: acceptCompletion }]),
-            // keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
+        const extensions = [
+            keymap.of([
+                {
+                    key: "Tab",
+                    preventDefault: true,
+                    shift: indentLess,
+                    run: (e) => {
+                        if (!completionStatus(e.state)) return indentMore(e);
+                        return acceptCompletion(e);
+                    },
+                },
+            ]),
             scrycardsFromCatalog(catalog),
             EditorView.lineWrapping,
         ];
-    }, [catalog]);
+
+        return extensions;
+    }, [catalog, settings]);
 
     const queryComponents = useMemo(
         () =>
@@ -154,6 +168,10 @@ export function Editor({
             onCreateEditor={onCreateEditor}
             onUpdate={onUpdate}
             onChange={onChange}
+            indentWithTab={false}
+            basicSetup={{
+                autocompletion: !settings.disableAutocomplete,
+            }}
         >
             {queryComponents}
             {children}
