@@ -4,6 +4,7 @@ import { Layout, Lock, Menu, SquarePen, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AIOpenButton } from "../ai-open-button";
 import { getWindowSize } from "@/lib/utils";
+import { SimpleToolTip } from "@/components/(ui)/tooltip";
 
 export function ChatsSidebar({
     activeId,
@@ -73,6 +74,7 @@ export function ChatsSidebar({
         }
         return chatThumbnails;
     }, [chats, activeId, emptyChat, removeChat, setActiveChat]);
+
     return (
         <div
             className={`${open ? "w-60" : "w-13"} bg-background/60 backdrop-blur-sm h-full absolute sm:static left-0 bottom-0 top-0 z-10 p-2 transition-width duration-300 ease-in-out`}
@@ -83,24 +85,30 @@ export function ChatsSidebar({
             <div className="flex flex-col gap-4 h-full">
                 <ul className={`flex flex-col gap-2`}>
                     <li>
-                        <Button
-                            className="group"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                                setOpen((prev) => !prev);
-                                setHovered(false);
-                            }}
+                        <SimpleToolTip
+                            text={
+                                open ? (_open ? "Close" : "Keep Open") : "Open"
+                            }
                         >
-                            {!open || _open ? (
-                                <Menu />
-                            ) : (
-                                <>
-                                    <Menu className="group-hover:hidden" />
-                                    <Lock className="hidden group-hover:block" />
-                                </>
-                            )}
-                        </Button>
+                            <Button
+                                className="group"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                    setOpen((prev) => !prev);
+                                    setHovered(false);
+                                }}
+                            >
+                                {!open || _open ? (
+                                    <Menu />
+                                ) : (
+                                    <>
+                                        <Menu className="group-hover:hidden" />
+                                        <Lock className="hidden group-hover:block" />
+                                    </>
+                                )}
+                            </Button>
+                        </SimpleToolTip>
                     </li>
                     <li>
                         <Button

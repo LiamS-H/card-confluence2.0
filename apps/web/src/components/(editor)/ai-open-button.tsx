@@ -6,6 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/(ui)/dropdown-menu";
+import { SimpleToolTip } from "../(ui)/tooltip";
 
 export function AIOpenButton({
     children,
@@ -23,11 +24,13 @@ export function AIOpenButton({
                 onClick?.();
             }}
         >
-            <DropdownMenuTrigger asChild>
-                <Button {...props} variant="outline" size="icon">
-                    {children}
-                </Button>
-            </DropdownMenuTrigger>
+            <SimpleToolTip text="Change View">
+                <DropdownMenuTrigger asChild>
+                    <Button {...props} variant="outline" size="icon">
+                        {children}
+                    </Button>
+                </DropdownMenuTrigger>
+            </SimpleToolTip>
             <DropdownMenuContent>
                 {(["genai", "split", "editor"] as const).map((mode) => (
                     <DropdownMenuItem
