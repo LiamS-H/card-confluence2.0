@@ -7,6 +7,7 @@ import {
 } from "@/components/(ui)/dropdown-menu";
 import { SearchUniques } from "@/lib/scryfall";
 import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { useMemo } from "react";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 
 export function Unique() {
@@ -15,53 +16,59 @@ export function Unique() {
     const computed_unique = computedSettings.unique ?? "cards";
     const unique = scryfallSettings.unique;
 
-    return (
-        <DropdownMenu>
-            <SimpleToolTip text="Change unique">
-                <DropdownMenuTrigger asChild>
-                    {unique ? (
-                        <Button className="relative">Unique: {unique}</Button>
-                    ) : (
-                        <Button variant={"highlight"}>
-                            Unique: {computed_unique}
-                        </Button>
-                    )}
-                </DropdownMenuTrigger>
-            </SimpleToolTip>
-            <DropdownMenuContent>
+    const options = useMemo(
+        () =>
+            SearchUniques.map((u) => (
                 <DropdownMenuItem
-                    disabled={unique === undefined}
-                    // className={
-                    //     scryfallSettings.order === undefined
-                    //         ? undefined
-                    //         : " hover:bg-highlight/50"
-                    // }
+                    key={u.label}
+                    disabled={unique === u.label}
                     onClick={() =>
                         setScryfallSettings((s) => ({
                             ...s,
-                            unique: undefined,
+                            unique: u.label,
                         }))
                     }
                 >
-                    <span className="text-highlight-foreground">
-                        computed <i>{computed_unique}</i>
-                    </span>
+                    {u.label}
                 </DropdownMenuItem>
-                {SearchUniques.map((u) => (
+            )),
+        [unique, setScryfallSettings]
+    );
+
+    return useMemo(
+        () => (
+            <DropdownMenu>
+                <SimpleToolTip text="Change unique">
+                    <DropdownMenuTrigger asChild>
+                        {unique ? (
+                            <Button className="relative">
+                                Unique: {unique}
+                            </Button>
+                        ) : (
+                            <Button variant={"highlight"}>
+                                Unique: {computed_unique}
+                            </Button>
+                        )}
+                    </DropdownMenuTrigger>
+                </SimpleToolTip>
+                <DropdownMenuContent>
                     <DropdownMenuItem
-                        key={u.label}
-                        disabled={unique === u.label}
+                        disabled={unique === undefined}
                         onClick={() =>
                             setScryfallSettings((s) => ({
                                 ...s,
-                                unique: u.label,
+                                unique: undefined,
                             }))
                         }
                     >
-                        {u.label}
+                        <span className="text-highlight-foreground">
+                            computed <i>{computed_unique}</i>
+                        </span>
                     </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    {options}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        ),
+        [options, unique, computed_unique, setScryfallSettings]
     );
 }

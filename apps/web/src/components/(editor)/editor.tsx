@@ -3,12 +3,7 @@ import ReactCodeEditor, {
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { EditorView, keymap } from "@codemirror/view";
-import {
-    defaultKeymap,
-    indentLess,
-    indentMore,
-    // indentWithTab
-} from "@codemirror/commands";
+import { indentLess, indentMore } from "@codemirror/commands";
 import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import React, { type ReactNode, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
@@ -66,40 +61,49 @@ function QueryNode({
     i: number;
 }) {
     const { activateQuery } = useEditorQueriesContext();
+
+    const content = useMemo(() => {
+        return (
+            <>
+                <SimpleToolTip text="Activate query">
+                    <Button
+                        variant={active ? "default" : "outline"}
+                        className="w-0.5 h-0.5"
+                        onClick={
+                            active
+                                ? () => {
+                                      activateQuery(null);
+                                  }
+                                : () => {
+                                      activateQuery(i);
+                                      window.scrollTo({
+                                          top: 0,
+                                          behavior: "instant",
+                                      });
+                                  }
+                        }
+                    >
+                        {active ? <TextSearch /> : <Search />}
+                    </Button>
+                </SimpleToolTip>
+                <SimpleToolTip text="Copy">
+                    <Button
+                        className="w-0.5 h-0.5"
+                        variant="outline"
+                        onClick={() => {
+                            navigator.clipboard.writeText(computed_query);
+                        }}
+                    >
+                        <Copy />
+                    </Button>
+                </SimpleToolTip>
+            </>
+        );
+    }, [active, i, activateQuery, computed_query]);
+
     return (
         <QueryWrapper node={node} offset={offset}>
-            <SimpleToolTip text="Activate query">
-                <Button
-                    variant={active ? "default" : "outline"}
-                    className="w-0.5 h-0.5"
-                    onClick={
-                        active
-                            ? () => {
-                                  activateQuery(null);
-                              }
-                            : () => {
-                                  activateQuery(i);
-                                  window.scrollTo({
-                                      top: 0,
-                                      behavior: "instant",
-                                  });
-                              }
-                    }
-                >
-                    {active ? <TextSearch /> : <Search />}
-                </Button>
-            </SimpleToolTip>
-            <SimpleToolTip text="Copy">
-                <Button
-                    className="w-0.5 h-0.5"
-                    variant="outline"
-                    onClick={() => {
-                        navigator.clipboard.writeText(computed_query);
-                    }}
-                >
-                    <Copy />
-                </Button>
-            </SimpleToolTip>
+            {content}
         </QueryWrapper>
     );
 }
