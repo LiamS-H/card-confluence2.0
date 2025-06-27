@@ -543,9 +543,26 @@ export function completionInfoFromArg(
         case "color":
             return null;
         case "keyword":
-            return catalog["keyword-abilities"].map((n) => ({
-                label: n,
+            const kab = { name: "Keyword Abilities", rank: 0 };
+            const req: Completion[] = catalog["keyword-abilities"].map((k) => ({
+                label: k,
+                section: kab,
             }));
+            const kac = { name: "Keyword Actions", rank: 1 };
+            req.push(
+                ...catalog["keyword-actions"].map((k) => ({
+                    label: k,
+                    section: kac,
+                }))
+            );
+            const aw = { name: "Ability Words", rank: 2 };
+            req.push(
+                ...catalog["ability-words"].map((a) => ({
+                    label: a,
+                    section: aw,
+                }))
+            );
+            return req;
         case "cmc":
             return null;
         case "rarity":

@@ -8,7 +8,7 @@ export interface IEditorSettings {
     disableTooltips?: boolean;
     disableAutocomplete?: boolean;
     disableAutocompleteInfo?: boolean;
-    hideSillyCards?: boolean;
+    showSillyCards?: boolean;
 }
 
 export interface IEditorSettingsContext {

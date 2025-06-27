@@ -21,14 +21,16 @@ function ToggleButton({
     setting,
     feedback,
     disabled,
+    inverted,
 }: {
     label: string;
     setting: keyof IEditorSettings;
     feedback: [string, string];
     disabled?: boolean;
+    inverted?: boolean;
 }) {
     const { setSettings, settings } = useEditorSettingsContext();
-    const val = settings[setting];
+    const val = settings[setting] ?? inverted;
     return (
         <div className="flex items-center space-x-2">
             <Switch
@@ -109,9 +111,10 @@ export function EditorSettingsModal() {
                         feedback={["Hidden", "Shown"]}
                     />
                     <ToggleButton
-                        setting="hideSillyCards"
+                        setting="showSillyCards"
                         label="Silly Cards"
                         feedback={["Hidden", "Shown"]}
+                        inverted
                     />
                 </div>
                 <DialogFooter />

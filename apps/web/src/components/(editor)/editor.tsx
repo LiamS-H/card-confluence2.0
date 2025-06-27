@@ -14,6 +14,7 @@ import { SimpleToolTip } from "../(ui)/tooltip";
 import { cn } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 import { useEditorSettingsContext } from "@/context/editor-settings";
+import { getCatalogWithSettings } from "@/lib/scrycards";
 
 function QueryWrapper({
     children,
@@ -143,7 +144,7 @@ export function Editor({
                     },
                 },
             ]),
-            scrycardsFromCatalog(catalog),
+            scrycardsFromCatalog(getCatalogWithSettings(catalog, settings)),
             EditorView.lineWrapping,
         ];
 

@@ -17,6 +17,7 @@ AI
 Autocomplete
     [X] Add autocomplete when nothing is selected to select an argument
     [ ] Dynamic suggestions that hide for example silly cards, or restrict creature types by format
+    [ ] Typing @query will start a code block for the name and then the rest of the query
 
 Linting
     [ ] fields like order can only appear on base level
@@ -33,7 +34,7 @@ Editor Settings
     [ ] Disable tooltips
     [X] Disable autocomplete (good for mobile or if you already know everything)
     [ ] Disable info / detail on 
-    [ ] Setting to Always hide silly cards (vanguard, unsets, etc.)
+    [X] Setting to Always hide silly cards (vanguard, unsets, etc.)
     [ ] Setting for wether ai chat should be restricted by domain when searching
 
 Bugs
