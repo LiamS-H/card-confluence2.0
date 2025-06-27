@@ -11,7 +11,7 @@ export function AIPrompter({ catalog }: { catalog: ICatalog }) {
     const [emptyChat, setEmptyChat] = useState<ChatId | null>(null);
 
     useEffect(() => {
-        if (emptyChat === null && activeChat === null) {
+        if (emptyChat === null) {
             setEmptyChat(addChat({ name: null, contents: [] }));
         }
     }, [emptyChat, addChat, setEmptyChat, activeChat]);
