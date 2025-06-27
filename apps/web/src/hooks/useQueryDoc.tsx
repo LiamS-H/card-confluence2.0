@@ -1,6 +1,8 @@
 import {
     EditorView,
     ReactCodeMirrorProps,
+    Transaction,
+    ViewUpdate,
     // Transaction,
 } from "@uiw/react-codemirror";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -42,14 +44,20 @@ export function useQueryDoc() {
     const [_domain, _setDomain] = useState<Domain | null>(null);
     const queriesRef = useRef<Query[]>([]);
     const queryNamesRef = useRef<string[]>([]);
-    const activeQueryNameRef = useRef<{ n: string; i: number } | null>(null);
+    const activeQueryNameRef = useRef<{
+        n: string;
+        c: number;
+        i: number;
+    } | null>(null);
 
     const activateQuery = useCallback((index: number | null) => {
-        setFastUpdate(true);
         if (index === null) {
             setActiveIndex(null);
             activeQueryNameRef.current = null;
             return;
+        }
+        if (activeQueryNameRef.current?.i !== index) {
+            setFastUpdate(true);
         }
         const query = queriesRef.current[index];
         if (!query) {
@@ -63,7 +71,7 @@ export function useQueryDoc() {
             }
         }
         setActiveIndex(index);
-        activeQueryNameRef.current = { n: name, i: count };
+        activeQueryNameRef.current = { n: name, c: count, i: index };
     }, []);
 
     const [doc, setDoc] = useState(INITIAL);
@@ -108,14 +116,13 @@ export function useQueryDoc() {
     );
 
     const updateQueries = useCallback(
-        (view: EditorView) => {
-            // todo: only update queries that had lines within them change.
-            // console.log(
-            //     "from completion:",
-            //     viewUpdate.transactions[0]?.annotation(
-            //         Transaction.userEvent
-            //     ) === "input.complete"
-            // );
+        (view: EditorView, viewUpdate?: ViewUpdate) => {
+            const isCompletion =
+                viewUpdate?.transactions[0]?.annotation(
+                    Transaction.userEvent
+                ) === "input.complete";
+
+            setFastUpdate(false);
 
             const { queries, domain } = queriesFromView(view);
             _setDomain(domain);
@@ -175,11 +182,13 @@ export function useQueryDoc() {
             const new_query_names_set = new Set(new_query_names);
 
             const old_query_name = activeQueryNameRef.current.n;
-            const repeat_index = activeQueryNameRef.current.i;
+            const repeat_index = activeQueryNameRef.current.c;
 
             if (old_query_names.length === new_query_names.length) {
                 const index = old_query_names.indexOf(old_query_name);
                 activateQuery(index === -1 ? null : index);
+                console.log("!", isCompletion);
+                setFastUpdate(isCompletion);
                 return;
             }
 
@@ -221,7 +230,7 @@ export function useQueryDoc() {
                 !viewUpdate.heightChanged
             )
                 return;
-            updateQueries(viewUpdate.view);
+            updateQueries(viewUpdate.view, viewUpdate);
         },
         [updateQueries]
     );
