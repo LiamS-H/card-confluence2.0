@@ -1,7 +1,7 @@
 "use client";
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Button } from "@/components/(ui)/button";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "@/components/(editor)/tooltip";
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { FileText, Search, Settings } from "lucide-react";
 import Link from "next/link";

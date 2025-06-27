@@ -4,7 +4,7 @@ import { Layout, Lock, Menu, SquarePen, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AIOpenButton } from "../ai-open-button";
 import { getWindowSize } from "@/lib/utils";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 
 export function ChatsSidebar({
     activeId,

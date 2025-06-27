@@ -1,7 +1,7 @@
 import { IEditorSettings } from "@/context/editor-settings";
-import { ICatalog, Settings } from "codemirror-lang-scrycards";
+import { ICatalog, SearchSettings } from "codemirror-lang-scrycards";
 
-export function settingsToText(settings: Settings): string {
+export function settingsToText(settings: SearchSettings): string {
     let out = "";
     if (settings.order) {
         out += `order:${settings.order} `;
@@ -15,7 +15,10 @@ export function settingsToText(settings: Settings): string {
     return out;
 }
 
-export function isSettingsEqual(s1: Settings, s2: Settings): boolean {
+export function isSettingsEqual(
+    s1: SearchSettings,
+    s2: SearchSettings
+): boolean {
     if (s1?.dir !== s2?.dir) return false;
     if (s1?.order !== s2?.order) return false;
     if (s1?.unique !== s2?.unique) return false;

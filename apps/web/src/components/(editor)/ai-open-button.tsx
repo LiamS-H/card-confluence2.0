@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/(ui)/dropdown-menu";
-import { SimpleToolTip } from "../(ui)/tooltip";
+import { SimpleToolTip } from "./tooltip";
 
 export function AIOpenButton({
     children,

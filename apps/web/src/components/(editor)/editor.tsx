@@ -7,14 +7,22 @@ import { indentLess, indentMore } from "@codemirror/commands";
 import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import React, { type ReactNode, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
-import { type ICatalog, scrycardsFromCatalog } from "codemirror-lang-scrycards";
+import {
+    completeScrycards,
+    type ICatalog,
+    scrycardsCatalogFacet,
+    scrycardsLanguage,
+    scrycardsSettingsFacet,
+    ScrycardsTooltips,
+} from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
 import { Copy, Search, TextSearch } from "lucide-react";
-import { SimpleToolTip } from "../(ui)/tooltip";
+import { SimpleToolTip } from "./tooltip";
 import { cn } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { getCatalogWithSettings } from "@/lib/scrycards";
+import { LanguageSupport } from "@codemirror/language";
 
 function QueryWrapper({
     children,
@@ -131,6 +139,12 @@ export function Editor({
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
+    const scrycards = useMemo(() => {
+        return new LanguageSupport(scrycardsLanguage, [
+            scrycardsLanguage.data.of({ autocomplete: completeScrycards }),
+        ]);
+    }, []);
+
     const extensions = useMemo(() => {
         const extensions = [
             keymap.of([
@@ -144,12 +158,21 @@ export function Editor({
                     },
                 },
             ]),
-            scrycardsFromCatalog(getCatalogWithSettings(catalog, settings)),
+            scrycards,
+            scrycardsCatalogFacet.of(getCatalogWithSettings(catalog, settings)),
+            scrycardsSettingsFacet.of({
+                autoDetail: !settings.disableAutocompleteDetail,
+                autoInfo: !settings.disableAutocompleteInfo,
+            }),
             EditorView.lineWrapping,
         ];
 
+        if (!settings.disableTooltips) {
+            extensions.push(ScrycardsTooltips);
+        }
+
         return extensions;
-    }, [catalog, settings]);
+    }, [catalog, settings, scrycards]);
 
     const queryComponents = useMemo(
         () =>

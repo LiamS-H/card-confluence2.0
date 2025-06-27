@@ -1,5 +1,5 @@
 import { Button } from "@/components/(ui)/button";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 import { SearchOrders } from "@/lib/scryfall";
 import {

@@ -7,6 +7,7 @@ export interface IEditorSettings {
     window: "editor" | "genai" | "split";
     disableTooltips?: boolean;
     disableAutocomplete?: boolean;
+    disableAutocompleteDetail?: boolean;
     disableAutocompleteInfo?: boolean;
     showSillyCards?: boolean;
 }

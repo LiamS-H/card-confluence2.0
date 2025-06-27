@@ -3,7 +3,7 @@ import { syntaxTree } from "@codemirror/language";
 import { detailFromArg, isArgument, nodeFromArg } from "./completion";
 import { TreeCursor } from "../types";
 
-export interface Settings {
+export interface SearchSettings {
     order?: string;
     dir?: string;
     unique?: string;
@@ -20,7 +20,7 @@ export interface Query {
         mergedTextNoSetting: string;
         from: number;
         to: number;
-        settings: Settings;
+        settings: SearchSettings;
     };
 }
 
@@ -29,14 +29,14 @@ export type Domain = {
     noSettingText: string;
     from: number;
     to: number;
-    settings: Settings;
+    settings: SearchSettings;
 };
 
 function extractSettingsFromCursor(
     view: EditorView,
     cursor: TreeCursor
-): { settings: Settings; noSettingText: string } {
-    const settings: Settings = {};
+): { settings: SearchSettings; noSettingText: string } {
+    const settings: SearchSettings = {};
     cursor.firstChild();
     let noSettingText = "";
     let from = cursor.from;

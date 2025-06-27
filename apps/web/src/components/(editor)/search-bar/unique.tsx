@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
 import { SearchUniques } from "@/lib/scryfall";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 import { useMemo } from "react";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 

@@ -5,7 +5,7 @@ import {
     type SetStateAction,
 } from "react";
 import { ISearchSettings } from "@/lib/scryfall";
-import { Query, Settings } from "codemirror-lang-scrycards";
+import { Query, SearchSettings } from "codemirror-lang-scrycards";
 
 export interface IEditorQueriesContext {
     activateQuery: (index: number | null, fast?: boolean) => void;
@@ -18,14 +18,14 @@ export interface IEditorQueriesContext {
         noSettings: string;
         active: boolean;
         ast: string;
-        computed_settings: Settings;
+        computed_settings: SearchSettings;
     }[];
     changeDocDomain: (new_domain: string) => void;
     addDocQuery: ({ name, body }: { name: string; body: string }) => void;
     setDocQuery: ({ name, body }: { name: string; body: string }) => void;
     computedQuery: string | undefined;
     ast: string | undefined;
-    computedSettings: Settings;
+    computedSettings: SearchSettings;
     scryfallSettings: ISearchSettings;
     mergedSettings: ISearchSettings;
     setScryfallSettings: Dispatch<SetStateAction<ISearchSettings>>;

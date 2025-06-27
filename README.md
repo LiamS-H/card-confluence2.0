@@ -31,9 +31,9 @@ Search Bar
 
 Editor Settings
     [X] Adjust number of card columns (settings page should be transparent or small so that you can see this as you apply settings)
-    [ ] Disable tooltips
+    [X] Disable tooltips
     [X] Disable autocomplete (good for mobile or if you already know everything)
-    [ ] Disable info / detail on 
+    [X] Disable info / detail on 
     [X] Setting to Always hide silly cards (vanguard, unsets, etc.)
     [ ] Setting for wether ai chat should be restricted by domain when searching
 
