@@ -1,14 +1,17 @@
+"use client";
 import { EditorSettingsModal } from "@/components/(editor)/settings";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+const LOCAL_STORAGE_KEY = "editorSettings";
 
 export interface IEditorSettings {
     cardColumns?: number;
     window: "editor" | "genai" | "split";
     disableTooltips?: boolean;
     disableAutocomplete?: boolean;
+    disableAutocompleteDetail?: boolean;
     disableAutocompleteInfo?: boolean;
-    hideSillyCards?: boolean;
+    showSillyCards?: boolean;
 }
 
 export interface IEditorSettingsContext {
@@ -34,6 +37,23 @@ export function EditorContextProvider({ children }: { children: ReactNode }) {
         window: "split",
     });
     const [open, setOpen] = useState<boolean>(false);
+    useEffect(() => {
+        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (stored) {
+            try {
+                setSettings((prev) => ({
+                    ...prev,
+                    ...JSON.parse(stored),
+                }));
+            } catch (e) {
+                console.error("[editor] settings failed to load", e);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
+    }, [settings]);
 
     return (
         <editorSettingsContext.Provider

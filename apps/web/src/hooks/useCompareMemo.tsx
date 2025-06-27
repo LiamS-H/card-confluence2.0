@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useCompareMemo<T>(
+export function useCompareMemoDebounced<T>(
     val: T,
     compare?: (v1: T, v2: T) => boolean
 ): T {
@@ -13,6 +13,19 @@ export function useCompareMemo<T>(
             setV((old) => (compare ? (compare(old, val) ? old : val) : val));
             timeoutRef.current = null;
         });
+    }, [val, compare]);
+
+    return v;
+}
+
+export function useCompareMemo<T>(
+    val: T,
+    compare: (v1: T, v2: T) => boolean
+): T {
+    const [v, setV] = useState<T>(() => val);
+
+    useEffect(() => {
+        setV((old) => (compare(old, val) ? old : val));
     }, [val, compare]);
 
     return v;

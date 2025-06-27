@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
 import { SearchOrders } from "@/lib/scryfall";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 import { useMemo } from "react";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 
@@ -38,35 +38,38 @@ export function Order() {
         [order, setScryfallSettings]
     );
 
-    return (
-        <DropdownMenu>
-            <SimpleToolTip text="Change order">
-                <DropdownMenuTrigger asChild>
-                    {order ? (
-                        <Button className="relative">Order: {order}</Button>
-                    ) : (
-                        <Button variant={"highlight"}>
-                            Order: {computed_order}
-                        </Button>
-                    )}
-                </DropdownMenuTrigger>
-            </SimpleToolTip>
-            <DropdownMenuContent>
-                <DropdownMenuItem
-                    disabled={order === undefined}
-                    onClick={() =>
-                        setScryfallSettings((s) => ({
-                            ...s,
-                            order: undefined,
-                        }))
-                    }
-                >
-                    <span className="text-highlight-foreground">
-                        computed <i>{computed_order}</i>
-                    </span>
-                </DropdownMenuItem>
-                {options}
-            </DropdownMenuContent>
-        </DropdownMenu>
+    return useMemo(
+        () => (
+            <DropdownMenu>
+                <SimpleToolTip text="Change order">
+                    <DropdownMenuTrigger asChild>
+                        {order ? (
+                            <Button className="relative">Order: {order}</Button>
+                        ) : (
+                            <Button variant={"highlight"}>
+                                Order: {computed_order}
+                            </Button>
+                        )}
+                    </DropdownMenuTrigger>
+                </SimpleToolTip>
+                <DropdownMenuContent>
+                    <DropdownMenuItem
+                        disabled={order === undefined}
+                        onClick={() =>
+                            setScryfallSettings((s) => ({
+                                ...s,
+                                order: undefined,
+                            }))
+                        }
+                    >
+                        <span className="text-highlight-foreground">
+                            computed <i>{computed_order}</i>
+                        </span>
+                    </DropdownMenuItem>
+                    {options}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        ),
+        [options, order, computed_order, setScryfallSettings]
     );
 }

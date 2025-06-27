@@ -58,28 +58,4 @@ function TooltipContent({
     );
 }
 
-function SimpleToolTip({
-    text,
-    children,
-}: {
-    text: string;
-    children: React.ReactNode;
-}) {
-    // return children; // bro this makes cursor snap when holding down a key and editing order/unique WHY????
-    return (
-        <Tooltip>
-            <TooltipTrigger asChild>{children}</TooltipTrigger>
-            <TooltipContent>
-                <p>{text}</p>
-            </TooltipContent>
-        </Tooltip>
-    );
-}
-
-export {
-    Tooltip,
-    TooltipTrigger,
-    TooltipContent,
-    TooltipProvider,
-    SimpleToolTip,
-};
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };

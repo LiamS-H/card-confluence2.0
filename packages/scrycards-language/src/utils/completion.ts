@@ -1,6 +1,7 @@
 import { Completion } from "@codemirror/autocomplete";
-import { ICatalog } from "../catalog";
+import { ICatalog, IDetailedCatalogEntry } from "../catalog";
 import { completionFromTypes } from "./type-completion";
+import { IEditorSettings } from "../settings";
 
 // prettier-ignore
 export const ARGUMENTS = [ // (to keep this list somewhat organized)
@@ -500,9 +501,29 @@ See m: for instruction on mana symbol formatting.`,
     },
 };
 
+function detailEntriesWithSettings(
+    entries: IDetailedCatalogEntry[],
+    settings: IEditorSettings
+) {
+    if (settings.autoDetail && settings.autoInfo) {
+        return entries.map((f) => f);
+    }
+    if (!settings.autoDetail && !settings.autoInfo) {
+        return entries.map((f) => ({ label: f.label }));
+    }
+    if (settings.autoDetail && !settings.autoInfo) {
+        return entries.map((f) => ({ label: f.label, detail: f.detail }));
+    }
+    if (!settings.autoDetail && settings.autoInfo) {
+        return entries.map((f) => ({ label: f.label, info: f.info }));
+    }
+    return [];
+}
+
 export function completionInfoFromArg(
     arg_type: ARG_TYPE,
-    catalog: ICatalog
+    catalog: ICatalog,
+    settings: IEditorSettings
 ): Completion[] | null {
     switch (arg_type) {
         case "number":
@@ -518,8 +539,8 @@ export function completionInfoFromArg(
         case "set":
             return catalog.sets.map((set) => ({
                 label: set.code,
-                detail: set.name,
-                info: set.released,
+                detail: settings.autoDetail ? set.name : undefined,
+                info: settings.autoInfo ? set.released : undefined,
             }));
         case "is":
             return catalog.criteria.map((crit) => ({
@@ -543,9 +564,26 @@ export function completionInfoFromArg(
         case "color":
             return null;
         case "keyword":
-            return catalog["keyword-abilities"].map((n) => ({
-                label: n,
+            const kab = { name: "Keyword Abilities", rank: 0 };
+            const req: Completion[] = catalog["keyword-abilities"].map((k) => ({
+                label: k,
+                section: kab,
             }));
+            const kac = { name: "Keyword Actions", rank: 1 };
+            req.push(
+                ...catalog["keyword-actions"].map((k) => ({
+                    label: k,
+                    section: kac,
+                }))
+            );
+            const aw = { name: "Ability Words", rank: 2 };
+            req.push(
+                ...catalog["ability-words"].map((a) => ({
+                    label: a,
+                    section: aw,
+                }))
+            );
+            return req;
         case "cmc":
             return null;
         case "rarity":
@@ -556,7 +594,8 @@ export function completionInfoFromArg(
                 displayLabel: c,
             }));
         case "format":
-            return catalog.formats.map((f) => f);
+            return detailEntriesWithSettings(catalog.formats, settings);
+
         case "artist":
             return catalog["artist-names"].map((a) => ({
                 label: a,
@@ -582,9 +621,9 @@ export function completionInfoFromArg(
                 label: p,
             }));
         case "unique":
-            return catalog["uniques"].map((u) => u);
+            return detailEntriesWithSettings(catalog.uniques, settings);
         case "order":
-            return catalog["orders"].map((o) => o);
+            return detailEntriesWithSettings(catalog.orders, settings);
         case "dir":
             return ["asc", "ascending", "desc", "descending"].map((d) => ({
                 label: d,

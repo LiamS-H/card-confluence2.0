@@ -161,7 +161,11 @@ export function useChat({
                             }
                             let suggestions = completionInfoFromArg(
                                 argTypeFromArg(tag),
-                                catalog
+                                catalog,
+                                {
+                                    autoDetail: true,
+                                    autoInfo: true,
+                                }
                             );
                             if (kw && suggestions) {
                                 suggestions = suggestions

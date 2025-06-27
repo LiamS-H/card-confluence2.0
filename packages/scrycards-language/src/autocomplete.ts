@@ -18,6 +18,7 @@ import {
     isArgument,
     nodeFromArg,
 } from "./utils/completion";
+import { scrycardsSettingsFacet } from "./settings";
 
 const BEGIN_OPERATORS = [":", "<", ">", "=", "!"] as const;
 
@@ -36,6 +37,7 @@ export const completeScrycards: CompletionSource = (context) => {
     const tag = tagFromView(view, pos);
 
     const catalog = context.state.facet(scrycardsCatalogFacet);
+    const settings = context.state.facet(scrycardsSettingsFacet);
 
     if (!tag) {
         const cursor = syntaxTree(view.state).cursorAt(pos, -1);
@@ -57,8 +59,8 @@ export const completeScrycards: CompletionSource = (context) => {
                     const { detail, info } = detailFromArg(tag);
                     return {
                         label: tag,
-                        detail,
-                        info,
+                        detail: settings.autoDetail ? detail : undefined,
+                        info: settings.autoInfo ? info : undefined,
                     };
                 }),
                 commitCharacters: BEGIN_OPERATORS,
@@ -96,8 +98,8 @@ export const completeScrycards: CompletionSource = (context) => {
                 return {
                     label: tag,
                     boost,
-                    detail,
-                    info,
+                    detail: settings.autoDetail ? detail : undefined,
+                    info: settings.autoInfo ? info : undefined,
                 };
             }),
             commitCharacters: BEGIN_OPERATORS,
@@ -146,8 +148,8 @@ export const completeScrycards: CompletionSource = (context) => {
                 return {
                     label: tag,
                     boost,
-                    detail,
-                    info,
+                    detail: settings.autoDetail ? detail : undefined,
+                    info: settings.autoInfo ? info : undefined,
                 };
             }),
         };
@@ -206,7 +208,7 @@ export const completeScrycards: CompletionSource = (context) => {
     }
 
     const arg_type = argTypeFromArg(lower_arg);
-    const options = completionInfoFromArg(arg_type, catalog);
+    const options = completionInfoFromArg(arg_type, catalog, settings);
     if (!options) return null;
 
     let val;

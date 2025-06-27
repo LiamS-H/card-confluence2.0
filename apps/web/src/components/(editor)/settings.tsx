@@ -21,11 +21,13 @@ function ToggleButton({
     setting,
     feedback,
     disabled,
+    inverted,
 }: {
     label: string;
     setting: keyof IEditorSettings;
     feedback: [string, string];
     disabled?: boolean;
+    inverted?: boolean;
 }) {
     const { setSettings, settings } = useEditorSettingsContext();
     const val = settings[setting];
@@ -34,12 +36,12 @@ function ToggleButton({
             <Switch
                 disabled={disabled}
                 id={setting}
-                checked={!val}
+                checked={inverted ? !!val : !val}
                 onCheckedChange={(checked) =>
                     setSettings((s) => {
                         const s2 = { ...s };
                         //@ts-expect-error ts is angry about this for some reason
-                        s2[setting] = !checked;
+                        s2[setting] = inverted ? checked : !checked;
                         return s2;
                     })
                 }
@@ -90,18 +92,26 @@ export function EditorSettingsModal() {
                             }
                         />
                     </div>
-                    <div className="flex justify-between w-80">
+                    <div className="flex justify-between w-md">
                         <ToggleButton
                             setting="disableAutocomplete"
-                            label="Autocomplete"
-                            feedback={["Disabled", "Enabled"]}
+                            label="Completion"
+                            feedback={["Off", "On"]}
                         />
-                        <ToggleButton
-                            disabled={settings.disableAutocomplete}
-                            setting="disableAutocompleteInfo"
-                            label="Info"
-                            feedback={["Hidden", "Shown"]}
-                        />
+                        <div className="flex justify-between w-64">
+                            <ToggleButton
+                                disabled={settings.disableAutocomplete}
+                                setting="disableAutocompleteDetail"
+                                label="Detail"
+                                feedback={["Hidden", "Shown"]}
+                            />
+                            <ToggleButton
+                                disabled={settings.disableAutocomplete}
+                                setting="disableAutocompleteInfo"
+                                label="Info"
+                                feedback={["Hidden", "Shown"]}
+                            />
+                        </div>
                     </div>
                     <ToggleButton
                         setting="disableTooltips"
@@ -109,9 +119,10 @@ export function EditorSettingsModal() {
                         feedback={["Hidden", "Shown"]}
                     />
                     <ToggleButton
-                        setting="hideSillyCards"
+                        setting="showSillyCards"
                         label="Silly Cards"
-                        feedback={["Hidden", "Shown"]}
+                        feedback={["Shown", "Hidden"]}
+                        inverted
                     />
                 </div>
                 <DialogFooter />

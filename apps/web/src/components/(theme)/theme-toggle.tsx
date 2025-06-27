@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/(ui)/dropdown-menu";
 import { useEffect, useState } from "react";
-import { SimpleToolTip } from "../(ui)/tooltip";
+import { SimpleToolTip } from "../(editor)/tooltip";
 
 export function ThemeToggle(props: Parameters<typeof Button>[0]) {
     const { setTheme, themes, theme } = useTheme();

@@ -13,6 +13,7 @@ import { AIPrompter } from "./ai-prompter";
 import { editorQueriesContext } from "@/context/editor-queries";
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { AIOpenButton } from "./ai-open-button";
+import { useMemo } from "react";
 
 export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     const { doc, onCreateEditor, onUpdate, onChange, context } = useQueryDoc();
@@ -33,6 +34,23 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
     });
     const { gridLayout, totalCards } = searchObj;
 
+    const ai_prompter = useMemo(() => {
+        return <AIPrompter catalog={catalog} />;
+    }, [catalog]);
+
+    const ai_open_button = useMemo(() => {
+        if (!editorOpen) return null;
+        return (
+            <AIOpenButton className="w-4 h-4" variant="outline" size="icon">
+                {aiOpen ? (
+                    <SquareCode className="h-[2px] w-[2px]" />
+                ) : (
+                    <Sparkles />
+                )}
+            </AIOpenButton>
+        );
+    }, [editorOpen, aiOpen]);
+
     return (
         <editorQueriesContext.Provider value={context}>
             <div className="flex flex-col gap-2">
@@ -42,19 +60,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                             // className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
                             className={`absolute bottom-[1] left-1 z-20`}
                         >
-                            {editorOpen && (
-                                <AIOpenButton
-                                    className="w-4 h-4"
-                                    variant="outline"
-                                    size="icon"
-                                >
-                                    {aiOpen ? (
-                                        <SquareCode className="h-[2px] w-[2px]" />
-                                    ) : (
-                                        <Sparkles />
-                                    )}
-                                </AIOpenButton>
-                            )}
+                            {ai_open_button}
                         </div>
 
                         <Editor
@@ -68,7 +74,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         <div
                             className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"} ${split ? "hidden lg:block" : ""}`}
                         >
-                            <AIPrompter catalog={catalog} />
+                            {ai_prompter}
                         </div>
                     </div>
                     <SearchBar

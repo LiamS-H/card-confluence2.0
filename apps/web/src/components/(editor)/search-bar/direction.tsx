@@ -1,5 +1,5 @@
 import { Button } from "@/components/(ui)/button";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 import { SearchOrders } from "@/lib/scryfall";
 import {
@@ -13,7 +13,7 @@ import {
     CalendarArrowDown,
     CalendarArrowUp,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 const autoOrders: Record<
     (typeof SearchOrders)[number]["label"],
@@ -48,10 +48,13 @@ export function Direction() {
         const last_order = lastOrder.current;
         lastOrder.current = order;
         if (order === last_order) return;
-        setScryfallSettings((s) => ({
-            ...s,
-            dir: undefined,
-        }));
+        setScryfallSettings((s) => {
+            if (s.dir === undefined) return s;
+            return {
+                ...s,
+                dir: undefined,
+            };
+        });
     }, [order, setScryfallSettings]);
 
     const asc = mergedSettings.dir ?? auto === "asc";
@@ -87,20 +90,23 @@ export function Direction() {
             Icon = BadgeAlert;
     }
 
-    return (
-        <SimpleToolTip text="Toggle direction">
-            <Button
-                size="icon"
-                variant="outline"
-                onClick={() =>
-                    setScryfallSettings((s) => ({
-                        ...s,
-                        dir: s.dir ? undefined : asc ? "desc" : "asc",
-                    }))
-                }
-            >
-                <Icon />
-            </Button>
-        </SimpleToolTip>
+    return useMemo(
+        () => (
+            <SimpleToolTip text="Toggle direction">
+                <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() =>
+                        setScryfallSettings((s) => ({
+                            ...s,
+                            dir: s.dir ? undefined : asc ? "desc" : "asc",
+                        }))
+                    }
+                >
+                    <Icon />
+                </Button>
+            </SimpleToolTip>
+        ),
+        [asc, Icon, setScryfallSettings]
     );
 }

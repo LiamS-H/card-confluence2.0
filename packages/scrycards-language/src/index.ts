@@ -20,9 +20,10 @@ import {
     queriesFromView,
     type Query,
     type Domain,
-    type Settings,
+    type SearchSettings,
 } from "./utils/queries-from-view";
 import { tagFromView } from "./utils/tag-from-view";
+import { IEditorSettingsInput, scrycardsSettingsFacet } from "./settings";
 export {
     argTypeFromString,
     argTypeFromArg,
@@ -64,11 +65,15 @@ export function scrycards() {
     ]);
 }
 
-export function scrycardsFromCatalog(value: ICatalog) {
+export function scrycardsFromCatalog(
+    value: ICatalog,
+    settings: IEditorSettingsInput
+) {
     return new LanguageSupport(scrycardsLanguage, [
         ScrycardsTooltips,
         scrycardsLanguage.data.of({ autocomplete: completeScrycards }),
         scrycardsCatalogFacet.of(value),
+        scrycardsSettingsFacet.of(settings),
     ]);
 }
 
@@ -76,6 +81,7 @@ export { completeScrycards, ScrycardsTooltips };
 
 export type { ICatalog, IDetailedCatalogEntry };
 export { scrycardsCatalogFacet, getEmptyCatalog };
+export { scrycardsSettingsFacet };
 export { tagFromView };
 export { queriesFromView };
-export type { Query, Domain, Settings };
+export type { Query, Domain, SearchSettings, IEditorSettingsInput };

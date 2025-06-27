@@ -1,5 +1,5 @@
 import { Button } from "@/components/(ui)/button";
-import { SimpleToolTip } from "@/components/(ui)/tooltip";
+import { SimpleToolTip } from "../tooltip";
 import { ArrowUpToLine } from "lucide-react";
 import { useEffect, useState } from "react";
 

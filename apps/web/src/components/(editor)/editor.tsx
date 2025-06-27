@@ -3,19 +3,26 @@ import ReactCodeEditor, {
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
 import { EditorView, keymap } from "@codemirror/view";
-import {
-    defaultKeymap,
-    // indentWithTab
-} from "@codemirror/commands";
-import { acceptCompletion } from "@codemirror/autocomplete";
+import { indentLess, indentMore } from "@codemirror/commands";
+import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import React, { type ReactNode, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
-import { type ICatalog, scrycardsFromCatalog } from "codemirror-lang-scrycards";
+import {
+    completeScrycards,
+    type ICatalog,
+    scrycardsCatalogFacet,
+    scrycardsLanguage,
+    scrycardsSettingsFacet,
+    ScrycardsTooltips,
+} from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
 import { Copy, Search, TextSearch } from "lucide-react";
-import { SimpleToolTip } from "../(ui)/tooltip";
+import { SimpleToolTip } from "./tooltip";
 import { cn } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
+import { useEditorSettingsContext } from "@/context/editor-settings";
+import { getCatalogWithSettings } from "@/lib/scrycards";
+import { LanguageSupport } from "@codemirror/language";
 
 function QueryWrapper({
     children,
@@ -63,40 +70,49 @@ function QueryNode({
     i: number;
 }) {
     const { activateQuery } = useEditorQueriesContext();
+
+    const content = useMemo(() => {
+        return (
+            <>
+                <SimpleToolTip text="Activate query">
+                    <Button
+                        variant={active ? "default" : "outline"}
+                        className="w-0.5 h-0.5"
+                        onClick={
+                            active
+                                ? () => {
+                                      activateQuery(null);
+                                  }
+                                : () => {
+                                      activateQuery(i);
+                                      window.scrollTo({
+                                          top: 0,
+                                          behavior: "instant",
+                                      });
+                                  }
+                        }
+                    >
+                        {active ? <TextSearch /> : <Search />}
+                    </Button>
+                </SimpleToolTip>
+                <SimpleToolTip text="Copy">
+                    <Button
+                        className="w-0.5 h-0.5"
+                        variant="outline"
+                        onClick={() => {
+                            navigator.clipboard.writeText(computed_query);
+                        }}
+                    >
+                        <Copy />
+                    </Button>
+                </SimpleToolTip>
+            </>
+        );
+    }, [active, i, activateQuery, computed_query]);
+
     return (
         <QueryWrapper node={node} offset={offset}>
-            <SimpleToolTip text="Activate query">
-                <Button
-                    variant={active ? "default" : "outline"}
-                    className="w-0.5 h-0.5"
-                    onClick={
-                        active
-                            ? () => {
-                                  activateQuery(null);
-                              }
-                            : () => {
-                                  activateQuery(i);
-                                  window.scrollTo({
-                                      top: 0,
-                                      behavior: "instant",
-                                  });
-                              }
-                    }
-                >
-                    {active ? <TextSearch /> : <Search />}
-                </Button>
-            </SimpleToolTip>
-            <SimpleToolTip text="Copy">
-                <Button
-                    className="w-0.5 h-0.5"
-                    variant="outline"
-                    onClick={() => {
-                        navigator.clipboard.writeText(computed_query);
-                    }}
-                >
-                    <Copy />
-                </Button>
-            </SimpleToolTip>
+            {content}
         </QueryWrapper>
     );
 }
@@ -118,19 +134,45 @@ export function Editor({
     className?: string;
     children?: ReactNode;
 }) {
+    const { settings } = useEditorSettingsContext();
     const { queryNodes } = useEditorQueriesContext();
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
+    const scrycards = useMemo(() => {
+        return new LanguageSupport(scrycardsLanguage, [
+            scrycardsLanguage.data.of({ autocomplete: completeScrycards }),
+        ]);
+    }, []);
+
     const extensions = useMemo(() => {
-        return [
-            keymap.of(defaultKeymap),
-            keymap.of([{ key: "Tab", run: acceptCompletion }]),
-            // keymap.of([{ key: "Tab", run: acceptCompletion }, indentWithTab]),
-            scrycardsFromCatalog(catalog),
+        const extensions = [
+            keymap.of([
+                {
+                    key: "Tab",
+                    preventDefault: true,
+                    shift: indentLess,
+                    run: (e) => {
+                        if (!completionStatus(e.state)) return indentMore(e);
+                        return acceptCompletion(e);
+                    },
+                },
+            ]),
+            scrycards,
+            scrycardsCatalogFacet.of(getCatalogWithSettings(catalog, settings)),
+            scrycardsSettingsFacet.of({
+                autoDetail: !settings.disableAutocompleteDetail,
+                autoInfo: !settings.disableAutocompleteInfo,
+            }),
             EditorView.lineWrapping,
         ];
-    }, [catalog]);
+
+        if (!settings.disableTooltips) {
+            extensions.push(ScrycardsTooltips);
+        }
+
+        return extensions;
+    }, [catalog, settings, scrycards]);
 
     const queryComponents = useMemo(
         () =>
@@ -154,6 +196,10 @@ export function Editor({
             onCreateEditor={onCreateEditor}
             onUpdate={onUpdate}
             onChange={onChange}
+            indentWithTab={false}
+            basicSetup={{
+                autocompletion: !settings.disableAutocomplete,
+            }}
         >
             {queryComponents}
             {children}
