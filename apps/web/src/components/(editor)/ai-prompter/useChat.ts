@@ -96,7 +96,8 @@ export function useChat({
             addContent(new_content);
 
             let i = 0;
-            while (i < MAX_CALLS) {
+            let STOP_PROMPT = false;
+            while (i < MAX_CALLS && !STOP_PROMPT) {
                 i++;
                 if (canceledMessages.current.has(curMessage)) {
                     break;
@@ -212,7 +213,8 @@ export function useChat({
                             if (chat.name === null) {
                                 nameChat(args.name);
                             }
-                            break;
+                            STOP_PROMPT = true;
+                            continue;
                         case "get_cards":
                             if (!func.args) break;
                             const { name } = func.args as {
@@ -279,7 +281,7 @@ export function useChat({
 
                         default:
                             console.error("[gemini] undefined func:", func);
-                            break;
+                            continue;
                     }
                 }
             }

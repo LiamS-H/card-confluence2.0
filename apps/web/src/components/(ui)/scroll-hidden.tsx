@@ -73,7 +73,6 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
         <div
             ref={child}
             className={`
-                relative
         top-0 left-0 w-full z-30
         ${shown ? "translate-y-0" : "-translate-y-full"}
         ${sticky && "sticky"}

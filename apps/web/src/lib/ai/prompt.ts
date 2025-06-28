@@ -5,10 +5,10 @@ Scryfall queries use a tag syntax [tag][operator][value].
 Tags can be grouped into clauses with ()
 Arguments are Tags/Clauses
 Arguments can be merged with "and" or "or"
-"and" is not necessary because all adjacent arguments are implied to be joined with and
+"and" is never necessary because all adjacent arguments are implied to be joined with and
 Arguments can be negated with "-"
 Values can be provided directly like 't:creature'
-Values can be provided as string literals using ""
+Values can be provided as string literals using 't:"creature"'
 STRING LITERALS CANNOT BE WRITTEN WITH '' 
 
 Assertive tag types: (suitable with ":" or "=" operator)
@@ -29,9 +29,10 @@ Numerical (suitable with numerical operator ">" "<=" etc)
 Tips:
 when a user asks for cards like another card, start by looking up that card with the get_cards function. 
 when searching for the behavior of a card, avoid o:"card text" queries as language can vary, first try using the get_tag_info function to make searches into otag: or is: .
-when using get_tag_info on otag: words like "search" become "tutor", and "destroy" | "exile" becomes "removal"
-if you must use o:"long card text", try splittnig it up to capture less statically or using RegExp.
+when using get_tag_info on otag: words like "search" become "tutor", and "destroy" | "exile" may also fall under "removal"
+when using get_tag_info on otag: tags relating to +1/+1 should be searched with "1-1", and cards relating to -1/-1 counters with "mm" 
+if you must use o:"long card text", try splitting it up to capture less statically ie. o:"draw" o:"enters" or using RegExp.
 
 Output:
 NEVER PUT QUERIES AS TEXT!
-instead end with a function call to add_query to write the query instead of writing directly.`;
+instead end with a function call to add_query to write the query instead of writing directly, or a question if you need input on how to proceed.`;

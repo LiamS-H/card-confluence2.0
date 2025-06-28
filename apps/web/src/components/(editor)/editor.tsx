@@ -5,7 +5,7 @@ import ReactCodeEditor, {
 import { EditorView, keymap } from "@codemirror/view";
 import { indentLess, indentMore } from "@codemirror/commands";
 import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
-import React, { type ReactNode, useMemo, useRef } from "react";
+import { type ReactNode, type RefObject, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
 import {
     completeScrycards,
@@ -28,10 +28,12 @@ function QueryWrapper({
     children,
     node,
     offset,
+    editorRef,
 }: {
     children: ReactNode;
     node: Node;
     offset: number;
+    editorRef: RefObject<ReactCodeMirrorRef | null>;
 }) {
     if (!(node instanceof Text)) return null;
 
@@ -45,7 +47,7 @@ function QueryWrapper({
             <div
                 className="absolute z-30 flex gap-1"
                 style={{
-                    top: rect.top,
+                    top: rect.top - (editorRef.current?.view?.documentTop ?? 0),
                     left: rect.x + rect.width,
                 }}
             >
@@ -60,6 +62,7 @@ function QueryWrapper({
 function QueryNode({
     query: { node, offset, active, computed_query },
     i,
+    editorRef,
 }: {
     query: {
         node: Node;
@@ -68,6 +71,7 @@ function QueryNode({
         computed_query: string;
     };
     i: number;
+    editorRef: RefObject<ReactCodeMirrorRef | null>;
 }) {
     const { activateQuery } = useEditorQueriesContext();
 
@@ -111,7 +115,7 @@ function QueryNode({
     }, [active, i, activateQuery, computed_query]);
 
     return (
-        <QueryWrapper node={node} offset={offset}>
+        <QueryWrapper node={node} offset={offset} editorRef={editorRef}>
             {content}
         </QueryWrapper>
     );
@@ -181,28 +185,31 @@ export function Editor({
                     key={i}
                     query={{ node, offset, active, computed_query }}
                     i={i}
+                    editorRef={editorRef}
                 />
             )),
         [queryNodes]
     );
 
     return (
-        <ReactCodeEditor
-            className={cn("font-[monospace]", className)}
-            ref={editorRef}
-            extensions={extensions}
-            value={doc}
-            theme={theme === "dark" ? "dark" : "light"}
-            onCreateEditor={onCreateEditor}
-            onUpdate={onUpdate}
-            onChange={onChange}
-            indentWithTab={false}
-            basicSetup={{
-                autocompletion: !settings.disableAutocomplete,
-            }}
-        >
+        <>
+            <ReactCodeEditor
+                className={cn("font-[monospace]", className)}
+                ref={editorRef}
+                extensions={extensions}
+                value={doc}
+                theme={theme === "dark" ? "dark" : "light"}
+                onCreateEditor={onCreateEditor}
+                onUpdate={onUpdate}
+                onChange={onChange}
+                indentWithTab={false}
+                basicSetup={{
+                    autocompletion: !settings.disableAutocomplete,
+                }}
+            >
+                {children}
+            </ReactCodeEditor>
             {queryComponents}
-            {children}
-        </ReactCodeEditor>
+        </>
     );
 }

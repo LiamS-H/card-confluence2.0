@@ -187,7 +187,6 @@ export function useQueryDoc() {
             if (old_query_names.length === new_query_names.length) {
                 const index = old_query_names.indexOf(old_query_name);
                 activateQuery(index === -1 ? null : index);
-                console.log("!", isCompletion);
                 setFastUpdate(isCompletion);
                 return;
             }
