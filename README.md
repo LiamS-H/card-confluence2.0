@@ -45,7 +45,7 @@
  - [X] tabautocomplete doesn't work
  - [ ] make scryhover work on mobile
  - [ ] quickly toggling a query and disabling while loading leaves the loading state on
- - [ ] queries symbols run away when you scroll down
+ - [X] queries symbols run away when you scroll down
 
 ## Add docs
   Argument explanation

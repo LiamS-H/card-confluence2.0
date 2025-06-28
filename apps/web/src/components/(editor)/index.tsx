@@ -55,7 +55,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         <editorQueriesContext.Provider value={context}>
             <div className="flex flex-col gap-2">
                 <ScrollHidden>
-                    <div className="flex flex-col lg:flex-row relative">
+                    <div className="flex flex-col lg:flex-row">
                         <div
                             // className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
                             className={`absolute bottom-[1] left-1 z-20`}
