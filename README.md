@@ -40,12 +40,12 @@
 ## Bugs
  - [X] is:e-t-b has a space so it fucks up autocomplete
  - [X] query reactivates after doc change
+ - [x] quickly toggling a query and disabling while loading leaves the loading state on
+ - [X] queries symbols run away when you scroll down
+ - [X] tabautocomplete doesn't work
  - [ ] the radix primitives are sloooooow, consider creating new dropdown and tooltip
  - [ ] when tooltip is diabled, cursor snaps when holding down a key and editing order/unique
- - [X] tabautocomplete doesn't work
  - [ ] make scryhover work on mobile
- - [ ] quickly toggling a query and disabling while loading leaves the loading state on
- - [X] queries symbols run away when you scroll down
 
 ## Add docs
   Argument explanation

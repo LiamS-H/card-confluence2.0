@@ -21,6 +21,7 @@ export function useSearch() {
                 queryRef.current = null;
                 currentQueryRef.current = null;
                 setAllData([]);
+                setIsLoading(false);
                 return;
             }
             const { query } = req;
