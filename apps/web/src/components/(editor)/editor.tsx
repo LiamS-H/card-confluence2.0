@@ -208,8 +208,8 @@ export function Editor({
                 }}
             >
                 {children}
+                {queryComponents}
             </ReactCodeEditor>
-            {queryComponents}
         </>
     );
 }

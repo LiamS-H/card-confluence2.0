@@ -74,11 +74,12 @@ export function EditorSettingsModal() {
                         <ThemeToggle id="themeToggle" />
                     </div>
                     {/* Card Columns Slider */}
-                    <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-col gap-2">
                         <Label className="w-40" htmlFor="cardColumns">
                             Columns: {cardColumns || "auto"}
                         </Label>
                         <Slider
+                            className="w-80"
                             id="cardColumns"
                             min={0}
                             max={15}
@@ -92,7 +93,7 @@ export function EditorSettingsModal() {
                             }
                         />
                     </div>
-                    <div className="flex justify-between w-md">
+                    <div className="flex flex-col sm:flex-row gap-y-2 justify-between w-md">
                         <ToggleButton
                             setting="disableAutocomplete"
                             label="Completion"
