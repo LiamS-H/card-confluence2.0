@@ -14,12 +14,12 @@ export function AIPrompter({ catalog }: { catalog: ICatalog }) {
         if (emptyChat === null) {
             setEmptyChat(addChat({ name: null, contents: [] }));
         }
-    }, [emptyChat, addChat, setEmptyChat, activeChat]);
+    }, [emptyChat, addChat, setEmptyChat]);
 
     const activeId = activeChat ?? emptyChat;
 
     return (
-        <div className="flex w-full bg-background relative">
+        <div className="flex w-full h-full bg-background relative">
             <ChatsSidebar
                 activeId={activeId}
                 emptyChat={emptyChat}
@@ -28,7 +28,9 @@ export function AIPrompter({ catalog }: { catalog: ICatalog }) {
             {activeId && (
                 <EditorChat
                     commitChat={() => {
-                        setEmptyChat(null);
+                        if (activeChat === emptyChat) {
+                            setEmptyChat(null);
+                        }
                         setActiveChat(activeId);
                     }}
                     catalog={catalog}
