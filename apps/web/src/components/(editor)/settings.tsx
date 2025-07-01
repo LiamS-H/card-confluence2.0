@@ -125,6 +125,11 @@ export function EditorSettingsModal() {
                         feedback={["Shown", "Hidden"]}
                         inverted
                     />
+                    <ToggleButton
+                        setting="disableBarOnScroll"
+                        label="Show Editor On Scroll"
+                        feedback={["Disabled", "Enabled"]}
+                    />
                 </div>
                 <DialogFooter />
             </DialogContent>

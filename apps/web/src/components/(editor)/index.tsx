@@ -1,7 +1,7 @@
 "use client";
 
 import { type ICatalog } from "codemirror-lang-scrycards";
-import { ScrollHidden } from "@/components/(ui)/scroll-hidden";
+import { ScrollHidden } from "@/components/(editor)/scroll-hidden";
 import { CardList } from "@/components/(editor)/card-list";
 
 import { useQueryDoc } from "@/hooks/useQueryDoc";
