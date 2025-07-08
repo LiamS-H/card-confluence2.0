@@ -1,6 +1,6 @@
 "use client";
 import { CardModal } from "@/components/(editor)/card-modal";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
     createContext,
     type ReactNode,
@@ -39,7 +39,6 @@ export function HighlightContextProvider({
     children: ReactNode;
 }) {
     const searchParams = useSearchParams();
-    const router = useRouter();
 
     const selected = searchParams.get("card") ?? undefined;
     const historyMap = useRef<Map<string, number>>(new Map());
@@ -138,10 +137,9 @@ export function HighlightContextProvider({
         if (!cur_card) {
             window.history.pushState(null, "", `?${newParams.toString()}`);
         } else {
-            console.log("test1");
             window.history.replaceState(null, "", `?${newParams.toString()}`);
         }
-    }, [searchParams, router]);
+    }, [searchParams]);
 
     const open = !!selected;
 
