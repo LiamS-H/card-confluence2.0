@@ -159,7 +159,7 @@ export function HighlightContextProvider({
                 previous,
             }}
         >
-            {open && <CardModal />}
+            <CardModal />
             {children}
         </highlightContext.Provider>
     );
