@@ -19,8 +19,15 @@ import { UndoButton } from "./undo-button";
 import Card from "./card";
 
 export function CardModal() {
-    const { open, selected, previous, setOpen, pushSelected, popSelected } =
-        useHighlightContext();
+    const {
+        open,
+        selected,
+        previous,
+        setOpen,
+        pushSelected,
+        goPrevious: popSelected,
+        replaceSelected,
+    } = useHighlightContext();
     const card = useCard(selected);
     const { cachedSearch, cacheResponse, getCard } = useSearchContext();
 
@@ -148,7 +155,9 @@ export function CardModal() {
                                                                 p === card.id
                                                             }
                                                             select={() =>
-                                                                pushSelected(p)
+                                                                replaceSelected(
+                                                                    p
+                                                                )
                                                             }
                                                         />
                                                     </li>

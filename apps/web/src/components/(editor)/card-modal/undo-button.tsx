@@ -10,11 +10,10 @@ export function UndoButton({
     prevId: string;
 }) {
     const card = useCard(prevId);
-
     return (
-        <Button variant="destructive" onClick={() => undo()}>
-            {card?.name}
-            <Undo2 />
+        <Button variant="destructive" onClick={undo}>
+            Back{card ? ` to ${card.name}` : " loading..."}
+            <Undo2 className="ml-2" />
         </Button>
     );
 }
