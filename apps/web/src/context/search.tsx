@@ -27,7 +27,7 @@ export type ScryfallCached = Omit<ScryfallList.Cards, "data"> & {
 export type Response = ScryfallCached | ScryfallError;
 
 interface ISearchContext {
-    cachedSearch: (prop: ICachedSearchProps) => Promise<Response>;
+    cachedSearch: (prop: ICachedSearchProps) => Promise<Response> | Response;
     cacheResponse: (props: ICachedSearchProps[], resp: Response) => void;
     getCard: (
         id: string
@@ -53,11 +53,11 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
     );
     const { requestCard } = useScrycardsContext();
 
-    const cachedSearch = useCallback(async function ({
+    const cachedSearch = useCallback(function ({
         query,
         ast,
         settings,
-    }: ICachedSearchProps): Promise<Response> {
+    }: ICachedSearchProps): Promise<Response> | Response {
         const settings_key = JSON.stringify(settings);
         const key = query + settings_key;
 

@@ -5,65 +5,24 @@ import {
 } from "@/components/(ui)/accordion";
 import { Button } from "@/components/(ui)/button";
 import { useHighlightContext } from "@/context/highlight";
-import { ICachedSearchProps, useSearchContext } from "@/context/search";
 import { useCard } from "@/hooks/useCard";
-import { ScryfallCard } from "@scryfall/api-types";
 import { LoaderCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 
-export function Printings({ card }: { card: ScryfallCard.Any }) {
-    const { cachedSearch, cacheResponse, getCard } = useSearchContext();
-    const { replaceSelected, open } = useHighlightContext();
-
-    const [printings, setPrintings] = useState<string[] | null>(null);
-
-    useEffect(() => {
-        if (!open) {
-            return;
-        }
-        if (!card) return;
-        if (!("oracle_id" in card)) return;
-        if (printings?.includes(card.id)) return;
-        setPrintings(null);
-        const search_props: ICachedSearchProps = {
-            query: `oracleid:${card.oracle_id}`,
-            settings: { unique: "prints", order: "released" },
-        };
-        cachedSearch(search_props).then(async (resp) => {
-            if (resp.object === "error") {
-                setPrintings(null);
-                return console.error("error fetching printings", resp);
-            }
-            const o_promises = [];
-            for (const id of resp.data) {
-                o_promises.push(getCard(id));
-            }
-            const o_ids = (await Promise.all(o_promises))
-                .map((c) => {
-                    if (!c) return null;
-                    if (!("oracle_id" in c)) return null;
-                    return c.oracle_id;
-                })
-                .filter((c) => c !== null);
-            cacheResponse(
-                o_ids.map((id) => {
-                    return {
-                        query: `oracleid:${id}`,
-                        settings: search_props.settings,
-                    };
-                }),
-                resp
-            );
-            setPrintings(resp.data);
-        });
-    }, [card, open, cachedSearch, cacheResponse, getCard, printings]);
+export function Printings({
+    id,
+    printings,
+}: {
+    id: string;
+    printings: string[] | null;
+}) {
+    const { replaceSelected } = useHighlightContext();
 
     if (printings?.length === 1) {
         return (
             <div className="py-4 border-b text-sm font-medium">
                 <div className="flex gap-2 items-center w-full">
                     <span>Printings</span>
-                    <Printing id={card.id} isSelected />
+                    <Printing id={id} isSelected />
                 </div>
             </div>
         );
@@ -78,37 +37,35 @@ export function Printings({ card }: { card: ScryfallCard.Any }) {
                             <span className="group-hover:underline">
                                 Printings
                             </span>
-                            <Printing id={card.id} isSelected />
+                            <Printing id={id} isSelected />
                         </div>
                     </AccordionTrigger>
-                    <AccordionContent>
-                        {printings.length > 1 && (
-                            <ul className="max-h-52 overflow-y-auto">
-                                {printings
-                                    .filter((p) => p !== card.id)
-                                    .map((p) => (
-                                        <li key={p}>
-                                            <Printing
-                                                id={p}
-                                                select={() =>
-                                                    replaceSelected(p)
-                                                }
-                                            />
-                                        </li>
-                                    ))}
-                            </ul>
-                        )}
-                    </AccordionContent>
                 </>
             ) : (
                 <AccordionTrigger disabled noChevron>
                     <div className="flex gap-2 items-center w-full">
                         <span>Printings</span>
-                        <Printing id={card.id} isSelected />
+                        <Printing id={id} isSelected />
                     </div>
                     <LoaderCircle className="animate-spin" />
                 </AccordionTrigger>
             )}
+            <AccordionContent>
+                {printings && printings.length > 1 && (
+                    <ul className="max-h-52 overflow-y-auto">
+                        {printings
+                            .filter((p) => p !== id)
+                            .map((p) => (
+                                <li key={p}>
+                                    <Printing
+                                        id={p}
+                                        select={() => replaceSelected(p)}
+                                    />
+                                </li>
+                            ))}
+                    </ul>
+                )}
+            </AccordionContent>
         </AccordionItem>
     );
 }

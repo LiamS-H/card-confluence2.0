@@ -23,6 +23,7 @@ import {
 } from "@/components/(ui)/accordion";
 import { Legalities } from "./legalities";
 import { Oracle } from "./oracle";
+import { usePrintings } from "./usePrintings";
 
 export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
@@ -34,6 +35,8 @@ export function CardModal() {
         "face-2",
         "printings",
     ]);
+
+    const printings = usePrintings(card);
 
     if (!open) return null;
 
@@ -58,11 +61,15 @@ export function CardModal() {
                             type="multiple"
                             className="w-full"
                             defaultValue={["printings"]}
-                            value={tabs}
+                            value={
+                                printings
+                                    ? tabs
+                                    : tabs.filter((t) => t !== "printings")
+                            }
                             onValueChange={(e) => setTabs(e)}
                         >
                             <Oracle card={card} />
-                            <Printings card={card} />
+                            <Printings id={card.id} printings={printings} />
                             {card.all_parts && card.all_parts.length > 1 && (
                                 <AccordionItem value="related">
                                     <AccordionTrigger>
