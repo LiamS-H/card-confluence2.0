@@ -31,7 +31,6 @@ export function useSearch() {
                 queryRef.current = null;
                 currentQueryRef.current = null;
                 resetSearch();
-                console.log("resettings");
                 return;
             }
             const { query } = req;
