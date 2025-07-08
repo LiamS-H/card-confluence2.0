@@ -160,6 +160,15 @@ export async function fetchSearch(
     return card_list;
 }
 
+export async function fetchRulings(
+    id: string
+): Promise<ScryfallList.Rulings | ScryfallError> {
+    const url = new URL(`https://api.scryfall.com/cards/${id}/rulings`);
+    const response = await fetch(url);
+    const rulings = await response.json();
+    return rulings;
+}
+
 export async function fetchCatalog(endpoint: string): Promise<string[]> {
     const url = new URL(`https://api.scryfall.com/catalog/${endpoint}`);
     const response = await fetchWithHeaders(url);
@@ -170,8 +179,8 @@ export async function fetchCatalog(endpoint: string): Promise<string[]> {
 export async function fetchSets(): Promise<ScryfallList.Sets | ScryfallError> {
     const url = new URL("https://api.scryfall.com/sets");
     const response = await fetchWithHeaders(url);
-    const catalog: ScryfallList.Sets = await response.json();
-    return catalog;
+    const sets: ScryfallList.Sets = await response.json();
+    return sets;
 }
 
 export async function fetchTags(): Promise<{

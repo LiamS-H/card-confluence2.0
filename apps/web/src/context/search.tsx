@@ -1,5 +1,9 @@
 "use client";
-import { fetchSearch, type ISearchSettings } from "@/lib/scryfall";
+import {
+    fetchRulings,
+    fetchSearch,
+    type ISearchSettings,
+} from "@/lib/scryfall";
 import type {
     ScryfallCard,
     ScryfallError,
@@ -24,11 +28,18 @@ export type ScryfallCached = Omit<ScryfallList.Cards, "data"> & {
     data: string[];
 };
 
-export type Response = ScryfallCached | ScryfallError;
+export type SearchResponse = ScryfallCached | ScryfallError;
+
+export type RulingsResponse = ScryfallList.Rulings | ScryfallError;
 
 interface ISearchContext {
-    cachedSearch: (prop: ICachedSearchProps) => Promise<Response> | Response;
-    cacheResponse: (props: ICachedSearchProps[], resp: Response) => void;
+    cachedRulings: (props: {
+        id: string;
+    }) => Promise<RulingsResponse> | RulingsResponse;
+    cachedSearch: (
+        prop: ICachedSearchProps
+    ) => Promise<SearchResponse> | SearchResponse;
+    cacheResponse: (props: ICachedSearchProps[], resp: SearchResponse) => void;
     getCard: (
         id: string
     ) => Promise<ScryfallCard.Any | undefined> | ScryfallCard.Any | undefined;
@@ -45,25 +56,26 @@ export function useSearchContext() {
 }
 
 export function SearchContextProvider({ children }: { children: ReactNode }) {
-    const astMappings = useRef(new Map<string, Response>());
-    const strMappings = useRef(new Map<string, Response>());
-    const responsePromises = useRef(new Map<string, Promise<Response>>());
+    const astMappings = useRef(new Map<string, SearchResponse>());
+    const strMappings = useRef(new Map<string, SearchResponse>());
+    const responsePromises = useRef(new Map<string, Promise<SearchResponse>>());
     const cardMappings = useRef(
         new Map<string, ScryfallCard.Any | undefined>()
     );
+    const rulingsMappings = useRef(new Map<string, RulingsResponse>());
     const { requestCard } = useScrycardsContext();
 
     const cachedSearch = useCallback(function ({
         query,
         ast,
         settings,
-    }: ICachedSearchProps): Promise<Response> | Response {
+    }: ICachedSearchProps): Promise<SearchResponse> | SearchResponse {
         const settings_key = JSON.stringify(settings);
         const key = query + settings_key;
 
         // todo, could check is ast is empty to see if should even query
         const ast_key = ast + settings_key;
-        let resp: Response | undefined = ast
+        let resp: SearchResponse | undefined = ast
             ? astMappings.current.get(ast_key)
             : undefined;
         if (resp) return resp;
@@ -75,9 +87,9 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         const p = responsePromises.current.get(key);
         if (p) return p;
 
-        const result = new Promise<Response>(async (resolve) => {
+        const result = new Promise<SearchResponse>(async (resolve) => {
             const new_resp = await fetchSearch(query, settings);
-            let new_data: Response;
+            let new_data: SearchResponse;
 
             if (new_resp.object === "list") {
                 const data: string[] = [];
@@ -108,19 +120,19 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         return result;
     }, []);
 
+    const cachedRulings = useCallback(function ({ id }: { id: string }) {
+        return rulingsMappings.current.get(id) || fetchRulings(id);
+    }, []);
+
     const getCard = useCallback(
         function (id: string) {
-            if (cardMappings.current.has(id)) {
-                return cardMappings.current.get(id);
-            } else {
-                return requestCard(id);
-            }
+            return cardMappings.current.get(id) || requestCard(id);
         },
         [requestCard]
     );
 
     const cacheResponse = useCallback(
-        (props: ICachedSearchProps[], resp: Response) => {
+        (props: ICachedSearchProps[], resp: SearchResponse) => {
             for (const { query, ast, settings } of props) {
                 const settings_key = JSON.stringify(settings);
                 const key = query + settings_key;
@@ -138,7 +150,7 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
 
     return (
         <searchContext.Provider
-            value={{ cachedSearch, getCard, cacheResponse }}
+            value={{ cachedSearch, cachedRulings, getCard, cacheResponse }}
         >
             {children}
         </searchContext.Provider>

@@ -1,7 +1,7 @@
 import { useHighlightContext } from "@/context/highlight";
 import {
     ICachedSearchProps,
-    Response,
+    SearchResponse,
     useSearchContext,
 } from "@/context/search";
 import { ScryfallCard } from "@scryfall/api-types";
@@ -26,7 +26,7 @@ export function usePrintings(card: ScryfallCard.Any | null | undefined) {
             settings: { unique: "prints", order: "released" },
         };
         const resp = cachedSearch(search_props);
-        const resolve = async (resp: Response) => {
+        const resolve = async (resp: SearchResponse) => {
             if (resp.object === "error") {
                 setPrintings(null);
                 return console.error("error fetching printings", resp);
