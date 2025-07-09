@@ -28,7 +28,7 @@ export function AIPrompter({ catalog }: { catalog: ICatalog }) {
             {activeId && (
                 <EditorChat
                     commitChat={() => {
-                        if (activeChat === emptyChat) {
+                        if (activeId === emptyChat) {
                             setEmptyChat(null);
                         }
                         setActiveChat(activeId);
