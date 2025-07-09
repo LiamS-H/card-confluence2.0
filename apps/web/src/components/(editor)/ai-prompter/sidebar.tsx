@@ -46,8 +46,8 @@ export function ChatsSidebar({
             chatThumbnails.push(
                 <li key={chatId} className="relative max-w-full flex">
                     <Button
-                        className="rounded-br-none rounded-tr-none w-36"
-                        disabled={activeId === chatId}
+                        className="rounded-br-none rounded-tr-none w-48"
+                        disabled={activeId === chatId || !open}
                         variant={activeId === chatId ? "default" : "ghost"}
                         onClick={() => {
                             setActiveChat(chatId);
@@ -58,7 +58,7 @@ export function ChatsSidebar({
                         </span>
                     </Button>
                     <Button
-                        className="w-7 overflow-ellipsis overflow-hidden rounded-bl-none rounded-tl-none"
+                        className="w-8 overflow-ellipsis overflow-hidden rounded-bl-none rounded-tl-none"
                         variant={activeId === chatId ? "destructive" : "ghost"}
                         onClick={() => {
                             if (activeId === chatId) {
@@ -73,12 +73,17 @@ export function ChatsSidebar({
             );
         }
         return chatThumbnails;
-    }, [chats, activeId, emptyChat, removeChat, setActiveChat]);
+    }, [chats, open, activeId, emptyChat, removeChat, setActiveChat]);
 
     return (
         <div
             className={`${open ? "w-60" : "w-13"} bg-background/60 backdrop-blur-sm h-full absolute sm:static left-0 bottom-0 top-0 z-10 p-2 transition-width duration-300 ease-in-out`}
-            onMouseEnter={() => setHovered(true)}
+            onMouseEnter={() => {
+                if (window.innerWidth > 640) setHovered(true);
+            }}
+            onClick={() => {
+                if (window.innerWidth < 640 && !open) setHovered(true);
+            }}
             onMouseLeave={() => setHovered(false)}
             ref={barRef}
         >
@@ -117,8 +122,9 @@ export function ChatsSidebar({
                             variant={
                                 activeId === emptyChat ? "default" : "ghost"
                             }
-                            onClick={() => {
+                            onClick={(e) => {
                                 if (activeId === null) return;
+                                e.stopPropagation();
                                 setActiveChat(null);
                             }}
                         >
