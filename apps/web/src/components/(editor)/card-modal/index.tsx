@@ -34,8 +34,8 @@ export function CardModal() {
     const card = useCard(selected);
 
     const [tabs, setTabs] = useState<string[]>([
+        "face-0",
         "face-1",
-        "face-2",
         "printings",
     ]);
 
