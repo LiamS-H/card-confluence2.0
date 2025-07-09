@@ -12,7 +12,7 @@ export default function Card({ card }: { card: ScryfallCard.Any }) {
     }, [card]);
 
     return (
-        <div className="overflow-clip relative">
+        <div className="overflow-visible relative">
             <Scrycard
                 flipped={flipped}
                 animated
