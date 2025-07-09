@@ -26,6 +26,7 @@ import { Oracle } from "./oracle";
 import { usePrintings } from "../../../hooks/usePrintings";
 import { useRulings } from "@/hooks/useRulings";
 import { Rulings } from "./rulings";
+import { ExternalLink, Tag } from "lucide-react";
 
 export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
@@ -111,8 +112,24 @@ export function CardModal() {
                         </Accordion>
                     </DialogHeader>
 
-                    <div className="w-full sm:min-w-96 sm:w-96 overflow-clip p-2">
+                    <div className="w-full sm:min-w-96 sm:w-96 overflow-visible p-2">
                         <Card card={card} />
+                        <div className="flex flex-wrap w-full mt-2">
+                            <a href={card.scryfall_uri}>
+                                <Button variant="link">
+                                    View Scryfall
+                                    <ExternalLink />
+                                </Button>
+                            </a>
+
+                            <a
+                                href={`https://tagger.scryfall.com/card/${card.set}/${card.collector_number}`}
+                            >
+                                <Button variant="link">
+                                    View Tagger <ExternalLink />
+                                </Button>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <DialogFooter className="self-end flex flex-col sm:flex-row">
