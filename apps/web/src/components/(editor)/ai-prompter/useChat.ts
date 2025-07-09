@@ -9,9 +9,9 @@ import {
     ICatalog,
     isArgument,
 } from "codemirror-lang-scrycards";
-import { fetchSearch } from "@/lib/scryfall";
 import { getContents } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
+import { useSearchContext } from "@/context/search";
 
 const MAX_CALLS = 10;
 
@@ -59,6 +59,8 @@ export function useChat({
     const [error, setError] = useState(true);
 
     const canceledMessages = useRef<Set<number>>(new Set());
+
+    const { cachedRulings, cachedSearch, getCard } = useSearchContext();
 
     const [poll, setPoll] = useState<{
         question: string;
@@ -215,12 +217,103 @@ export function useChat({
                             }
                             STOP_PROMPT = true;
                             continue;
+                        case "get_rulings": {
+                            if (!func.args) break;
+                            const { name } = func.args as { name: string };
+                            const searchResp = await cachedSearch({
+                                query: name,
+                            });
+
+                            if (searchResp.object === "error") {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_rulings",
+                                                response: {
+                                                    error: `Could not find a card with name ${name}.`,
+                                                    details: searchResp.details,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            const card = await getCard(searchResp.data[0]);
+
+                            if (!card || !("oracle_id" in card)) {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_rulings",
+                                                response: {
+                                                    error: `Could not find a card with name ${name}.`,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            const rulingsResp = await cachedRulings({
+                                oracle_id: card.oracle_id,
+                                scryfall_id: card.id,
+                            });
+
+                            if (rulingsResp.object === "error") {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_rulings",
+                                                response: {
+                                                    error: `Could not fetch rulings for ${card.name}.`,
+                                                    details:
+                                                        rulingsResp.details,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            addContent({
+                                role: "user",
+                                parts: [
+                                    {
+                                        functionResponse: {
+                                            name: "get_rulings",
+                                            response: {
+                                                card: card.name,
+                                                rulings: rulingsResp.data.map(
+                                                    (r) => ({
+                                                        date: r.published_at,
+                                                        text: r.comment,
+                                                    })
+                                                ),
+                                            },
+                                        },
+                                    },
+                                ],
+                            });
+                            continue;
+                        }
                         case "get_cards":
                             if (!func.args) break;
                             const { name } = func.args as {
                                 name: string;
                             };
-                            const resp = await fetchSearch(`${name}`);
+                            const resp = await cachedSearch({
+                                query: `${name}`,
+                            });
                             if (resp.object === "error") {
                                 addContent({
                                     role: "user",
@@ -237,7 +330,11 @@ export function useChat({
                                 });
                                 continue;
                             }
-                            const cards = resp.data;
+                            const cards = (
+                                await Promise.all(
+                                    resp.data.map((c) => getCard(c))
+                                )
+                            ).filter((c) => !!c);
                             // TODO: Rank the response based on some string similarity to shorten results
                             // cards.filter(
                             //     (c) => c.name.includes(name) || name.includes(c.name)
@@ -290,6 +387,9 @@ export function useChat({
             setLoading(false);
         },
         [
+            cachedSearch,
+            cachedRulings,
+            getCard,
             loading,
             poll,
             contents,

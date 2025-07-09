@@ -63,6 +63,21 @@ const get_tag_info: FunctionDeclaration = {
     },
 };
 
+const get_rulings: FunctionDeclaration = {
+    name: "get_rulings",
+    description: "gets the rulings for a card given its name.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            name: {
+                type: Type.STRING,
+                description: "The name of the card to get rulings for.",
+            },
+        },
+        required: ["name"],
+    },
+};
+
 export async function queryModel(contents: ContentListUnion) {
     console.log("[gemini-backend] querying", contents);
     try {
@@ -84,6 +99,7 @@ export async function queryModel(contents: ContentListUnion) {
                             add_query,
                             get_tag_info,
                             get_cards,
+                            get_rulings,
                         ],
                     },
                 ],
