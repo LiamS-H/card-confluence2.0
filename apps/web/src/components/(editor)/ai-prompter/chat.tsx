@@ -1,8 +1,12 @@
 import { Button } from "@/components/(ui)/button";
 import { Textarea } from "@/components/(ui)/textarea";
 import { ICatalog } from "codemirror-lang-scrycards";
-import { LoaderCircle, SendHorizontal } from "lucide-react";
-import { useState, useMemo } from "react";
+import {
+    ChevronDown,
+    LoaderCircle,
+    SendHorizontal,
+} from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useChat } from "./useChat";
 import { ChatId } from "@/context/chat";
 import { getContents } from "@/lib/utils";
@@ -59,11 +63,20 @@ export function EditorChat({
         catalog: _catalog,
     });
 
-    const handleDemoClick = async (demoPrompt: string) => {
-        if (loading) return;
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isAtBottom, setIsAtBottom] = useState(true);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-        commitChat();
-        await query(demoPrompt);
+    const handleScroll = () => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 5; // 5px tolerance
+        setIsAtBottom(atBottom);
+    };
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     const processedMessages = useMemo(() => {
@@ -71,6 +84,30 @@ export function EditorChat({
         const contents = getContents(chat.contents);
         return processChatContents(contents, loading);
     }, [chat, loading]);
+
+    useEffect(() => {
+        if (isAtBottom) {
+            messagesEndRef.current?.scrollIntoView();
+        }
+    }, [processedMessages, isAtBottom]);
+
+    useEffect(() => {
+        if (!loading) {
+            if (
+                document.activeElement === document.body ||
+                document.activeElement === null
+            ) {
+                textareaRef.current?.focus();
+            }
+        }
+    }, [loading]);
+
+    const handleDemoClick = async (demoPrompt: string) => {
+        if (loading) return;
+
+        commitChat();
+        await query(demoPrompt);
+    };
 
     const disabled = prompt === "" || loading;
 
@@ -95,7 +132,11 @@ export function EditorChat({
     };
 
     return (
-        <div className="w-full h-96 max-h-96 flex justify-center relative overflow-y-auto">
+        <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="w-full h-96 max-h-96 flex justify-center relative overflow-y-auto"
+        >
             <div className="w-full max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-13 sm:ml-0">
                 <div className="pr-2">
                     <div className="mb-4 px-2">
@@ -138,6 +179,7 @@ export function EditorChat({
                                     <LoaderCircle className="animate-spin" />
                                 </div>
                             )}
+                            <div ref={messagesEndRef} />
                         </div>
                     </div>
 
@@ -145,6 +187,7 @@ export function EditorChat({
                         <form onSubmit={handleSubmit}>
                             <div className="flex w-full justify-center relative">
                                 <Textarea
+                                    ref={textareaRef}
                                     disabled={loading}
                                     placeholder="Ask GenAI"
                                     className="min-h-24 flex-grow backdrop-blur-sm"
@@ -155,7 +198,9 @@ export function EditorChat({
                                 <Button
                                     className="absolute bottom-4 right-2"
                                     size="icon"
-                                    variant={disabled ? "outline" : "highlight"}
+                                    variant={
+                                        disabled ? "outline" : "highlight"
+                                    }
                                     disabled={disabled}
                                     type="submit"
                                 >
@@ -170,6 +215,16 @@ export function EditorChat({
                     </div>
                 </div>
             </div>
+            {!isAtBottom && (
+                <Button
+                    onClick={scrollToBottom}
+                    variant="secondary"
+                    className="absolute bottom-28 right-1/2 translate-x-1/2 z-10 rounded-full shadow-lg"
+                >
+                    <ChevronDown className="h-4 w-4 mr-1" />
+                    Jump to Bottom
+                </Button>
+            )}
         </div>
     );
 }
