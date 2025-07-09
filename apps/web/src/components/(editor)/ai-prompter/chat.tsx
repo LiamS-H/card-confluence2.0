@@ -50,13 +50,24 @@ export function EditorChat({
 
     const disabled = prompt === "" || loading;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!prompt) return;
+    const doSubmit = async () => {
+        if (disabled) return;
 
         commitChat();
         await query(prompt);
         setPrompt("");
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await doSubmit();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            doSubmit();
+        }
     };
 
     return (
@@ -89,6 +100,7 @@ export function EditorChat({
                                     className="min-h-24 flex-grow backdrop-blur-sm"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
+                                    onKeyDown={handleKeyDown}
                                 />
                                 <Button
                                     className="absolute bottom-4 right-2"
