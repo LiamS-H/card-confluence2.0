@@ -46,7 +46,7 @@ export function ChatsSidebar({
             chatThumbnails.push(
                 <li key={chatId} className="relative max-w-full flex">
                     <Button
-                        className="rounded-br-none rounded-tr-none w-48"
+                        className="rounded-br-none rounded-tr-none w-34"
                         disabled={activeId === chatId || !open}
                         variant={activeId === chatId ? "default" : "ghost"}
                         onClick={() => {
@@ -58,7 +58,7 @@ export function ChatsSidebar({
                         </span>
                     </Button>
                     <Button
-                        className="w-8 overflow-ellipsis overflow-hidden rounded-bl-none rounded-tl-none"
+                        className="w-7 overflow-ellipsis overflow-hidden rounded-bl-none rounded-tl-none"
                         variant={activeId === chatId ? "destructive" : "ghost"}
                         onClick={() => {
                             if (activeId === chatId) {

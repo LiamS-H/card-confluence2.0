@@ -45,7 +45,7 @@ interface ISearchContext {
     ) => Promise<SearchResponse> | SearchResponse;
     cacheResponse: (props: ICachedSearchProps[], resp: SearchResponse) => void;
     getCard: (
-        id: string
+        id?: string
     ) => Promise<ScryfallCard.Any | undefined> | ScryfallCard.Any | undefined;
 }
 
@@ -144,7 +144,8 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const getCard = useCallback(
-        function (id: string) {
+        function (id?: string) {
+            if (!id) return;
             return cardMappings.current.get(id) || requestCard(id);
         },
         [requestCard]

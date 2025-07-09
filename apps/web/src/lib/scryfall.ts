@@ -7,6 +7,7 @@ import {
     type ScryfallList,
     type ScryfallCatalog,
     ScryfallError,
+    ScryfallCard,
 } from "@scryfall/api-types";
 import { parse } from "node-html-parser";
 
@@ -142,7 +143,7 @@ export async function fetchSearch(
     fetch_func?: typeof fetchWithHeaders
 ): Promise<ScryfallList.Cards | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/search");
-    const params = settings ? { q: query } : { q: query };
+    const params = { q: query };
     const search = new URLSearchParams(params);
     if (settings) {
         for (const key in settings) {
@@ -158,6 +159,18 @@ export async function fetchSearch(
     const response = await (fetch_func ? fetch_func(url) : fetch(url));
     const card_list: ScryfallList.Cards = await response.json();
     return card_list;
+}
+
+export async function fetchRandom(
+    query: string
+): Promise<ScryfallCard.Any | ScryfallError> {
+    const url = new URL("https://api.scryfall.com/cards/random");
+    const params = { q: query };
+    const search = new URLSearchParams(params);
+    url.search = search.toString();
+    const response = await fetch(url);
+    const card: ScryfallCard.Any = await response.json();
+    return card;
 }
 
 export async function fetchRulings(

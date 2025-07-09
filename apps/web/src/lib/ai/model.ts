@@ -63,6 +63,36 @@ const get_tag_info: FunctionDeclaration = {
     },
 };
 
+const get_rulings: FunctionDeclaration = {
+    name: "get_rulings",
+    description: "gets the rulings for a card given its name.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            name: {
+                type: Type.STRING,
+                description: "The name of the card to get rulings for.",
+            },
+        },
+        required: ["name"],
+    },
+};
+
+const get_random_card: FunctionDeclaration = {
+    name: "get_random_card",
+    description: "gets a random card, optionally matching a scryfall query.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            query: {
+                type: Type.STRING,
+                description:
+                    "A scryfall query to filter the random card. Can be an empty string for any random card.",
+            },
+        },
+    },
+};
+
 export async function queryModel(contents: ContentListUnion) {
     console.log("[gemini-backend] querying", contents);
     try {
@@ -70,6 +100,7 @@ export async function queryModel(contents: ContentListUnion) {
             model: "gemini-2.0-flash",
             contents: contents,
             config: {
+                temperature: 1.3,
                 candidateCount: 1,
                 systemInstruction: SYSTEM_PROMPT,
                 // toolConfig: {
@@ -84,6 +115,8 @@ export async function queryModel(contents: ContentListUnion) {
                             add_query,
                             get_tag_info,
                             get_cards,
+                            get_rulings,
+                            get_random_card,
                         ],
                     },
                 ],
