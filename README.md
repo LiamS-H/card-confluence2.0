@@ -16,7 +16,7 @@
 
 ## Autocomplete
  - [X] Add autocomplete when nothing is selected to select an argument
- - [ ] Dynamic suggestions that hide for example silly cards, or restrict creature types by format
+ - [ ] Dynamic suggestions that hide for example silly card names, or restrict creature types by format
  - [ ] Typing @query will start a code block for the name and then the rest of the query
 
 ## Linting
@@ -26,7 +26,7 @@
 ## Search Bar
  - [X] scroll to top button - and scroll to top when a new query is searched
  - [X] loading bar display on how many cards
- - [ ] adjustable card sizes
+ - [X] adjustable card sizes
  - [X] potentially order and display setting dropdowns
 
 ## Editor Settings
@@ -42,10 +42,10 @@
  - [X] query reactivates after doc change
  - [x] quickly toggling a query and disabling while loading leaves the loading state on
  - [X] queries symbols run away when you scroll down
- - [X] tabautocomplete doesn't work
- - [ ] the radix primitives are sloooooow, consider creating new dropdown and tooltip
- - [ ] when tooltip is diabled, cursor snaps when holding down a key and editing order/unique
+ - [X] tab autocomplete doesn't work
+ - [ ] when tooltip is disabled, cursor snaps when holding down a key and editing order/unique
  - [ ] make scryhover work on mobile
+ - [ ] searching directly in a query causes parsing errors
 
 ## Add docs
   Argument explanation

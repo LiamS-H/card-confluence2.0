@@ -79,3 +79,25 @@ t:test
 ==>
 
 Program(Domain(Tag(Argument,Operator,Value(String)),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String))))))
+
+# Name Query + Multi-Query
+
+@query troll
+Golgari Grave-Troll
+
+==>
+
+Program(Query(QueryName,QueryBody(Argument,Argument,Argument)))
+
+# Name Only + Multi-Query
+
+@query troll
+Golgari Grave-Troll
+
+@query elves
+t:elf
+
+==>
+
+Program(Query(QueryName,QueryBody(Argument,Argument,Argument),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String))))))
+
