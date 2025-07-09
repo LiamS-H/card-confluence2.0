@@ -26,6 +26,23 @@ export interface ProcessedMessage {
     isUser: boolean;
     parts: ProcessedPart[];
 }
+const demoPrompts = [
+    {
+        line1: "Find cards",
+        line2: "like entomb",
+        prompt: "Show me cards like entomb.",
+    },
+    {
+        line1: "Combos with",
+        line2: "Dr. Eggman",
+        prompt: "What cards can combo with my commander Dr. Eggman",
+    },
+    {
+        line1: "Let's play",
+        line2: "20 questions",
+        prompt: "Think of an iconic card and I'll try and guess it.",
+    },
+];
 
 export function EditorChat({
     catalog: _catalog,
@@ -41,6 +58,13 @@ export function EditorChat({
         chatId: _chatId,
         catalog: _catalog,
     });
+
+    const handleDemoClick = async (demoPrompt: string) => {
+        if (loading) return;
+
+        commitChat();
+        await query(demoPrompt);
+    };
 
     const processedMessages = useMemo(() => {
         if (!chat?.contents) return [];
@@ -76,6 +100,32 @@ export function EditorChat({
                 <div className="pr-2">
                     <div className="mb-4 px-2">
                         <div className="mb-30" />
+                        {processedMessages.length === 0 && !loading && (
+                            <div className="mb-4 text-center">
+                                <p className="text-sm text-muted-foreground mb-2">
+                                    Try an example
+                                </p>
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                    {demoPrompts.map((p, i) => (
+                                        <Button
+                                            key={i}
+                                            variant="outline"
+                                            className="h-auto"
+                                            onClick={() =>
+                                                handleDemoClick(p.prompt)
+                                            }
+                                        >
+                                            <div className="text-left text-sm">
+                                                <p className="font-bold">
+                                                    {p.line1}
+                                                </p>
+                                                <p>{p.line2}</p>
+                                            </div>
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                         <div className="flex flex-col gap-3 ">
                             {processedMessages.map((message) => (
                                 <ChatMessage

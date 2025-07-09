@@ -11,6 +11,7 @@ import {
 } from "codemirror-lang-scrycards";
 import { getContents } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
+import { fetchRandom } from "@/lib/scryfall";
 import { useSearchContext } from "@/context/search";
 
 const MAX_CALLS = 10;
@@ -375,6 +376,48 @@ export function useChat({
                                 ],
                             });
                             continue;
+                        case "get_random_card": {
+                            if (!func.args) break;
+                            const { query } = func.args as {
+                                query?: string;
+                            };
+                            const card = await fetchRandom(query ?? "");
+
+                            if (card.object === "error") {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_random_card",
+                                                response: {
+                                                    error: card.details,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            addContent({
+                                role: "user",
+                                parts: [
+                                    {
+                                        functionResponse: {
+                                            name: "get_random_card",
+                                            response: {
+                                                card,
+                                            },
+                                        },
+                                    },
+                                ],
+                            });
+                            if (chat.name === null) {
+                                nameChat("Guessing Game");
+                            }
+                            continue;
+                        }
 
                         default:
                             console.error("[gemini] undefined func:", func);
