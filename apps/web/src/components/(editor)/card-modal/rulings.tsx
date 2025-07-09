@@ -6,6 +6,8 @@ import {
 import { ScryfallRuling } from "@scryfall/api-types";
 import { LoaderCircle } from "lucide-react";
 import { useMemo } from "react";
+import { Oracle } from "./oracle";
+import { OracleText } from "../oracle-text";
 
 type Comp = {
     published_at: string;
@@ -74,7 +76,9 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
                                 className="bg-secondary text-secondary-foreground p-2 rounded-md"
                                 key={i}
                             >
-                                <p className="px-1 text-left">{c.comment}</p>
+                                <OracleText className="px-1 text-left">
+                                    {c.comment}
+                                </OracleText>
                             </li>
                         ))}
                     </ul>
