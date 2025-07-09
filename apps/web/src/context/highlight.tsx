@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import {
     createContext,
     type ReactNode,
+    Suspense,
     useCallback,
     useContext,
     useEffect,
@@ -144,21 +145,23 @@ export function HighlightContextProvider({
     const open = !!selected;
 
     return (
-        <highlightContext.Provider
-            value={{
-                selected,
-                pushSelected,
-                replaceSelected,
-                goPrevious,
-                open,
-                setOpen,
-                hovered,
-                setHovered,
-                previous,
-            }}
-        >
-            <CardModal />
-            {children}
-        </highlightContext.Provider>
+        <Suspense fallback={children}>
+            <highlightContext.Provider
+                value={{
+                    selected,
+                    pushSelected,
+                    replaceSelected,
+                    goPrevious,
+                    open,
+                    setOpen,
+                    hovered,
+                    setHovered,
+                    previous,
+                }}
+            >
+                <CardModal />
+                {children}
+            </highlightContext.Provider>
+        </Suspense>
     );
 }
