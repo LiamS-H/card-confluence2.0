@@ -6,7 +6,6 @@ import {
 import { ScryfallRuling } from "@scryfall/api-types";
 import { LoaderCircle } from "lucide-react";
 import { useMemo } from "react";
-import { Oracle } from "./oracle";
 import { OracleText } from "../oracle-text";
 
 type Comp = {
