@@ -47,8 +47,11 @@ function QueryWrapper({
             <div
                 className="absolute z-30 flex gap-1"
                 style={{
-                    top: rect.top - (editorRef.current?.view?.documentTop ?? 0),
-                    left: rect.x + rect.width,
+                    top:
+                        rect.top -
+                        (editorRef.current?.view?.documentTop ?? 0) +
+                        3,
+                    left: rect.x + rect.width + 4,
                 }}
             >
                 {children}
@@ -208,8 +211,8 @@ export function Editor({
                 }}
             >
                 {children}
+                {queryComponents}
             </ReactCodeEditor>
-            {queryComponents}
         </>
     );
 }

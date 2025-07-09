@@ -15,13 +15,22 @@ export function useSearch() {
     const queryRef = useRef<null | string>(null);
     const currentQueryRef = useRef<null | string>(null);
 
+    const resetSearch = useCallback(() => {
+        setAllData([]);
+        setError(null);
+        setWarning(null);
+        setIsLoading(false);
+        setHasNextPage(false);
+        setCurrentPage(0);
+        setTotalCards(0);
+    }, []);
+
     const search = useCallback(
         async (req: ICachedSearchProps | null, resetData = true) => {
             if (!req) {
                 queryRef.current = null;
                 currentQueryRef.current = null;
-                setAllData([]);
-                setIsLoading(false);
+                resetSearch();
                 return;
             }
             const { query } = req;
@@ -45,11 +54,6 @@ export function useSearch() {
 
             if (result.object === "error") {
                 setError(result);
-                if (resetData) {
-                    setAllData([]);
-                    setHasNextPage(false);
-                    setTotalCards(0);
-                }
                 return;
             } else if (result.object === "list") {
                 setError(null);
@@ -59,7 +63,6 @@ export function useSearch() {
                 if (resetData) {
                     setAllData(result.data);
                 } else {
-                    // Append new data for pagination
                     setAllData((prev) => [...prev, ...result.data]);
                 }
                 setCurrentPage(req.settings?.page ?? 1);
@@ -69,7 +72,7 @@ export function useSearch() {
                 return;
             }
         },
-        [cachedSearch]
+        [cachedSearch, resetSearch]
     );
 
     const loadNextPage = useCallback(

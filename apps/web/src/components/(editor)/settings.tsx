@@ -15,6 +15,7 @@ import { Slider } from "@/components/(ui)/slider";
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Label } from "@/components/(ui)/label";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/(ui)/button";
 
 function ToggleButton({
     label,
@@ -74,11 +75,12 @@ export function EditorSettingsModal() {
                         <ThemeToggle id="themeToggle" />
                     </div>
                     {/* Card Columns Slider */}
-                    <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-col gap-2">
                         <Label className="w-40" htmlFor="cardColumns">
                             Columns: {cardColumns || "auto"}
                         </Label>
                         <Slider
+                            className="w-80"
                             id="cardColumns"
                             min={0}
                             max={15}
@@ -92,7 +94,7 @@ export function EditorSettingsModal() {
                             }
                         />
                     </div>
-                    <div className="flex justify-between w-md">
+                    <div className="flex flex-col sm:flex-row gap-y-2 justify-between w-md">
                         <ToggleButton
                             setting="disableAutocomplete"
                             label="Completion"
@@ -124,8 +126,22 @@ export function EditorSettingsModal() {
                         feedback={["Shown", "Hidden"]}
                         inverted
                     />
+                    <ToggleButton
+                        setting="disableBarOnScroll"
+                        label="Show Editor On Scroll"
+                        feedback={["Disabled", "Enabled"]}
+                    />
                 </div>
-                <DialogFooter />
+                <DialogFooter>
+                    <Button
+                        onClick={() => {
+                            setSettings({ window: "split" });
+                        }}
+                        variant="destructive"
+                    >
+                        Reset Settings
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

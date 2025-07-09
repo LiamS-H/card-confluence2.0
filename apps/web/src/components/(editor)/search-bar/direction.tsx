@@ -57,7 +57,7 @@ export function Direction() {
         });
     }, [order, setScryfallSettings]);
 
-    const asc = mergedSettings.dir ?? auto === "asc";
+    const asc = (mergedSettings.dir ?? auto) === "asc";
 
     let Icon;
     switch (order) {

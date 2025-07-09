@@ -1,3 +1,4 @@
+import { useEditorSettingsContext } from "@/context/editor-settings";
 import React, {
     useState,
     useEffect,
@@ -10,6 +11,10 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
     const [shown, setShown] = useState(true);
     const [sticky, setSticky] = useState(false);
     const [animate, setAnimate] = useState(true);
+
+    const {
+        settings: { disableBarOnScroll },
+    } = useEditorSettingsContext();
 
     const child = useRef<HTMLDivElement>(null);
     const lastScrollRef = useRef(0);
@@ -31,6 +36,18 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
                     window.scrollY || document.documentElement.scrollTop;
                 const lastScrollY = lastScrollRef.current;
                 lastScrollRef.current = currentScrollY;
+                if (disableBarOnScroll) {
+                    if (currentScrollY < childHeight) {
+                        setSticky(false);
+                        setShown(true);
+                        setAnimate(false);
+                    } else {
+                        setSticky(true);
+                        setShown(false);
+                        setAnimate(false);
+                    }
+                    return;
+                }
 
                 if (currentScrollY === 0) {
                     setSticky(false);
@@ -67,7 +84,7 @@ export function ScrollHidden({ children }: { children: ReactNode }) {
         return () => {
             controller.abort();
         };
-    }, [lastScrollRef]);
+    }, [lastScrollRef, disableBarOnScroll]);
 
     return (
         <div
