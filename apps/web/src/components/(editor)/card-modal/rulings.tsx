@@ -9,7 +9,11 @@ import { useMemo } from "react";
 
 type Comp = {
     published_at: string;
-    comments: Omit<Omit<ScryfallRuling, "object">, "published_at">[];
+    source: ScryfallRuling["source"][];
+    comments: Omit<
+        Omit<Omit<ScryfallRuling, "object">, "published_at">,
+        "source"
+    >[];
 };
 
 function Content({ rulings }: { rulings: ScryfallRuling[] }) {
@@ -28,6 +32,7 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
         for (let i = 0; i < rulings.length; i++) {
             const {
                 published_at: date,
+                source,
                 object: _,
                 ...ruling
             } = rulings[i] as ScryfallRuling;
@@ -36,6 +41,7 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
                 cur_comp = {
                     comments: [{ ...ruling }],
                     published_at: date,
+                    source: [source],
                 };
                 continue;
             }
@@ -44,8 +50,12 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
                 cur_comp = {
                     comments: [{ ...ruling }],
                     published_at: date,
+                    source: [source],
                 };
                 continue;
+            }
+            if (!cur_comp.source.includes(source)) {
+                cur_comp.source.push(source);
             }
             cur_comp.comments.push({ ...ruling });
         }
@@ -54,24 +64,24 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
     }, [rulings]);
 
     return (
-        <ul className="max-h-52 overflow-y-auto">
+        <ul className="flex flex-col items-center">
             {ruling_comps.map((r) => (
                 <div
                     key={r.published_at}
-                    className="p-1 flex flex-col items-end"
+                    className="p-1 flex flex-col items-end max-w-96"
                 >
                     <ul className="flex flex-col gap-1">
                         {r.comments.map((c, i) => (
                             <li
-                                className="bg-secondary max-w-96 text-secondary-foreground p-2 rounded-md"
+                                className="bg-secondary text-secondary-foreground p-2 rounded-md"
                                 key={i}
                             >
                                 <p className="px-1 text-left">{c.comment}</p>
                             </li>
                         ))}
                     </ul>
-                    <span className=" text-muted-foreground">
-                        {r.published_at}
+                    <span className="text-muted-foreground uppercase">
+                        {r.published_at} {r.source.join(" & ")}
                     </span>
                 </div>
             ))}
