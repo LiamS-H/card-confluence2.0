@@ -26,7 +26,7 @@ import { Oracle } from "./oracle";
 import { usePrintings } from "../../../hooks/usePrintings";
 import { useRulings } from "@/hooks/useRulings";
 import { Rulings } from "./rulings";
-import { ExternalLink, Tag } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
@@ -52,7 +52,7 @@ export function CardModal() {
         return null;
     }
 
-    let disp_tabs = tabs.filter((t) => {
+    const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
         if (!rulings && t === "rulings") return false;
         return true;

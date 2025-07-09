@@ -17,8 +17,6 @@ type Comp = {
 };
 
 function Content({ rulings }: { rulings: ScryfallRuling[] }) {
-    if (rulings.length === 0) return <span>none</span>;
-
     rulings = rulings.sort((r1, r2) => {
         if (r2.oracle_id !== r2.oracle_id)
             return r1.oracle_id.localeCompare(r2.oracle_id);
@@ -33,7 +31,7 @@ function Content({ rulings }: { rulings: ScryfallRuling[] }) {
             const {
                 published_at: date,
                 source,
-                object: _,
+                object: _, // eslint-disable-line
                 ...ruling
             } = rulings[i] as ScryfallRuling;
 

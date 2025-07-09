@@ -1,8 +1,4 @@
-import {
-    IRulingProps,
-    RulingsResponse,
-    useSearchContext,
-} from "@/context/search";
+import { RulingsResponse, useSearchContext } from "@/context/search";
 import { ScryfallCard, ScryfallRuling } from "@scryfall/api-types";
 import { useEffect, useState } from "react";
 
@@ -31,7 +27,7 @@ export function useRulings(card: ScryfallCard.Any | undefined | null) {
         } else {
             resolve(resp);
         }
-    }, [card]);
+    }, [card, cachedRulings]);
 
     return rulings;
 }
