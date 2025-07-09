@@ -31,16 +31,12 @@ export function Printings({
     return (
         <AccordionItem value={"printings"}>
             {printings ? (
-                <>
-                    <AccordionTrigger className="group hover:no-underline">
-                        <div className="flex gap-2 items-center w-full">
-                            <span className="group-hover:underline">
-                                Printings
-                            </span>
-                            <Printing id={id} isSelected />
-                        </div>
-                    </AccordionTrigger>
-                </>
+                <AccordionTrigger className="group hover:no-underline">
+                    <div className="flex gap-2 items-center w-full">
+                        <span className="group-hover:underline">Printings</span>
+                        <Printing id={id} isSelected />
+                    </div>
+                </AccordionTrigger>
             ) : (
                 <AccordionTrigger disabled noChevron>
                     <div className="flex gap-2 items-center w-full">
@@ -74,11 +70,17 @@ export function Printing({
     id,
     isSelected,
     select,
-}: {
-    id: string;
-    isSelected?: boolean;
-    select?: () => void;
-}) {
+}:
+    | {
+          id: string;
+          isSelected?: false;
+          select: () => void;
+      }
+    | {
+          id: string;
+          isSelected: true;
+          select?: never;
+      }) {
     const card = useCard(id);
     if (!card) return <div>loading...</div>;
     let price: string | undefined;
@@ -95,22 +97,22 @@ export function Printing({
     }
 
     const content = (
-        <div className="w-full flex justify-between">
+        <div className={`w-full flex flex-wrap justify-between`}>
             <div className="flex gap-2">
                 <span
-                    className={`lg:max-w-96 md:max-w-32 sm:max-w-44 max-w-44 truncate ${select ? "group-hover:underline" : ""}`}
+                    className={`lg:max-w-96 md:max-w-32 sm:max-w-44 "max-w-44"  ${select ? "group-hover:underline truncate" : ""}`}
                 >
                     {card.set_name}
                 </span>
                 <span className="font-thin">({card.set.toUpperCase()})</span>
             </div>
-            {price && <span>{price}</span>}
+            {price && <span className="truncate">{price}</span>}
         </div>
     );
 
-    if (!select) {
+    if (isSelected) {
         return (
-            <div className="w-full h-6 px-2 py-1 rounded-md group bg-secondary group-hover:bg-secondary/80">
+            <div className="w-full px-2 py-1 rounded-md group bg-secondary group-hover:bg-secondary/80">
                 {content}
             </div>
         );
@@ -118,7 +120,7 @@ export function Printing({
 
     return (
         <Button
-            className="w-full h-6 px-2 group"
+            className={`w-full h-6 px-2 group`}
             variant={isSelected ? "secondary" : "ghost"}
             onClick={select}
         >
