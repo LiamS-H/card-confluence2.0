@@ -24,7 +24,7 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <OracleText className="gap-2 max-w-96">
+                        <OracleText className="gap-2 max-w-96 text-left">
                             {f.oracle_text}
                         </OracleText>
                     </AccordionContent>
@@ -45,7 +45,7 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <OracleText className="gap-2 max-w-96">
+                    <OracleText className="gap-2 max-w-96 text-left">
                         {f.oracle_text}
                     </OracleText>
                 </AccordionContent>

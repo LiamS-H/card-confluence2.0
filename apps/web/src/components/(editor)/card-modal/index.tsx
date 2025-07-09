@@ -66,8 +66,8 @@ export function CardModal() {
             }}
         >
             <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto">
-                    <DialogHeader className="w-full px-5 md:overflow-y-auto ">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto md:overflow-hidden">
+                    <DialogHeader className="w-full h-fit px-5 md:h-full md:overflow-y-auto">
                         <Accordion
                             type="multiple"
                             className="w-full"
