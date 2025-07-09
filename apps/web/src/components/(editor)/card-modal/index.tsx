@@ -23,7 +23,9 @@ import {
 } from "@/components/(ui)/accordion";
 import { Legalities } from "./legalities";
 import { Oracle } from "./oracle";
-import { usePrintings } from "./usePrintings";
+import { usePrintings } from "../../../hooks/usePrintings";
+import { useRulings } from "@/hooks/useRulings";
+import { Rulings } from "./rulings";
 
 export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
@@ -37,6 +39,8 @@ export function CardModal() {
     ]);
 
     const printings = usePrintings(card);
+    const rulingsOpen = tabs.includes("rulings");
+    const rulings = useRulings(rulingsOpen ? card?.id : undefined);
 
     if (!open) return null;
 
@@ -47,25 +51,28 @@ export function CardModal() {
         return null;
     }
 
+    let disp_tabs = tabs.filter((t) => {
+        if (!printings && t === "printings") return false;
+        if (!rulings && t === "rulings") return false;
+        return true;
+    });
+
     return (
         <Dialog
             defaultOpen
             onOpenChange={(open) => {
                 setOpen(open);
+                setTabs((old) => [...old.filter((t) => t !== "rulings")]);
             }}
         >
-            <DialogContent className="min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl h-11/12 px-2 sm:py-8 md:px-4 md:py-16">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto h-full">
-                    <DialogHeader className="md:flex-grow h-full px-4 md:overflow-y-auto">
+            <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto">
+                    <DialogHeader className="w-full px-5 md:overflow-y-auto ">
                         <Accordion
                             type="multiple"
                             className="w-full"
                             defaultValue={["printings"]}
-                            value={
-                                printings
-                                    ? tabs
-                                    : tabs.filter((t) => t !== "printings")
-                            }
+                            value={disp_tabs}
                             onValueChange={(e) => setTabs(e)}
                         >
                             <Oracle card={card} />
@@ -100,6 +107,7 @@ export function CardModal() {
                                     <Legalities card={card} />
                                 </AccordionContent>
                             </AccordionItem>
+                            <Rulings rulings={rulings} isOpen={rulingsOpen} />
                         </Accordion>
                     </DialogHeader>
 
@@ -107,7 +115,7 @@ export function CardModal() {
                         <Card card={card} />
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="self-end flex flex-col sm:flex-row">
                     {goPrevious && previous && (
                         <UndoButton undo={goPrevious} prevId={previous} />
                     )}

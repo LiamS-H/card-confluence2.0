@@ -53,7 +53,7 @@ function Legality({
 export function Legalities({ card }: { card: ScryfallCard.Any }) {
     // TODO: add sorting and hiding formats saved in settings
     return (
-        <ul className="w-fit flex flex-row lg:flex-col flex-wrap lg:max-h-36">
+        <ul className="w-fit max-w-64 sm:max-w-full flex flex-row lg:flex-col flex-wrap lg:max-h-36">
             {Object.entries(card.legalities)
                 .map(([format, legality]) => ({
                     format,
