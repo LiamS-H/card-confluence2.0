@@ -15,6 +15,7 @@ import { Slider } from "@/components/(ui)/slider";
 import { ThemeToggle } from "@/components/(theme)/theme-toggle";
 import { Label } from "@/components/(ui)/label";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/(ui)/button";
 
 function ToggleButton({
     label,
@@ -131,7 +132,16 @@ export function EditorSettingsModal() {
                         feedback={["Disabled", "Enabled"]}
                     />
                 </div>
-                <DialogFooter />
+                <DialogFooter>
+                    <Button
+                        onClick={() => {
+                            setSettings({ window: "split" });
+                        }}
+                        variant="destructive"
+                    >
+                        Reset Settings
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
