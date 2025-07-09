@@ -1,15 +1,23 @@
-import { RulingsResponse, useSearchContext } from "@/context/search";
-import { ScryfallRuling } from "@scryfall/api-types";
+import {
+    IRulingProps,
+    RulingsResponse,
+    useSearchContext,
+} from "@/context/search";
+import { ScryfallCard, ScryfallRuling } from "@scryfall/api-types";
 import { useEffect, useState } from "react";
 
-export function useRulings(id?: string) {
+export function useRulings(card: ScryfallCard.Any | undefined | null) {
     const { cachedRulings } = useSearchContext();
     const [rulings, setRulings] = useState<ScryfallRuling[] | null>(null);
 
     useEffect(() => {
-        if (!id) return;
+        if (!card) return;
+        if (!("oracle_id" in card)) return;
         setRulings(null);
-        const resp = cachedRulings({ id });
+        const resp = cachedRulings({
+            oracle_id: card.oracle_id,
+            scryfall_id: card.id,
+        });
         async function resolve(resp: RulingsResponse) {
             if (resp.object === "error") {
                 console.error("couldn't fetch rulings", resp);
@@ -23,7 +31,7 @@ export function useRulings(id?: string) {
         } else {
             resolve(resp);
         }
-    }, [id]);
+    }, [card]);
 
     return rulings;
 }

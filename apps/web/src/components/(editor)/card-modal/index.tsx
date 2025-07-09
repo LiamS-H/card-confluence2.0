@@ -40,7 +40,7 @@ export function CardModal() {
 
     const printings = usePrintings(card);
     const rulingsOpen = tabs.includes("rulings");
-    const rulings = useRulings(rulingsOpen ? card?.id : undefined);
+    const rulings = useRulings(card);
 
     if (!open) return null;
 

@@ -30,12 +30,16 @@ export type ScryfallCached = Omit<ScryfallList.Cards, "data"> & {
 
 export type SearchResponse = ScryfallCached | ScryfallError;
 
+export interface IRulingProps {
+    scryfall_id: string;
+    oracle_id: string;
+}
 export type RulingsResponse = ScryfallList.Rulings | ScryfallError;
 
 interface ISearchContext {
-    cachedRulings: (props: {
-        id: string;
-    }) => Promise<RulingsResponse> | RulingsResponse;
+    cachedRulings: (
+        props: IRulingProps
+    ) => Promise<RulingsResponse> | RulingsResponse;
     cachedSearch: (
         prop: ICachedSearchProps
     ) => Promise<SearchResponse> | SearchResponse;
@@ -63,6 +67,7 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         new Map<string, ScryfallCard.Any | undefined>()
     );
     const rulingsMappings = useRef(new Map<string, RulingsResponse>());
+    const rulingsPromises = useRef(new Map<string, Promise<RulingsResponse>>());
     const { requestCard } = useScrycardsContext();
 
     const cachedSearch = useCallback(function ({
@@ -120,8 +125,22 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         return result;
     }, []);
 
-    const cachedRulings = useCallback(function ({ id }: { id: string }) {
-        return rulingsMappings.current.get(id) || fetchRulings(id);
+    const cachedRulings = useCallback(function ({
+        oracle_id,
+        scryfall_id,
+    }: IRulingProps) {
+        const cached_ruling = rulingsMappings.current.get(oracle_id);
+        if (cached_ruling) return cached_ruling;
+        const cached_request = rulingsPromises.current.get(oracle_id);
+        if (cached_request) return cached_request;
+        const ruling = fetchRulings(scryfall_id);
+        ruling.then((resp) => {
+            rulingsMappings.current.set(oracle_id, resp);
+            rulingsPromises.current.delete(oracle_id);
+        });
+        rulingsPromises.current.set(oracle_id, ruling);
+
+        return ruling;
     }, []);
 
     const getCard = useCallback(
