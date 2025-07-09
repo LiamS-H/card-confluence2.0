@@ -34,11 +34,7 @@ export function useHighlightContext() {
     return context;
 }
 
-export function HighlightContextProvider({
-    children,
-}: {
-    children: ReactNode;
-}) {
+function Provider({ children }: { children: ReactNode }) {
     const searchParams = useSearchParams();
 
     const selected = searchParams.get("card") ?? undefined;
@@ -145,23 +141,33 @@ export function HighlightContextProvider({
     const open = !!selected;
 
     return (
+        <highlightContext.Provider
+            value={{
+                selected,
+                pushSelected,
+                replaceSelected,
+                goPrevious,
+                open,
+                setOpen,
+                hovered,
+                setHovered,
+                previous,
+            }}
+        >
+            <CardModal />
+            {children}
+        </highlightContext.Provider>
+    );
+}
+
+export function HighlightContextProvider({
+    children,
+}: {
+    children: ReactNode;
+}) {
+    return (
         <Suspense fallback={children}>
-            <highlightContext.Provider
-                value={{
-                    selected,
-                    pushSelected,
-                    replaceSelected,
-                    goPrevious,
-                    open,
-                    setOpen,
-                    hovered,
-                    setHovered,
-                    previous,
-                }}
-            >
-                <CardModal />
-                {children}
-            </highlightContext.Provider>
+            <Provider>{children}</Provider>
         </Suspense>
     );
 }
