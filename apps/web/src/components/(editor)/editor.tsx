@@ -16,10 +16,13 @@ import {
     ScrycardsTooltips,
 } from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
-import { Copy, Search, TextSearch } from "lucide-react";
+import { Copy, PencilLine, Search, TextSearch } from "lucide-react";
 import { SimpleToolTip } from "./tooltip";
 import { cn } from "@/lib/utils";
-import { useEditorQueriesContext } from "@/context/editor-queries";
+import {
+    IEditorQueriesContext,
+    useEditorQueriesContext,
+} from "@/context/editor-queries";
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { getCatalogWithSettings } from "@/lib/scrycards";
 import { LanguageSupport } from "@codemirror/language";
@@ -63,16 +66,11 @@ function QueryWrapper({
 }
 
 function QueryNode({
-    query: { node, offset, active, computed_query },
+    query: { node, offset, active, computed_query, query },
     i,
     editorRef,
 }: {
-    query: {
-        node: Node;
-        offset: number;
-        active: boolean;
-        computed_query: string;
-    };
+    query: IEditorQueriesContext["queryNodes"][number];
     i: number;
     editorRef: RefObject<ReactCodeMirrorRef | null>;
 }) {
@@ -100,6 +98,23 @@ function QueryNode({
                         }
                     >
                         {active ? <TextSearch /> : <Search />}
+                    </Button>
+                </SimpleToolTip>
+                <SimpleToolTip text="Edit">
+                    <Button
+                        className="w-0.5 h-0.5"
+                        variant="outline"
+                        onClick={() => {
+                            editorRef.current?.view?.dispatch({
+                                selection: {
+                                    anchor: query.body.from,
+                                    head: query.body.to,
+                                },
+                            });
+                            editorRef.current?.view?.focus();
+                        }}
+                    >
+                        <PencilLine />
                     </Button>
                 </SimpleToolTip>
                 <SimpleToolTip text="Copy">
@@ -183,10 +198,10 @@ export function Editor({
 
     const queryComponents = useMemo(
         () =>
-            queryNodes.map(({ node, offset, active, computed_query }, i) => (
+            queryNodes.map((queryNode, i) => (
                 <QueryNode
                     key={i}
-                    query={{ node, offset, active, computed_query }}
+                    query={queryNode}
                     i={i}
                     editorRef={editorRef}
                 />
