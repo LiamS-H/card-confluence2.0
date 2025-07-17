@@ -1,10 +1,13 @@
 import { Button } from "@/components/(ui)/button";
-import { ScryfallCard } from "@scryfall/api-types";
+import { useHighlightContext } from "@/context/highlight";
+import { useCard } from "@/hooks/useCard";
 import { FlipHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { isFlippable, Scrycard } from "react-scrycards";
 
-export default function Card({ card }: { card: ScryfallCard.Any }) {
+export default function Card() {
+    const { selected, hovered } = useHighlightContext();
+    const card = useCard(hovered || selected);
     const [flipped, setFlipped] = useState(false);
 
     useEffect(() => {

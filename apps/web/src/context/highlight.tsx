@@ -16,8 +16,8 @@ export interface IHighlightContext {
     pushSelected: (id: string) => void;
     replaceSelected: (id: string) => void;
     selected: string | undefined;
-    setHovered: (id: string) => void;
-    hovered: string | undefined;
+    setHovered: (id: string | null) => void;
+    hovered: string | null;
     setOpen: (open: boolean) => void;
     open: boolean;
     previous: string | undefined;
@@ -71,7 +71,7 @@ function Provider({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    const [hovered, setHovered] = useState<string | undefined>(undefined);
+    const [hovered, setHovered] = useState<string | null>(null);
 
     const setOpen = useCallback(
         (open: boolean) => {
