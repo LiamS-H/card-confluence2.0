@@ -41,6 +41,7 @@ function Provider({ children }: { children: ReactNode }) {
     const historyMap = useRef<Map<string, number>>(new Map());
     const historyOrder = useRef<string[]>([]);
     const [previous, setPrevious] = useState<string | undefined>();
+    const [hovered, setHovered] = useState<string | null>(null);
 
     const addToHistory = useCallback((id: string) => {
         const index = historyMap.current.get(id);
@@ -70,8 +71,6 @@ function Provider({ children }: { children: ReactNode }) {
             window.removeEventListener("popstate", onPopState);
         };
     }, []);
-
-    const [hovered, setHovered] = useState<string | null>(null);
 
     const setOpen = useCallback(
         (open: boolean) => {
