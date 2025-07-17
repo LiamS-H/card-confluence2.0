@@ -44,7 +44,6 @@ export function Printings({
     const { replaceSelected, setHovered } = useHighlightContext();
 
     return useMemo(() => {
-        console.log("printings");
         if (printings?.length === 1) {
             return (
                 <div className="py-4 border-b text-sm font-medium">
