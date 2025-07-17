@@ -1,12 +1,8 @@
 import { Button } from "@/components/(ui)/button";
 import { Textarea } from "@/components/(ui)/textarea";
 import { ICatalog } from "codemirror-lang-scrycards";
-import {
-    ChevronDown,
-    LoaderCircle,
-    SendHorizontal,
-} from "lucide-react";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { ChevronDown, LoaderCircle, SendHorizontal } from "lucide-react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useChat } from "./useChat";
 import { ChatId } from "@/context/chat";
 import { getContents } from "@/lib/utils";
@@ -49,8 +45,8 @@ const demoPrompts = [
 ];
 
 export function EditorChat({
-    catalog: _catalog,
-    chatId: _chatId,
+    catalog,
+    chatId,
     commitChat,
 }: {
     catalog: ICatalog;
@@ -59,8 +55,8 @@ export function EditorChat({
 }) {
     const [prompt, setPrompt] = useState("");
     const { chat, loading, query } = useChat({
-        chatId: _chatId,
-        catalog: _catalog,
+        chatId,
+        catalog,
     });
 
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -68,16 +64,19 @@ export function EditorChat({
     const [isAtBottom, setIsAtBottom] = useState(true);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleScroll = () => {
+    const handleScroll = useCallback(() => {
         const el = scrollRef.current;
         if (!el) return;
-        const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 5; // 5px tolerance
+        const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 20;
         setIsAtBottom(atBottom);
-    };
+    }, []);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const scrollToBottom = useCallback(() => {
+        const el = scrollRef.current;
+        const height = el?.scrollHeight;
+        if (!height) return;
+        el.scrollTo({ top: height, behavior: "smooth" });
+    }, [scrollRef]);
 
     const processedMessages = useMemo(() => {
         if (!chat?.contents) return [];
@@ -86,10 +85,10 @@ export function EditorChat({
     }, [chat, loading]);
 
     useEffect(() => {
-        if (isAtBottom) {
-            messagesEndRef.current?.scrollIntoView();
+        if (isAtBottom && (scrollRef.current?.scrollTop ?? 0) > 0) {
+            scrollToBottom();
         }
-    }, [processedMessages, isAtBottom]);
+    }, [processedMessages, isAtBottom, scrollToBottom]);
 
     useEffect(() => {
         if (!loading) {
@@ -101,6 +100,10 @@ export function EditorChat({
             }
         }
     }, [loading]);
+
+    useEffect(() => {
+        handleScroll();
+    }, [chatId, handleScroll]);
 
     const handleDemoClick = async (demoPrompt: string) => {
         if (loading) return;
@@ -184,6 +187,16 @@ export function EditorChat({
                     </div>
 
                     <div className="sticky bottom-0 w-full bg-linear-to-b from-transparent to-25% to-background/70 py-2">
+                        {!isAtBottom && (
+                            <Button
+                                onClick={scrollToBottom}
+                                variant="secondary"
+                                className="absolute bottom-28 right-1/2 translate-x-1/2 z-10 rounded-full shadow-lg"
+                            >
+                                <ChevronDown className="h-4 w-4 mr-1" />
+                                Jump to Bottom
+                            </Button>
+                        )}
                         <form onSubmit={handleSubmit}>
                             <div className="flex w-full justify-center relative">
                                 <Textarea
@@ -198,9 +211,7 @@ export function EditorChat({
                                 <Button
                                     className="absolute bottom-4 right-2"
                                     size="icon"
-                                    variant={
-                                        disabled ? "outline" : "highlight"
-                                    }
+                                    variant={disabled ? "outline" : "highlight"}
                                     disabled={disabled}
                                     type="submit"
                                 >
@@ -215,16 +226,6 @@ export function EditorChat({
                     </div>
                 </div>
             </div>
-            {!isAtBottom && (
-                <Button
-                    onClick={scrollToBottom}
-                    variant="secondary"
-                    className="absolute bottom-28 right-1/2 translate-x-1/2 z-10 rounded-full shadow-lg"
-                >
-                    <ChevronDown className="h-4 w-4 mr-1" />
-                    Jump to Bottom
-                </Button>
-            )}
         </div>
     );
 }
