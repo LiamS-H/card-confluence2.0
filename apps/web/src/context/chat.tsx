@@ -72,16 +72,13 @@ export function ChatsContextProvider({ children }: { children: ReactNode }) {
         [setChats]
     );
 
-    const removeChat = useCallback(
-        (chatId: ChatId) => {
-            setChats((prev) => {
-                const newChats = new Map(prev);
-                newChats.delete(chatId);
-                return newChats;
-            });
-        },
-        [setChats]
-    );
+    const removeChat = useCallback((chatId: ChatId) => {
+        setChats((prev) => {
+            const newChats = new Map(prev);
+            newChats.delete(chatId);
+            return newChats;
+        });
+    }, []);
 
     const addContents = useCallback(
         (chatId: ChatId, new_contents: Content[]) => {
@@ -106,7 +103,7 @@ export function ChatsContextProvider({ children }: { children: ReactNode }) {
                 return newChats;
             });
         },
-        [setChats, chats]
+        [chats]
     );
 
     const nameChat = useCallback((chatId: ChatId, name: string | null) => {
