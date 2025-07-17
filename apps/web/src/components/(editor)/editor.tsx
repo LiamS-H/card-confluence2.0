@@ -130,7 +130,15 @@ function QueryNode({
                 </SimpleToolTip>
             </>
         );
-    }, [active, i, activateQuery, computed_query]);
+    }, [
+        active,
+        i,
+        activateQuery,
+        computed_query,
+        query.body.from,
+        query.body.to,
+        editorRef,
+    ]);
 
     return (
         <QueryWrapper node={node} offset={offset} editorRef={editorRef}>

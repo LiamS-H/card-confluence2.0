@@ -13,9 +13,8 @@ import {
     type Domain,
 } from "codemirror-lang-scrycards";
 import { ISearchSettings } from "@/lib/scryfall";
-import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
+import { settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
-import { useCompareMemo } from "./useCompareMemo";
 import { IEditorQueriesContext } from "@/context/editor-queries";
 
 const INITIAL = `
@@ -267,11 +266,7 @@ export function useQueryDoc() {
         return { queryNodes: updated_query_nodes, activeQuery };
     }, [activeIndex, _queryNodes, _domain]);
 
-    const computedSettings = useCompareMemo(
-        activeQuery.computed_settings,
-        isSettingsEqual
-    );
-    // const computedSettings = activeQuery.computed_settings;
+    const computedSettings = activeQuery.computed_settings;
     const mergedSettings = useMemo(() => {
         return mergeObjects(scryfallSettings, computedSettings);
     }, [scryfallSettings, computedSettings]);
@@ -288,7 +283,10 @@ export function useQueryDoc() {
         computedSettings: computedSettings,
         scryfallSettings,
         mergedSettings,
-        setScryfallSettings,
+        setScryfallSettings: (s) => {
+            setFastUpdate(true);
+            setScryfallSettings(s);
+        },
     };
 
     return {

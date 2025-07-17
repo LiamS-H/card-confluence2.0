@@ -1,4 +1,5 @@
 import { type ICachedSearchProps, useSearchContext } from "@/context/search";
+import { isSettingsEqual } from "@/lib/scrycards";
 import { ScryfallError } from "@scryfall/api-types";
 import { useCallback, useRef, useState } from "react";
 
@@ -12,7 +13,7 @@ export function useSearch() {
     const [totalCards, setTotalCards] = useState(0);
 
     const { cachedSearch } = useSearchContext();
-    const queryRef = useRef<null | string>(null);
+    const queryRef = useRef<null | ICachedSearchProps>(null);
     const currentQueryRef = useRef<null | string>(null);
 
     const resetSearch = useCallback(() => {
@@ -35,7 +36,7 @@ export function useSearch() {
             }
             const { query } = req;
             setIsLoading(true);
-            queryRef.current = req.query;
+            queryRef.current = req;
 
             // If this is a new query, reset all data
             if (resetData || currentQueryRef.current !== query) {
@@ -47,8 +48,15 @@ export function useSearch() {
             const result = await cachedSearch(req);
 
             // Check if query changed while we were fetching
-            if (queryRef.current !== req.query) return;
-
+            if (queryRef.current.ast !== req.ast) return;
+            if (queryRef.current.query !== req.query) return;
+            if (
+                !isSettingsEqual(
+                    queryRef.current.settings ?? {},
+                    req.settings ?? {}
+                )
+            )
+                return;
             setIsLoading(false);
             setWarning(result.warnings ?? null);
 

@@ -110,7 +110,7 @@ export function CardList({
                             </div>
                         )}
 
-                        {hasNextPage && (
+                        {hasNextPage && allData.length > 0 && (
                             <div
                                 ref={sentinelRef}
                                 className="absolute w-full h-4"
@@ -136,9 +136,6 @@ export function CardList({
                                 }}
                             >
                                 Showing {allData.length} of {totalCards} cards
-                                {!hasNextPage &&
-                                    allData.length < totalCards &&
-                                    "(some results may be filtered)"}
                             </div>
                         )}
                     </>

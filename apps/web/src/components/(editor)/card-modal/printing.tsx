@@ -102,9 +102,30 @@ export function Printing({ id, select }: { id: string; select?: () => void }) {
                 {card.full_art && (
                     <span className="text-muted-foreground">Full</span>
                 )}
-                {card.frame_effects?.map((f) => (
-                    <span className="text-muted-foreground">{f}</span>
-                ))}
+
+                {card.promo_types?.map((f) => {
+                    return <span className="text-muted-foreground">{f}</span>;
+                })}
+                {card.frame_effects?.map((f) => {
+                    if (
+                        (
+                            [
+                                "nyxtouched",
+                                "colorshifted",
+                                "inverted",
+                                "showcase",
+                                "extendedart",
+                                "etched",
+                                "shatteredglass",
+                            ] as const
+                        ).includes(f as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+                    ) {
+                        return (
+                            <span className="text-muted-foreground">{f}</span>
+                        );
+                    }
+                    return null;
+                })}
             </div>
             <div className="flex gap-2">
                 {price && <span className="truncate">{price}</span>}
