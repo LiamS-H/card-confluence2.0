@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function useCompareMemoDebounced<T>(
     val: T,
@@ -22,11 +22,12 @@ export function useCompareMemo<T>(
     val: T,
     compare: (v1: T, v2: T) => boolean
 ): T {
-    const [v, setV] = useState<T>(() => val);
+    const ref = useRef<T>(val);
 
-    useEffect(() => {
-        setV((old) => (compare(old, val) ? old : val));
+    return useMemo(() => {
+        if (!compare(ref.current, val)) {
+            ref.current = val;
+        }
+        return ref.current;
     }, [val, compare]);
-
-    return v;
 }
