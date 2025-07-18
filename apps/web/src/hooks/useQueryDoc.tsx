@@ -28,8 +28,7 @@ order:released
 direction:desc
 is:firstprinting
 
-@query elves
-t:elf
+@query my query
 `;
 
 export function useQueryDoc() {
