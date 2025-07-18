@@ -60,14 +60,13 @@ export function EditorChat({
     });
 
     const scrollRef = useRef<HTMLDivElement>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isAtBottom, setIsAtBottom] = useState(true);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const handleScroll = useCallback(() => {
         const el = scrollRef.current;
         if (!el) return;
-        const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 20;
+        const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 5;
         setIsAtBottom(atBottom);
     }, []);
 
@@ -82,11 +81,11 @@ export function EditorChat({
         if (!chat?.contents) return [];
         const contents = getContents(chat.contents);
         return processChatContents(contents, loading);
-    }, [chat, loading]);
+    }, [chat.contents, loading]);
 
     useEffect(() => {
-        if (isAtBottom && (scrollRef.current?.scrollTop ?? 0) > 0) {
-            scrollToBottom();
+        if (isAtBottom) {
+            requestAnimationFrame(scrollToBottom);
         }
     }, [processedMessages, isAtBottom, scrollToBottom]);
 
@@ -104,13 +103,6 @@ export function EditorChat({
     useEffect(() => {
         handleScroll();
     }, [chatId, handleScroll]);
-
-    const handleDemoClick = async (demoPrompt: string) => {
-        if (loading) return;
-
-        commitChat();
-        await query(demoPrompt);
-    };
 
     const disabled = prompt === "" || loading;
 
@@ -155,9 +147,12 @@ export function EditorChat({
                                             key={i}
                                             variant="outline"
                                             className="h-auto"
-                                            onClick={() =>
-                                                handleDemoClick(p.prompt)
-                                            }
+                                            onClick={() => {
+                                                if (loading) return;
+
+                                                commitChat();
+                                                query(p.prompt);
+                                            }}
                                         >
                                             <div className="text-left text-sm">
                                                 <p className="font-bold">
@@ -182,7 +177,6 @@ export function EditorChat({
                                     <LoaderCircle className="animate-spin" />
                                 </div>
                             )}
-                            <div ref={messagesEndRef} />
                         </div>
                     </div>
 
@@ -190,7 +184,7 @@ export function EditorChat({
                         {!isAtBottom && (
                             <Button
                                 onClick={scrollToBottom}
-                                variant="secondary"
+                                variant="outline"
                                 className="absolute bottom-28 right-1/2 translate-x-1/2 z-10 rounded-full shadow-lg"
                             >
                                 <ChevronDown className="h-4 w-4 mr-1" />
