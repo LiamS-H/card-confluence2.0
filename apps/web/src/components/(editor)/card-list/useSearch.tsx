@@ -1,4 +1,5 @@
 import { type ICachedSearchProps, useSearchContext } from "@/context/search";
+import { isSettingsEqual } from "@/lib/scrycards";
 import { ScryfallError } from "@scryfall/api-types";
 import { useCallback, useRef, useState } from "react";
 
@@ -12,8 +13,7 @@ export function useSearch() {
     const [totalCards, setTotalCards] = useState(0);
 
     const { cachedSearch } = useSearchContext();
-    const queryRef = useRef<null | string>(null);
-    const currentQueryRef = useRef<null | string>(null);
+    const queryRef = useRef<null | ICachedSearchProps>(null);
 
     const resetSearch = useCallback(() => {
         setAllData([]);
@@ -29,26 +29,38 @@ export function useSearch() {
         async (req: ICachedSearchProps | null, resetData = true) => {
             if (!req) {
                 queryRef.current = null;
-                currentQueryRef.current = null;
                 resetSearch();
                 return;
             }
             const { query } = req;
             setIsLoading(true);
-            queryRef.current = req.query;
 
-            // If this is a new query, reset all data
-            if (resetData || currentQueryRef.current !== query) {
+            const lastQuery = queryRef.current;
+            queryRef.current = req;
+
+            if (
+                resetData ||
+                (lastQuery &&
+                    (lastQuery.ast !== req.ast ||
+                        lastQuery.query !== req.query))
+            ) {
                 setAllData([]);
                 setCurrentPage(1);
-                currentQueryRef.current = query;
             }
 
             const result = await cachedSearch(req);
 
             // Check if query changed while we were fetching
-            if (queryRef.current !== req.query) return;
-
+            if (queryRef.current.ast !== req.ast) return;
+            if (queryRef.current.query !== req.query) return;
+            if (
+                !isSettingsEqual(
+                    queryRef.current.settings ?? {},
+                    req.settings ?? {}
+                )
+            ) {
+                return;
+            }
             setIsLoading(false);
             setWarning(result.warnings ?? null);
 
@@ -75,21 +87,32 @@ export function useSearch() {
         [cachedSearch, resetSearch]
     );
 
-    const loadNextPage = useCallback(
-        async ({ query, ast, settings }: ICachedSearchProps) => {
-            if (!hasNextPage || isLoading) return;
+    const loadNextPageDeps = useRef({
+        hasNextPage,
+        isLoading,
+        currentPage,
+    });
+    loadNextPageDeps.current = { hasNextPage, isLoading, currentPage };
 
-            await search(
-                {
-                    query,
-                    ast,
-                    settings: { ...settings, page: currentPage + 1 },
-                },
-                false // Don't reset data, append instead
-            );
-        },
-        [search, hasNextPage, isLoading, currentPage]
-    );
+    const loadNextPage = useCallback(async () => {
+        const { hasNextPage, isLoading, currentPage } =
+            loadNextPageDeps.current;
+        if (!hasNextPage) return;
+        if (isLoading) return;
+
+        if (!queryRef.current) return;
+
+        const { ast, settings, query } = queryRef.current;
+
+        await search(
+            {
+                query,
+                ast,
+                settings: { ...settings, page: currentPage + 1 },
+            },
+            false
+        );
+    }, [search]);
 
     return {
         search,

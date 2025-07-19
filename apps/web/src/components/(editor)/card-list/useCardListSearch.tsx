@@ -7,6 +7,7 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { useSearch } from "./useSearch";
 export const GAP = 4;
 export const OVERSCAN_ROWS = 2;
+export const OBSERVER_ROWS = 2;
 
 function calcGrid(
     allData: string[],
@@ -123,7 +124,10 @@ export function useCardListSearch({
     } = useSearch();
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const sentinelRef = useRef<HTMLDivElement>(null);
+    const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
+    const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+        setSentinelEl(node);
+    }, []);
 
     useEffect(() => {
         if (!query || fastUpdate) return;
@@ -151,19 +155,20 @@ export function useCardListSearch({
     }, [search, query, ast, settings, fastUpdate]);
 
     useEffect(() => {
-        if (!sentinelRef.current || !hasNextPage || isLoading) return;
-        if (!query) return;
+        if (!sentinelEl) return;
+        console.log("test");
+
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0]?.isIntersecting) {
-                    loadNextPage({ query, ast, settings });
+                    loadNextPage();
                 }
             },
             { rootMargin: "100px" }
         );
-        observer.observe(sentinelRef.current);
+        observer.observe(sentinelEl);
         return () => observer.disconnect();
-    }, [hasNextPage, isLoading, loadNextPage, query, ast, settings]);
+    }, [loadNextPage, sentinelEl]);
 
     const [gridLayout, setGridLayout] = useState<ReturnType<
         typeof calcGrid

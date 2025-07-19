@@ -23,7 +23,7 @@ export function SimpleToolTip({
         <Tooltip>
             <TooltipTrigger asChild>{children}</TooltipTrigger>
             <TooltipContent>
-                <p>{text}</p>
+                <p className="capitalize">{text}</p>
             </TooltipContent>
         </Tooltip>
     );

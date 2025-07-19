@@ -11,7 +11,6 @@ export interface IEditorSettings {
     disableAutocomplete?: boolean;
     disableAutocompleteDetail?: boolean;
     disableAutocompleteInfo?: boolean;
-    disableBarOnScroll?: boolean;
     showSillyCards?: boolean;
 }
 

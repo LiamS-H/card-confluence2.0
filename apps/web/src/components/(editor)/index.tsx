@@ -1,7 +1,6 @@
 "use client";
 
 import { type ICatalog } from "codemirror-lang-scrycards";
-import { ScrollHidden } from "@/components/(editor)/scroll-hidden";
 import { CardList } from "@/components/(editor)/card-list";
 
 import { useQueryDoc } from "@/hooks/useQueryDoc";
@@ -53,42 +52,39 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
 
     return (
         <editorQueriesContext.Provider value={context}>
-            <div className="flex flex-col gap-2">
-                <ScrollHidden>
-                    <div className="flex flex-col lg:flex-row">
+            <div className="flex flex-col">
+                <div className="flex flex-col lg:flex-row">
+                    <Editor
+                        doc={doc}
+                        catalog={catalog}
+                        onCreateEditor={onCreateEditor}
+                        onUpdate={onUpdate}
+                        onChange={onChange}
+                        className={`flex-grow relative text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-full lg:w-1/2" : ""}`}
+                    >
                         <div
                             // className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
                             className={`absolute bottom-[1] left-1 z-20`}
                         >
                             {ai_open_button}
                         </div>
-
-                        <Editor
-                            doc={doc}
-                            catalog={catalog}
-                            onCreateEditor={onCreateEditor}
-                            onUpdate={onUpdate}
-                            onChange={onChange}
-                            className={`flex-grow text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-full lg:w-1/2" : ""}`}
-                        />
-                        <div
-                            className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"} ${split ? "hidden lg:block" : ""}`}
-                        >
-                            {ai_prompter}
-                        </div>
+                    </Editor>
+                    <div
+                        className={`w-full flex justify-center ${aiOpen ? "w-1/2" : "hidden"} ${split ? "hidden lg:block" : ""}`}
+                    >
+                        {ai_prompter}
                     </div>
-                    <SearchBar
-                        progress={
-                            gridLayout
-                                ? gridLayout.rows > 3
-                                    ? (gridLayout.curRow * gridLayout.columns) /
-                                      totalCards
-                                    : null
+                </div>
+                <SearchBar
+                    progress={
+                        gridLayout
+                            ? gridLayout.rows > 3
+                                ? (gridLayout.curRow * gridLayout.columns) /
+                                  totalCards
                                 : null
-                        }
-                    />
-                </ScrollHidden>
-                <div className="h-12"></div>
+                            : null
+                    }
+                />
                 <CardList search={searchObj} />
             </div>
         </editorQueriesContext.Provider>

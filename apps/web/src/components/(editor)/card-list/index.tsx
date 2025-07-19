@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Card } from "@/components/(editor)/card";
-import { useCardListSearch } from "./useCardListSearch";
+import { OBSERVER_ROWS, useCardListSearch } from "./useCardListSearch";
 
 export function CardList({
     search: {
@@ -115,13 +115,10 @@ export function CardList({
                                 ref={sentinelRef}
                                 className="absolute w-full h-4"
                                 style={{
-                                    top: Math.max(
-                                        0,
-                                        gridLayout
-                                            ? gridLayout.totalHeight -
-                                                  gridLayout?.cardH
-                                            : 0
-                                    ),
+                                    top:
+                                        (gridLayout?.totalHeight ?? 0) -
+                                        (gridLayout?.cardH ?? 0) *
+                                            OBSERVER_ROWS,
                                 }}
                             />
                         )}
@@ -136,9 +133,6 @@ export function CardList({
                                 }}
                             >
                                 Showing {allData.length} of {totalCards} cards
-                                {!hasNextPage &&
-                                    allData.length < totalCards &&
-                                    "(some results may be filtered)"}
                             </div>
                         )}
                     </>

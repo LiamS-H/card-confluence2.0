@@ -113,7 +113,7 @@ export function CardModal() {
                     </DialogHeader>
 
                     <div className="w-full sm:min-w-96 sm:w-96 overflow-visible p-2">
-                        <Card card={card} />
+                        <Card />
                         <div className="flex flex-wrap w-full mt-2">
                             <a href={card.scryfall_uri}>
                                 <Button variant="link">

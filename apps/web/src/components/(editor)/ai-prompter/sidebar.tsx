@@ -75,6 +75,22 @@ export function ChatsSidebar({
         return chatThumbnails;
     }, [chats, open, activeId, emptyChat, removeChat, setActiveChat]);
 
+    const viewButton = useMemo(
+        () => (
+            <AIOpenButton
+                variant={"outline"}
+                className="w-full gap-0 p-3"
+                onClick={() => setOpen(true)}
+            >
+                <Layout />
+                <span className="overflow-ellipsis overflow-hidden">
+                    Change View
+                </span>
+            </AIOpenButton>
+        ),
+        []
+    );
+
     return (
         <div
             className={`${open ? "w-60" : "w-13"} bg-background/60 backdrop-blur-sm h-full absolute sm:static left-0 bottom-0 top-0 z-10 p-2 transition-width duration-300 ease-in-out`}
@@ -143,18 +159,7 @@ export function ChatsSidebar({
                 >
                     {chatThumbnails}
                 </ul>
-                <div>
-                    <AIOpenButton
-                        variant={"outline"}
-                        className="w-full gap-0 p-3"
-                        onClick={() => setOpen(true)}
-                    >
-                        <Layout />
-                        <span className="overflow-ellipsis overflow-hidden">
-                            Change View
-                        </span>
-                    </AIOpenButton>
-                </div>
+                <div>{viewButton}</div>
             </div>
         </div>
     );

@@ -15,8 +15,8 @@ import {
 import { ISearchSettings } from "@/lib/scryfall";
 import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
-import { useCompareMemo } from "./useCompareMemo";
 import { IEditorQueriesContext } from "@/context/editor-queries";
+import { useCompareMemo } from "./useCompareMemo";
 
 const INITIAL = `
 order:cmc
@@ -28,8 +28,7 @@ order:released
 direction:desc
 is:firstprinting
 
-@query elves
-t:elf
+@query my query
 `;
 
 export function useQueryDoc() {
@@ -271,7 +270,6 @@ export function useQueryDoc() {
         activeQuery.computed_settings,
         isSettingsEqual
     );
-    // const computedSettings = activeQuery.computed_settings;
     const mergedSettings = useMemo(() => {
         return mergeObjects(scryfallSettings, computedSettings);
     }, [scryfallSettings, computedSettings]);
@@ -288,7 +286,13 @@ export function useQueryDoc() {
         computedSettings: computedSettings,
         scryfallSettings,
         mergedSettings,
-        setScryfallSettings,
+        setScryfallSettings: useCallback(
+            (s) => {
+                setFastUpdate(true);
+                setScryfallSettings(s);
+            },
+            [setFastUpdate, setScryfallSettings]
+        ),
     };
 
     return {
