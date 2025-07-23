@@ -10,7 +10,7 @@ import {
     // DialogTitle,
 } from "@/components/(ui)/dialog";
 import { Button } from "../../(ui)/button";
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Printings } from "./printing";
 import { Related } from "./related";
 import { UndoButton } from "./undo-button";
@@ -32,6 +32,10 @@ export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
         useHighlightContext();
     const card = useCard(selected);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const scrollDistanceFromTopRef = useRef(0);
+    const [contentLoaded, setContentLoaded] = useState(false);
 
     const [tabs, setTabs] = useState<string[]>([
         "face-0",
@@ -42,6 +46,50 @@ export function CardModal() {
     const printings = usePrintings(card);
     const rulingsOpen = tabs.includes("rulings");
     const rulings = useRulings(card);
+
+    useEffect(() => {
+        if (card) {
+            setContentLoaded(true);
+        }
+    }, [card]);
+
+    useLayoutEffect(() => {
+        if (!contentLoaded) return;
+        if (!scrollRef.current) return;
+        if (!open) return;
+
+        function resumeScroll() {
+            const scrollableElement = scrollRef.current;
+            if (!scrollableElement) return;
+            const { scrollHeight } = scrollableElement;
+
+            let targetScrollTop = 0;
+
+            const maxScrollTop = scrollHeight;
+            if (scrollDistanceFromTopRef.current === -1) {
+                targetScrollTop = maxScrollTop;
+            } else {
+                targetScrollTop = scrollDistanceFromTopRef.current;
+            }
+
+            const finalScrollTop = Math.max(
+                0,
+                Math.min(targetScrollTop, maxScrollTop)
+            );
+
+            scrollableElement.scrollTop = finalScrollTop;
+            if (scrollableElement.scrollTop === 0 && finalScrollTop !== 0) {
+                setTimeout(resumeScroll, 100);
+            }
+        }
+        setTimeout(resumeScroll, 0);
+    }, [contentLoaded, open]);
+
+    useEffect(() => {
+        if (!open) {
+            setContentLoaded(false);
+        }
+    }, [open]);
 
     if (!open) return null;
 
@@ -67,8 +115,24 @@ export function CardModal() {
             }}
         >
             <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 overflow-y-auto md:overflow-hidden">
-                    <DialogHeader className="w-full h-fit px-5 md:h-full md:overflow-y-auto">
+                <div
+                    ref={scrollRef}
+                    className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto"
+                    onScroll={(e) => {
+                        const scrollableElement = scrollRef.current;
+                        if (!scrollableElement) return;
+                        const { scrollTop, clientHeight, scrollHeight } =
+                            scrollableElement;
+
+                        if (scrollTop + clientHeight >= scrollHeight - 1) {
+                            scrollDistanceFromTopRef.current = -1;
+                            return;
+                        }
+
+                        scrollDistanceFromTopRef.current = scrollTop;
+                    }}
+                >
+                    <DialogHeader className="w-full h-fit px-5">
                         <Accordion
                             type="multiple"
                             className="w-full"
