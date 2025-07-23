@@ -156,7 +156,6 @@ export function useCardListSearch({
 
     useEffect(() => {
         if (!sentinelEl) return;
-        console.log("test");
 
         const observer = new IntersectionObserver(
             (entries) => {
