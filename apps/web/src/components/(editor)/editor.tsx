@@ -26,6 +26,7 @@ import {
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { getCatalogWithSettings } from "@/lib/scrycards";
 import { LanguageSupport } from "@codemirror/language";
+import { CopyButton } from "../(ui)/copy-button";
 
 function QueryWrapper({
     children,
@@ -118,15 +119,11 @@ function QueryNode({
                     </Button>
                 </SimpleToolTip>
                 <SimpleToolTip text="Copy">
-                    <Button
+                    <CopyButton
+                        text={computed_query}
                         className="w-0.5 h-0.5"
                         variant="outline"
-                        onClick={() => {
-                            navigator.clipboard.writeText(computed_query);
-                        }}
-                    >
-                        <Copy />
-                    </Button>
+                    />
                 </SimpleToolTip>
             </>
         );
