@@ -17,10 +17,15 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
                 <AccordionItem key={i} value={`face-${i}`}>
                     <AccordionTrigger>
                         <div>
-                            <DialogTitle>{card.name}</DialogTitle>
+                            <DialogTitle>{f.name}</DialogTitle>
                             <DialogDescription className="font-thin">
                                 {f.type_line}
                             </DialogDescription>
+                        </div>
+                        <div>
+                            <OracleText className="text-xl">
+                                {f.mana_cost || ""}
+                            </OracleText>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
@@ -42,6 +47,11 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
                         <p className="font-thin text-muted-foreground">
                             {f.type_line}
                         </p>
+                    </div>
+                    <div>
+                        <OracleText className="text-xl">
+                            {f.mana_cost || ""}
+                        </OracleText>
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>
