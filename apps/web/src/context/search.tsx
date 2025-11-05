@@ -1,9 +1,6 @@
 "use client";
-import {
-    fetchRulings,
-    fetchSearch,
-    type ISearchSettings,
-} from "@/lib/scryfall";
+import { fetchRulings, fetchSearch } from "@/lib/scryfall";
+import { type ISearchSettings } from "@/lib/search";
 import type {
     ScryfallCard,
     ScryfallError,

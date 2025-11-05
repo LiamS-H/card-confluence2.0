@@ -1,7 +1,7 @@
 import { Button } from "@/components/(ui)/button";
 import { SimpleToolTip } from "../tooltip";
 import { useEditorQueriesContext } from "@/context/editor-queries";
-import { SearchOrders } from "@/lib/scryfall";
+import { SearchOrders } from "@/lib/search";
 import {
     ArrowDown01,
     ArrowDown10,

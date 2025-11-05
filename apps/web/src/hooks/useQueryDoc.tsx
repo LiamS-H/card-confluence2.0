@@ -12,7 +12,7 @@ import {
     type Query,
     type Domain,
 } from "codemirror-lang-scrycards";
-import { ISearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/search";
 import { isSettingsEqual, settingsToText } from "@/lib/scrycards";
 import { mergeObjects } from "@/lib/utils";
 import { IEditorQueriesContext } from "@/context/editor-queries";
