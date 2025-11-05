@@ -122,7 +122,8 @@ export async function fetchCardTags(
     collector_number: string
 ): Promise<string[]> {
     try {
-        const url = `https://tagger.scryfall.com/card/${set}/${collector_number.split(":").at(0)}`;
+        const cn = collector_number.match(/^\d+/)?.[0] ?? collector_number;
+        const url = `https://tagger.scryfall.com/card/${set}/${cn}`;
         const resp = await fetch(url);
         const text = await resp.text();
         const root = parse(text);

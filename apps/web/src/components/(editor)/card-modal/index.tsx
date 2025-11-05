@@ -27,6 +27,8 @@ import { usePrintings } from "../../../hooks/usePrintings";
 import { useRulings } from "@/hooks/useRulings";
 import { Rulings } from "./rulings";
 import { ExternalLink } from "lucide-react";
+import { useTags } from "../../../hooks/useTags";
+import { Tags } from "./tags";
 
 export function CardModal() {
     const { open, selected, setOpen, pushSelected, previous, goPrevious } =
@@ -46,6 +48,8 @@ export function CardModal() {
     const printings = usePrintings(card);
     const rulingsOpen = tabs.includes("rulings");
     const rulings = useRulings(card);
+    const tagsOpen = tabs.includes("tags");
+    const tags = useTags(card);
 
     useEffect(() => {
         if (card) {
@@ -103,15 +107,20 @@ export function CardModal() {
     const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
         if (!rulings && t === "rulings") return false;
+        if (!tags && t === "tags") return false;
         return true;
     });
+
+    const tagger_link = `https://tagger.scryfall.com/card/${card.set}/${card.collector_number}`;
 
     return (
         <Dialog
             defaultOpen
             onOpenChange={(open) => {
                 setOpen(open);
-                setTabs((old) => [...old.filter((t) => t !== "rulings")]);
+                setTabs((old) => [
+                    ...old.filter((t) => t !== "rulings" && t !== "tags"),
+                ]);
             }}
         >
             <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
@@ -173,6 +182,11 @@ export function CardModal() {
                                 </AccordionContent>
                             </AccordionItem>
                             <Rulings rulings={rulings} isOpen={rulingsOpen} />
+                            <Tags
+                                tags={tags}
+                                tagger={tagger_link}
+                                isOpen={tagsOpen}
+                            />
                         </Accordion>
                     </DialogHeader>
 
@@ -186,9 +200,7 @@ export function CardModal() {
                                 </Button>
                             </a>
 
-                            <a
-                                href={`https://tagger.scryfall.com/card/${card.set}/${card.collector_number}`}
-                            >
+                            <a href={tagger_link}>
                                 <Button variant="link">
                                     View Tagger <ExternalLink />
                                 </Button>
