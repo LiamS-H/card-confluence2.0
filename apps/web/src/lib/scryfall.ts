@@ -117,6 +117,40 @@ export async function fetchTags(): Promise<{
     return { otags, atags };
 }
 
+export async function fetchCardTags(
+    set: string,
+    collector_number: string
+): Promise<string[]> {
+    try {
+        const url = `https://tagger.scryfall.com/card/${set}/${collector_number.split(":").at(0)}`;
+        const resp = await fetch(url);
+        const text = await resp.text();
+        const root = parse(text);
+        const metaTag = root.querySelector('meta[property="og:description"]');
+        if (!metaTag) return [];
+        const content = metaTag.getAttribute("content");
+        if (!content) return [];
+
+        const cardTagsMatch = content.match(
+            /Card Tags:\s*([\s\S]*?)(?=\n\n|$)/
+        );
+        if (!cardTagsMatch) return [];
+
+        const cardTagsSection = cardTagsMatch[1];
+        if (!cardTagsSection) return [];
+
+        const cardTags = cardTagsSection
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .map((line) => line.replace(/^[★•]\s*/, ""));
+
+        return cardTags;
+    } catch {
+        return [];
+    }
+}
+
 export async function getCatalog(): Promise<Readonly<ICatalog>> {
     const catalogEndpoints = [
         "card-names",
