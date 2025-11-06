@@ -59,6 +59,10 @@ function Provider({ children }: { children: ReactNode }) {
     }, [selected, addToHistory]);
 
     useEffect(() => {
+        setHovered(selected ?? null);
+    }, [selected]);
+
+    useEffect(() => {
         const onPopState = () => {
             const lastId = historyOrder.current.pop();
             if (lastId) {
