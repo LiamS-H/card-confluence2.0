@@ -13,7 +13,6 @@ import { getContents } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
 import { fetchCardTags, fetchRandom } from "@/lib/scryfall";
 import { useSearchContext } from "@/context/search";
-import { parse } from "node-html-parser";
 
 const MAX_CALLS = 10;
 

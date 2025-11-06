@@ -16,7 +16,7 @@ import {
     ScrycardsTooltips,
 } from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
-import { Copy, PencilLine, Search, TextSearch } from "lucide-react";
+import { PencilLine, Search, TextSearch } from "lucide-react";
 import { SimpleToolTip } from "./tooltip";
 import { cn } from "@/lib/utils";
 import {

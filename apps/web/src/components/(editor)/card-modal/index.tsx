@@ -127,7 +127,7 @@ export function CardModal() {
                 <div
                     ref={scrollRef}
                     className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto"
-                    onScroll={(e) => {
+                    onScroll={() => {
                         const scrollableElement = scrollRef.current;
                         if (!scrollableElement) return;
                         const { scrollTop, clientHeight, scrollHeight } =
