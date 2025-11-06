@@ -24,6 +24,20 @@ const get_cards: FunctionDeclaration = {
     },
 };
 
+const get_tags: FunctionDeclaration = {
+    name: "get_tags",
+    description: "get the tags for a specific card.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            card: {
+                type: Type.STRING,
+            },
+        },
+        required: ["card"],
+    },
+};
+
 const add_query: FunctionDeclaration = {
     name: "add_query",
     description: "adds a query to the document.",
@@ -115,6 +129,7 @@ export async function queryModel(contents: ContentListUnion) {
                             add_query,
                             get_tag_info,
                             get_cards,
+                            get_tags,
                             get_rulings,
                             get_random_card,
                         ],

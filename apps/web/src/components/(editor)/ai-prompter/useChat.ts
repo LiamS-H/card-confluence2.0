@@ -11,7 +11,7 @@ import {
 } from "codemirror-lang-scrycards";
 import { getContents } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
-import { fetchRandom } from "@/lib/scryfall";
+import { fetchCardTags, fetchRandom } from "@/lib/scryfall";
 import { useSearchContext } from "@/context/search";
 
 const MAX_CALLS = 10;
@@ -370,6 +370,73 @@ export function useChat({
                                             name: "get_cards",
                                             response: {
                                                 cards: formatted_cards,
+                                            },
+                                        },
+                                    },
+                                ],
+                            });
+                            continue;
+                        case "get_tags":
+                            if (!func.args) break;
+                            const { card: card_name } = func.args as {
+                                card: string;
+                            };
+                            const response = await cachedSearch({
+                                query: `!${card_name}`,
+                            });
+                            if (response.object === "error") {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_tags",
+                                                response: {
+                                                    error: response.details,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            const response_card = await getCard(
+                                response.data.at(0)
+                            );
+
+                            if (!response_card) {
+                                addContent({
+                                    role: "user",
+                                    parts: [
+                                        {
+                                            functionResponse: {
+                                                name: "get_tags",
+                                                response: {
+                                                    error: `"${card_name}" returned 0 cards`,
+                                                },
+                                            },
+                                        },
+                                    ],
+                                });
+                                continue;
+                            }
+
+                            const { set, collector_number } = response_card;
+
+                            const tags = await fetchCardTags(
+                                set,
+                                collector_number
+                            );
+
+                            addContent({
+                                role: "user",
+                                parts: [
+                                    {
+                                        functionResponse: {
+                                            name: "get_tags",
+                                            response: {
+                                                tags: tags,
                                             },
                                         },
                                     },

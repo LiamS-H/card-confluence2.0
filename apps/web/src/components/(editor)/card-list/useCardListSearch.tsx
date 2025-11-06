@@ -2,7 +2,7 @@ import {
     useEditorSettingsContext,
     IEditorSettings,
 } from "@/context/editor-settings";
-import { ISearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/search";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useSearch } from "./useSearch";
 export const GAP = 4;
@@ -156,7 +156,6 @@ export function useCardListSearch({
 
     useEffect(() => {
         if (!sentinelEl) return;
-        console.log("test");
 
         const observer = new IntersectionObserver(
             (entries) => {

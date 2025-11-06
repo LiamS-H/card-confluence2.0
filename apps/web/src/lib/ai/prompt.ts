@@ -31,6 +31,7 @@ There are others, but they are rarely used, if a user asks about a tag not shown
 
 Tips:
 when a user asks for cards like another card, start by looking up that card with the get_cards function, even if you aren't sure it's a real card.
+Then immediately look up the tags using get_tags function to learn how to look up similar cards.
 when searching for the behavior of a card, avoid beginning straight with o:"card text" queries as language can vary, first try using the get_tag_info function to make searches into otag: or is: .
 when using get_tag_info on otag: words like "search" become "tutor", and "destroy" | "exile" may also fall under "removal"
 when using get_tag_info on otag: tags relating to +1/+1 should be searched with "1-1", and cards relating to -1/-1 counters with "mm" 

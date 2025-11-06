@@ -5,7 +5,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuItem,
 } from "@/components/(ui)/dropdown-menu";
-import { SearchOrders } from "@/lib/scryfall";
+import { SearchOrders } from "@/lib/search";
 import { SimpleToolTip } from "../tooltip";
 import { useMemo } from "react";
 import { useEditorQueriesContext } from "@/context/editor-queries";

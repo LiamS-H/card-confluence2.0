@@ -16,7 +16,7 @@ import {
     ScrycardsTooltips,
 } from "codemirror-lang-scrycards";
 import { Button } from "@/components/(ui)/button";
-import { Copy, PencilLine, Search, TextSearch } from "lucide-react";
+import { PencilLine, Search, TextSearch } from "lucide-react";
 import { SimpleToolTip } from "./tooltip";
 import { cn } from "@/lib/utils";
 import {
@@ -26,6 +26,7 @@ import {
 import { useEditorSettingsContext } from "@/context/editor-settings";
 import { getCatalogWithSettings } from "@/lib/scrycards";
 import { LanguageSupport } from "@codemirror/language";
+import { CopyButton } from "../(ui)/copy-button";
 
 function QueryWrapper({
     children,
@@ -118,15 +119,11 @@ function QueryNode({
                     </Button>
                 </SimpleToolTip>
                 <SimpleToolTip text="Copy">
-                    <Button
+                    <CopyButton
+                        text={computed_query}
                         className="w-0.5 h-0.5"
                         variant="outline"
-                        onClick={() => {
-                            navigator.clipboard.writeText(computed_query);
-                        }}
-                    >
-                        <Copy />
-                    </Button>
+                    />
                 </SimpleToolTip>
             </>
         );

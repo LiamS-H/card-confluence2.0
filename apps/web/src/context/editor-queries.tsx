@@ -4,7 +4,7 @@ import {
     type Dispatch,
     type SetStateAction,
 } from "react";
-import { ISearchSettings } from "@/lib/scryfall";
+import { ISearchSettings } from "@/lib/search";
 import { Query, SearchSettings } from "codemirror-lang-scrycards";
 
 export interface IEditorQueriesContext {
