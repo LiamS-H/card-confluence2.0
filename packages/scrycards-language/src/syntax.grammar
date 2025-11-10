@@ -7,11 +7,10 @@ Query { space? "@query" space QueryName space? QueryBody}
 QueryBody{ queryBody }
 
 queryBody {
-  (statement Clause) |
   (Clause) |
   (statement Query) |
   (Clause Query) |
-  (statement (space queryBody)?) |
+  (statement (space? queryBody)?) |
   (Clause space? queryBody)
 }
 
@@ -49,7 +48,7 @@ And { @specialize<Argument, "and"> }
 
     Prefix { "!" | "-" }
 
-    Argument { $[a-zA-Z]+ }
+    Argument { $[a-zA-Z']+ }
 
 
 
