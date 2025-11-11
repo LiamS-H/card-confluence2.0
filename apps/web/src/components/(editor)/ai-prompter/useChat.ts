@@ -382,7 +382,7 @@ export function useChat({
                                 card: string;
                             };
                             const response = await cachedSearch({
-                                query: `!${card_name}`,
+                                query: `!"${card_name}"`,
                             });
                             if (response.object === "error") {
                                 addContent({

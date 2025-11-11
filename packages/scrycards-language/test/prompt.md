@@ -1,0 +1,2 @@
+I am using CodeMirror ide and the custom @lezer syntax generator for a custom language. There are currently some issues with the language, which you can test with pnpm run test (within the packages/scrycards-language directory).
+@packages/scrycards-language/src/syntax.grammar @packages/scrycards-language/test/cases.txt

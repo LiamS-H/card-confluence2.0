@@ -16,16 +16,18 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
             return (
                 <AccordionItem key={i} value={`face-${i}`}>
                     <AccordionTrigger>
-                        <div>
-                            <DialogTitle>{f.name}</DialogTitle>
-                            <DialogDescription className="font-thin">
-                                {f.type_line}
-                            </DialogDescription>
-                        </div>
-                        <div>
-                            <OracleText className="text-xl">
-                                {f.mana_cost || ""}
-                            </OracleText>
+                        <div className="flex flex-col-reverse md:flex-row gap-1 md:gap-0">
+                            <div>
+                                <DialogTitle>{f.name}</DialogTitle>
+                                <DialogDescription className="font-thin">
+                                    {f.type_line}
+                                </DialogDescription>
+                            </div>
+                            <div>
+                                <OracleText className="text-xl">
+                                    {f.mana_cost || ""}
+                                </OracleText>
+                            </div>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
@@ -40,18 +42,20 @@ export function Oracle({ card }: { card: ScryfallCard.Any }) {
         return (
             <AccordionItem key={i} value={`face-${i}`}>
                 <AccordionTrigger>
-                    <div>
-                        <h2 className="text-lg leading-none font-semibold">
-                            {f.name}
-                        </h2>
-                        <p className="font-thin text-muted-foreground">
-                            {f.type_line}
-                        </p>
-                    </div>
-                    <div>
-                        <OracleText className="text-xl">
-                            {f.mana_cost || ""}
-                        </OracleText>
+                    <div className="flex flex-col-reverse md:flex-row gap-1 md:gap-0">
+                        <div>
+                            <h2 className="text-lg leading-none font-semibold">
+                                {f.name}
+                            </h2>
+                            <p className="font-thin text-muted-foreground">
+                                {f.type_line}
+                            </p>
+                        </div>
+                        <div>
+                            <OracleText className="text-xl">
+                                {f.mana_cost || ""}
+                            </OracleText>
+                        </div>
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>

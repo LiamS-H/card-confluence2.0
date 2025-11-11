@@ -1,14 +1,23 @@
-# Name Only
+# Name Only with special character
 
-Test
+Test's Test
 
 ==>
 
-Program(Domain(Argument))
+Program(Domain(Argument, Argument))
+
+
+# Name Only
+
+Test Test
+
+==>
+
+Program(Domain(Argument, Argument))
 
 # Name Literal Only
 
-"Test"
+"Test's Test"
 
 ==>
 
@@ -24,7 +33,7 @@ Program(Domain(Tag(Prefix,Argument,Operator,Value(String))))
 
 # String Tag
 
-test:"long test"
+test:"long test'"
 
 ==>
 
@@ -53,6 +62,14 @@ t:creature or (t:artifact t:vehicle)
 ==>
 
 Program(Domain(Tag(Argument,Operator,Value(String)),Or,Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)))))
+
+# Conjoined Compound Query
+
+is:commander(t:artifact t:vehicle)
+
+==>
+
+Program(Domain(Tag(Argument,Operator,Value(String)),Clause(Tag(Argument,Operator,Value(String)),Tag(Argument,Operator,Value(String)))))
 
 # Complex Multi-Query
 
@@ -92,7 +109,7 @@ Program(Query(QueryName,QueryBody(Argument,Argument,Argument)))
 # Name Only + Multi-Query
 
 @query troll
-Golgari Grave-Troll
+Golgari's Grave-Troll
 
 @query elves
 t:elf
@@ -100,4 +117,3 @@ t:elf
 ==>
 
 Program(Query(QueryName,QueryBody(Argument,Argument,Argument),Query(QueryName,QueryBody(Tag(Argument,Operator,Value(String))))))
-
