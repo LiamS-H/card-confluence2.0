@@ -1,0 +1,15 @@
+{
+  "name": "@repo/scryfall-search",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "codemirror-lang-scrycards": "workspace:*",
+    "@scryfall/api-types": "1.0.0-alpha.4",
+    "node-html-parser": "^7.0.1"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5"
+  }
+}
