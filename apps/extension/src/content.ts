@@ -14,9 +14,10 @@ async function getCachedCatalog(): Promise<ICatalog> {
 
     if (
         cached[CATALOG_CACHE_KEY] &&
-        now - cached[CATALOG_CACHE_KEY].timestamp < CATALOG_CACHE_EXPIRY
+        now - (cached[CATALOG_CACHE_KEY] as any).timestamp <
+            CATALOG_CACHE_EXPIRY
     ) {
-        return cached[CATALOG_CACHE_KEY].data;
+        return (cached[CATALOG_CACHE_KEY] as any).data;
     }
 
     const catalog = await getCatalog();
