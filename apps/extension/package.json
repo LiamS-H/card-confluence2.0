@@ -1,14 +1,23 @@
 {
   "name": "card-confluence-extension",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build"
   },
+  "dependencies": {
+    "@codemirror/autocomplete": "6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/view": "^6.36.8",
+    "@codemirror/state": "^6.5.2",
+    "codemirror-lang-scrycards": "workspace:*",
+    "@repo/scryfall-search": "workspace:*"
+  },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/chrome": "^0.0.268",
+    "@types/chrome": "^0.1.31",
     "typescript": "~5.9.3",
     "vite": "^7.2.4"
   }

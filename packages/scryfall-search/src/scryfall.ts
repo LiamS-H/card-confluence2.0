@@ -9,7 +9,6 @@ import {
     ScryfallError,
     ScryfallCard,
 } from "@scryfall/api-types";
-import { parse } from "node-html-parser";
 import { ISearchSettings, SearchOrders, SearchUniques } from "./search";
 
 export async function fetchWithHeaders(url: URL) {
@@ -89,30 +88,31 @@ export async function fetchTags(): Promise<{
 
     const resp = await fetch("https://scryfall.com/docs/tagger-tags");
     const text = await resp.text();
-    const root = parse(text);
 
-    const headers = root.querySelectorAll(".prose > h2");
+    const sectionRegex = /<h2[^>]*>(.*?)<\/h2>\s*<p[^>]*>([\s\S]*?)<\/p>/g;
+    let match;
+    while ((match = sectionRegex.exec(text)) !== null) {
+        const header = match[1];
+        const pContent = match[2];
+        if (!header || !pContent) continue;
 
-    headers.forEach((header) => {
-        if (!header.textContent) return;
         const tags: string[] = [];
-        const nextParagraph = header.nextElementSibling;
-
-        if (nextParagraph) {
-            const links = nextParagraph.querySelectorAll("a");
-            links.forEach((link) => {
-                if (!link.textContent) return;
-                const tag = link.textContent.trim();
-                tags.push(tag);
-            });
-
-            if (header.textContent.endsWith("(functional)")) {
-                otags.push(...tags);
-            } else {
-                atags.push(...tags);
+        const linkRegex = /<a[^>]*>(.*?)<\/a>/g;
+        let linkMatch;
+        while ((linkMatch = linkRegex.exec(pContent)) !== null) {
+            const tag = linkMatch[1];
+            if (tag) {
+                tags.push(tag.trim());
             }
         }
-    });
+
+        if (header.endsWith("(functional)")) {
+            otags.push(...tags);
+        } else {
+            atags.push(...tags);
+        }
+    }
+
     return { otags, atags };
 }
 
@@ -125,19 +125,19 @@ export async function fetchCardTags(
         const url = `https://tagger.scryfall.com/card/${set}/${cn}`;
         const resp = await fetch(url);
         const text = await resp.text();
-        const root = parse(text);
-        const metaTag = root.querySelector('meta[property="og:description"]');
-        if (!metaTag) return [];
-        const content = metaTag.getAttribute("content");
-        if (!content) return [];
+
+        const metaTagMatch = text.match(
+            /<meta\s+property="og:description"\s+content="([^"]*)"/
+        );
+        if (!metaTagMatch || !metaTagMatch[1]) return [];
+        const content = metaTagMatch[1];
 
         const cardTagsMatch = content.match(
             /Card Tags:\s*([\s\S]*?)(?=\n\n|$)/
         );
-        if (!cardTagsMatch) return [];
+        if (!cardTagsMatch || !cardTagsMatch[1]) return [];
 
         const cardTagsSection = cardTagsMatch[1];
-        if (!cardTagsSection) return [];
 
         const cardTags = cardTagsSection
             .split("\n")

@@ -1,11 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Card Confluence Extension",
-  "version": "1.0.0",
+  "version": "0.0.0",
+  "description": "Replaces deckbox search with Scryfall autocomplete on Moxfield.",
+  "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": ["https://moxfield.com/decks/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }
