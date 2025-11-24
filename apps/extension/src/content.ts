@@ -1,104 +1,158 @@
 import { EditorView, keymap, placeholder, ViewUpdate } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+    defaultKeymap,
+    history,
+    historyKeymap,
+    indentLess,
+    indentMore,
+} from "@codemirror/commands";
+import { basicSetup } from "codemirror";
 import { scrycardsFromCatalog } from "codemirror-lang-scrycards";
-import { getCatalog, ICatalog } from "@repo/scryfall-search";
+import { ICatalog } from "@repo/scryfall-search";
+import { GetCatalogRequest, GetCatalogResponse } from "./messages.js";
+import {
+    acceptCompletion,
+    autocompletion,
+    closeBrackets,
+    completionStatus,
+} from "@codemirror/autocomplete";
+import {
+    bracketMatching,
+    defaultHighlightStyle,
+    syntaxHighlighting,
+} from "@codemirror/language";
 
-// Cache key for catalog
-const CATALOG_CACHE_KEY = "scryfall_catalog_cache";
-const CATALOG_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
-
-async function getCachedCatalog(): Promise<ICatalog> {
-    const now = Date.now();
-    const cached = await chrome.storage.local.get(CATALOG_CACHE_KEY);
-
-    if (
-        cached[CATALOG_CACHE_KEY] &&
-        now - (cached[CATALOG_CACHE_KEY] as any).timestamp <
-            CATALOG_CACHE_EXPIRY
-    ) {
-        return (cached[CATALOG_CACHE_KEY] as any).data;
-    }
-
-    const catalog = await getCatalog();
-    await chrome.storage.local.set({
-        [CATALOG_CACHE_KEY]: { timestamp: now, data: catalog },
+async function getCatalogFromBackground(): Promise<ICatalog> {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            { type: "GET_CATALOG" } as GetCatalogRequest,
+            (response: GetCatalogResponse) => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else if (response.type === "GET_CATALOG_SUCCESS") {
+                    resolve(response.data);
+                } else {
+                    reject(new Error(response.error));
+                }
+            }
+        );
     });
-    return catalog;
 }
+
+let editorView: EditorView | null = null;
+let isInitializing = false;
 
 async function init() {
+    if (isInitializing) return;
+
     const searchInput = document.getElementById(
         "deckbox-search"
-    ) as HTMLInputElement;
-    if (!searchInput) return;
+    ) as HTMLInputElement | null;
 
-    // Hide original input
-    searchInput.style.display = "none";
+    // If search input doesn't exist, we can't do anything
+    if (!searchInput) {
+        // If we have an editor view but no search input, it means we navigated away
+        // and need to cleanup
+        if (editorView) {
+            editorView.destroy();
+            editorView = null;
+            const wrapper = document.getElementById(
+                "scryfall-autocomplete-wrapper"
+            );
+            if (wrapper) wrapper.remove();
+        }
+        return;
+    }
 
-    const wrapper = document.createElement("div");
-    wrapper.id = "scryfall-autocomplete-wrapper";
-    wrapper.style.width = "100%";
-    searchInput.parentNode?.insertBefore(wrapper, searchInput);
+    // Check if we're already injected
+    if (document.getElementById("scryfall-autocomplete-wrapper")) {
+        // If we have the wrapper but no editor view (weird state), cleanup
+        if (!editorView) {
+            document.getElementById("scryfall-autocomplete-wrapper")?.remove();
+        } else {
+            // Already initialized and healthy
+            return;
+        }
+    }
 
-    const catalog = await getCachedCatalog();
+    // If we have an editor view but the wrapper is gone (SPA navigation replaced DOM),
+    // we need to re-initialize. Destroy old instance first.
+    if (editorView) {
+        editorView.destroy();
+        editorView = null;
+    }
 
-    // Initialize with default settings
-    const scryfallExtension = scrycardsFromCatalog(catalog, {
-        autoDetail: true,
-        autoInfo: true,
-    });
+    isInitializing = true;
 
-    const startState = EditorState.create({
-        doc: searchInput.value,
-        extensions: [
-            keymap.of([...defaultKeymap, ...historyKeymap]),
-            history(),
-            placeholder("Search for cards..."),
-            scryfallExtension,
-            EditorView.updateListener.of((update: ViewUpdate) => {
-                if (update.docChanged) {
-                    searchInput.value = update.state.doc.toString();
-                    searchInput.dispatchEvent(
-                        new Event("input", { bubbles: true })
-                    );
-                    searchInput.dispatchEvent(
-                        new Event("change", { bubbles: true })
-                    );
-                }
-            }),
-            EditorView.theme({
-                "&": {
-                    backgroundColor: "var(--bg-surface-low, #fff)",
-                    color: "var(--fg-primary, #000)",
-                    border: "1px solid var(--border-default, #ccc)",
-                    borderRadius: "4px",
-                    padding: "4px",
-                },
-                ".cm-content": {
-                    caretColor: "var(--fg-primary, #000)",
-                },
-                "&.cm-focused": {
-                    outline: "2px solid var(--focus-ring, blue)",
-                },
-            }),
-        ],
-    });
+    try {
+        const catalog = await getCatalogFromBackground();
+        console.log("Catalog loaded:", catalog);
 
-    new EditorView({
-        state: startState,
-        parent: wrapper,
-    });
+        // Re-check existence after async await
+        const currentSearchInput = document.getElementById(
+            "deckbox-search"
+        ) as HTMLInputElement | null;
+        if (!currentSearchInput) return;
+
+        if (document.getElementById("scryfall-autocomplete-wrapper")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.id = "scryfall-autocomplete-wrapper";
+        wrapper.style.width = "100%";
+        wrapper.style.position = "absolute";
+        wrapper.style.zIndex = "1000";
+        wrapper.style.top = "0";
+        wrapper.style.left = "0";
+        currentSearchInput.parentNode?.insertBefore(
+            wrapper,
+            currentSearchInput
+        );
+
+        // Initialize with default settings
+        const scryfallExtension = scrycardsFromCatalog(catalog, {
+            autoDetail: true,
+            autoInfo: true,
+        });
+
+        editorView = new EditorView({
+            parent: wrapper,
+            extensions: [
+                EditorView.theme({}, { dark: true }),
+                keymap.of([
+                    {
+                        key: "Tab",
+                        preventDefault: true,
+                        shift: indentLess,
+                        run: (e) => {
+                            if (!completionStatus(e.state))
+                                return indentMore(e);
+                            return acceptCompletion(e);
+                        },
+                    },
+                ]),
+                // placeholder(searchInput.placeholder),
+                placeholder("enter"),
+                history(),
+                bracketMatching(),
+                closeBrackets(),
+                autocompletion(),
+                scryfallExtension,
+            ],
+        });
+    } catch (error) {
+        console.error("Failed to initialize Scryfall autocomplete:", error);
+        const wrapper = document.getElementById(
+            "scryfall-autocomplete-wrapper"
+        );
+        if (wrapper) wrapper.remove();
+    } finally {
+        isInitializing = false;
+    }
 }
 
-// Observer to handle dynamic loading (SPA)
 const observer = new MutationObserver(() => {
-    if (
-        document.getElementById("deckbox-search") &&
-        !document.getElementById("scryfall-autocomplete-wrapper")
-    ) {
-        init();
-    }
+    init();
 });
 
 observer.observe(document.body, { childList: true, subtree: true });

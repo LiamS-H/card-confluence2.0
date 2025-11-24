@@ -4,6 +4,15 @@
   "version": "0.0.0",
   "description": "Replaces deckbox search with Scryfall autocomplete on Moxfield.",
   "permissions": ["storage"],
+  "host_permissions": [
+    "https://scryfall.com/*",
+    "https://tagger.scryfall.com/*",
+    "https://api.scryfall.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "content_scripts": [
     {
       "matches": ["https://moxfield.com/decks/*"],

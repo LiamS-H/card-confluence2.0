@@ -38,6 +38,9 @@ importers:
       '@repo/scryfall-search':
         specifier: workspace:*
         version: link:../../packages/scryfall-search
+      codemirror:
+        specifier: 6.0.2
+        version: 6.0.2
       codemirror-lang-scrycards:
         specifier: workspace:*
         version: link:../../packages/scrycards-language
