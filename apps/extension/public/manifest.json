@@ -1,14 +1,16 @@
 {
+  "$schema": "https://json.schemastore.org/chrome-manifest",
   "manifest_version": 3,
   "name": "Card Confluence Extension",
   "version": "0.0.0",
   "description": "Replaces deckbox search with Scryfall autocomplete on Moxfield.",
   "permissions": ["storage"],
-  "host_permissions": [
-    "https://scryfall.com/*",
-    "https://tagger.scryfall.com/*",
-    "https://api.scryfall.com/*"
-  ],
+  //   "host_permissions": [
+  // "https://scryfall.com/*",
+  //   "https://api.scryfall.com/*",
+  //   "https://scryfall.com/docs/tagger-tags",
+  // "https://tagger.scryfall.com/*"
+  //   ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

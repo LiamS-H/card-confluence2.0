@@ -6,6 +6,7 @@ import {
     historyKeymap,
     indentLess,
     indentMore,
+    insertNewline,
 } from "@codemirror/commands";
 import { basicSetup } from "codemirror";
 import { scrycardsFromCatalog } from "codemirror-lang-scrycards";
@@ -50,10 +51,11 @@ async function init() {
         "deckbox-search"
     ) as HTMLInputElement | null;
 
-    // If search input doesn't exist, we can't do anything
-    if (!searchInput) {
-        // If we have an editor view but no search input, it means we navigated away
-        // and need to cleanup
+    const parent = searchInput?.parentElement;
+    const searchCarrot = parent?.querySelector(
+        ".search-results-feedback"
+    ) as HTMLElement | null;
+    if (!searchInput || !parent || !searchCarrot) {
         if (editorView) {
             editorView.destroy();
             editorView = null;
@@ -65,19 +67,16 @@ async function init() {
         return;
     }
 
-    // Check if we're already injected
+    searchCarrot.style.opacity = "0%";
+
     if (document.getElementById("scryfall-autocomplete-wrapper")) {
-        // If we have the wrapper but no editor view (weird state), cleanup
         if (!editorView) {
             document.getElementById("scryfall-autocomplete-wrapper")?.remove();
         } else {
-            // Already initialized and healthy
             return;
         }
     }
 
-    // If we have an editor view but the wrapper is gone (SPA navigation replaced DOM),
-    // we need to re-initialize. Destroy old instance first.
     if (editorView) {
         editorView.destroy();
         editorView = null;
@@ -89,7 +88,6 @@ async function init() {
         const catalog = await getCatalogFromBackground();
         console.log("Catalog loaded:", catalog);
 
-        // Re-check existence after async await
         const currentSearchInput = document.getElementById(
             "deckbox-search"
         ) as HTMLInputElement | null;
@@ -97,28 +95,49 @@ async function init() {
 
         if (document.getElementById("scryfall-autocomplete-wrapper")) return;
 
+        searchInput.style.position = "absolute";
+        searchInput.style.pointerEvents = "none";
+        searchInput.style.opacity = "0%";
+
         const wrapper = document.createElement("div");
         wrapper.id = "scryfall-autocomplete-wrapper";
-        wrapper.style.width = "100%";
-        wrapper.style.position = "absolute";
-        wrapper.style.zIndex = "1000";
-        wrapper.style.top = "0";
-        wrapper.style.left = "0";
+        wrapper.style.display = "flex";
+        wrapper.style.alignItems = "center";
+        wrapper.style.flexGrow = "1";
+        wrapper.style.height = "33.1px";
+        wrapper.style.textAlign = "left";
+        wrapper.style.background = "#0F0F0F";
+        wrapper.style.border = "0.8px black";
+        wrapper.style.borderBottomLeftRadius = "5.25px";
+        wrapper.style.borderTopLeftRadius = "5.25px";
+        // wrapper.style.position = "absolute";
+        // wrapper.style.zIndex = "1000";
+        // wrapper.style.top = "0";
+        // wrapper.style.left = "0";
         currentSearchInput.parentNode?.insertBefore(
             wrapper,
             currentSearchInput
         );
 
-        // Initialize with default settings
         const scryfallExtension = scrycardsFromCatalog(catalog, {
             autoDetail: true,
             autoInfo: true,
         });
 
+        const url_params = new URLSearchParams(window.location.search);
+        const url_search = url_params.get("q");
+
         editorView = new EditorView({
             parent: wrapper,
+            doc: url_search ?? "",
             extensions: [
-                EditorView.theme({}, { dark: true }),
+                EditorView.theme(
+                    {
+                        "&.cm-tooltip": { zIndex: "1000" },
+                        "&.cm-editor": { width: "100%" },
+                    },
+                    { dark: true }
+                ),
                 keymap.of([
                     {
                         key: "Tab",
@@ -131,14 +150,45 @@ async function init() {
                         },
                     },
                 ]),
-                // placeholder(searchInput.placeholder),
-                placeholder("enter"),
+                keymap.of([
+                    {
+                        key: "Enter",
+                        preventDefault: false,
+                        // shift: insertNewline,
+                        run: (e) => {
+                            if (completionStatus(e.state)) {
+                                return acceptCompletion(e);
+                            }
+                            const searchButton = parent?.querySelector(
+                                "button"
+                            ) as HTMLElement | null;
+                            searchButton?.click();
+                            return true;
+                        },
+                    },
+                ]),
+                EditorView.updateListener.of((update: ViewUpdate) => {
+                    if (update.docChanged) {
+                        searchInput.value = update.state.doc.toString();
+                        searchInput.dispatchEvent(
+                            new Event("input", { bubbles: true })
+                        );
+                        searchInput.dispatchEvent(
+                            new Event("change", { bubbles: true })
+                        );
+                    }
+                }),
+                placeholder("cconfluence search..."),
                 history(),
                 bracketMatching(),
                 closeBrackets(),
                 autocompletion(),
+                EditorView.lineWrapping,
                 scryfallExtension,
             ],
+        });
+        searchInput.addEventListener("focus", () => {
+            editorView?.focus();
         });
     } catch (error) {
         console.error("Failed to initialize Scryfall autocomplete:", error);
@@ -157,5 +207,4 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Initial check
 init();

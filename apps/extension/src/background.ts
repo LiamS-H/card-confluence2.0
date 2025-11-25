@@ -2,7 +2,9 @@ import { getCatalog, ICatalog } from "@repo/scryfall-search";
 import { GetCatalogRequest, GetCatalogResponse } from "./messages.js";
 
 const CATALOG_CACHE_KEY = "scryfall_catalog_cache";
-const CATALOG_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+// const CATALOG_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+// const CATALOG_CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour
+const CATALOG_CACHE_EXPIRY = 20 * 1000; // 20 second
 
 async function getCachedCatalog(): Promise<ICatalog> {
     const now = Date.now();
