@@ -16,7 +16,7 @@
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "dependencies": {
-    "@lezer/lr": "^1.4.2",
+    "@lezer/lr": "^1.3.14",
     "@lezer/highlight": "^1.2.1",
     "@codemirror/autocomplete": "^6.18.6",
     "@codemirror/view": "^6.36.8",
