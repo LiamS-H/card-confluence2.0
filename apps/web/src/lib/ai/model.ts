@@ -111,7 +111,7 @@ export async function queryModel(contents: ContentListUnion) {
     console.log("[gemini-backend] querying", contents);
     try {
         const resp = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: contents,
             config: {
                 temperature: 1.3,
