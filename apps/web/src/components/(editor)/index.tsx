@@ -41,11 +41,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
         if (!editorOpen) return null;
         return (
             <AIOpenButton className="w-4 h-4" variant="outline" size="icon">
-                {aiOpen ? (
-                    <SquareCode className="h-[2px] w-[2px]" />
-                ) : (
-                    <Sparkles />
-                )}
+                {aiOpen ? <SquareCode className="h-0.5 w-0.5" /> : <Sparkles />}
             </AIOpenButton>
         );
     }, [editorOpen, aiOpen]);
@@ -60,7 +56,7 @@ export function ScrycardsEditor({ catalog }: { catalog: ICatalog }) {
                         onCreateEditor={onCreateEditor}
                         onUpdate={onUpdate}
                         onChange={onChange}
-                        className={`flex-grow relative text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-full lg:w-1/2" : ""}`}
+                        className={`grow relative text-sm bg-white dark:bg-[#292c34] ${!editorOpen && "absolute opacity-0 pointer-events-none"} ${split ? "w-full lg:w-1/2" : ""}`}
                     >
                         <div
                             // className={`absolute bottom-[1] left-1 z-20 ${aiOpen ? "hidden lg:block" : ""}`}
