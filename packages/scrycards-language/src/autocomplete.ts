@@ -85,6 +85,22 @@ export const completeScrycards: CompletionSource = (context) => {
                 to,
                 options: catalog["card-names"].map((name) => ({
                     label: name,
+                    apply: (view, completion) => {
+                        completion.label = `!"${completion.label}"`;
+                        view.dispatch(
+                            view.state.update({
+                                changes: {
+                                    from,
+                                    to,
+                                    insert: completion.label,
+                                },
+                                selection: EditorSelection.cursor(
+                                    from + completion.label.length
+                                ),
+                                userEvent: "completion.apply",
+                            })
+                        );
+                    },
                 })),
             };
         }
