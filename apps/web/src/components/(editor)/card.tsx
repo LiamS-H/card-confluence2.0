@@ -5,7 +5,15 @@ import { isFlippable, Scrycard } from "react-scrycards";
 import { Button } from "../(ui)/button";
 import { FlipHorizontal } from "lucide-react";
 
-export function Card({ id, width = 200 }: { id: string; width?: number }) {
+export function Card({
+    id,
+    width = 200,
+    index,
+}: {
+    id: string;
+    width?: number;
+    index?: number;
+}) {
     const card = useCard(id);
     const { pushSelected, setHovered, setOpen } = useHighlightContext();
     const [flipped, setFlipped] = useState(false);
@@ -18,7 +26,7 @@ export function Card({ id, width = 200 }: { id: string; width?: number }) {
                 setHovered(id);
             }}
             onClick={() => {
-                pushSelected(id);
+                pushSelected(id, index);
                 setOpen(true);
             }}
         >

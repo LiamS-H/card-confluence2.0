@@ -95,7 +95,11 @@ export function CardList({
                                     height: gridLayout.cardH,
                                 }}
                             >
-                                <Card id={item.id} width={gridLayout.cardW} />
+                                <Card
+                                    id={item.id}
+                                    width={gridLayout.cardW}
+                                    index={item.index}
+                                />
                             </div>
                         ))}
 

@@ -31,8 +31,18 @@ import { useTags } from "../../../hooks/useTags";
 import { Tags } from "./tags";
 
 export function CardModal() {
-    const { open, selected, setOpen, pushSelected, previous, goPrevious } =
-        useHighlightContext();
+    const {
+        open,
+        selected,
+        setOpen,
+        pushSelected,
+        previous,
+        goPrevious,
+        goNext,
+        goPrev,
+        hasNext,
+        hasPrev,
+    } = useHighlightContext();
     const card = useCard(selected);
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +88,7 @@ export function CardModal() {
 
             const finalScrollTop = Math.max(
                 0,
-                Math.min(targetScrollTop, maxScrollTop)
+                Math.min(targetScrollTop, maxScrollTop),
             );
 
             scrollableElement.scrollTop = finalScrollTop;
@@ -208,10 +218,27 @@ export function CardModal() {
                         </div>
                     </div>
                 </div>
-                <DialogFooter className="self-end flex flex-col sm:flex-row">
+                <DialogFooter className="self-end flex flex-col sm:flex-row gap-2">
                     {goPrevious && previous && (
                         <UndoButton undo={goPrevious} prevId={previous} />
                     )}
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={goPrev}
+                            disabled={!hasPrev}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={goNext}
+                            disabled={!hasNext}
+                        >
+                            Next
+                        </Button>
+                    </div>
+
                     <DialogClose asChild>
                         <Button variant="outline">Close</Button>
                     </DialogClose>
