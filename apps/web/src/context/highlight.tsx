@@ -250,7 +250,7 @@ export function HighlightContextProvider({
     children: ReactNode;
 }) {
     return (
-        <Suspense fallback={children}>
+        <Suspense fallback={null}>
             <Provider>{children}</Provider>
         </Suspense>
     );
