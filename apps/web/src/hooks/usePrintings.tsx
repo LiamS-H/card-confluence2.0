@@ -6,7 +6,10 @@ import {
 import { ScryfallCard } from "@scryfall/api-types";
 import { useEffect, useState } from "react";
 
-export function usePrintings(card: ScryfallCard.Any | null | undefined) {
+export function usePrintings(
+    card: ScryfallCard.Any | null | undefined,
+    onlyCached?: boolean,
+) {
     const { cachedSearch, cacheResponse, getCard } = useSearchContext();
 
     const [printings, setPrintings] = useState<string[] | null>(null);
@@ -19,8 +22,10 @@ export function usePrintings(card: ScryfallCard.Any | null | undefined) {
         const search_props: ICachedSearchProps = {
             query: `oracleid:${card.oracle_id}`,
             settings: { unique: "prints", order: "released" },
+            onlyCached,
         };
         const resp = cachedSearch(search_props);
+        if (resp === null) return;
         const resolve = async (resp: SearchResponse) => {
             if (resp.object === "error") {
                 setPrintings(null);
@@ -45,7 +50,7 @@ export function usePrintings(card: ScryfallCard.Any | null | undefined) {
                         settings: search_props.settings,
                     };
                 }),
-                resp
+                resp,
             );
         };
         if ("then" in resp) {
@@ -53,7 +58,7 @@ export function usePrintings(card: ScryfallCard.Any | null | undefined) {
         } else {
             resolve(resp);
         }
-    }, [card, cachedSearch, cacheResponse, getCard, printings]);
+    }, [card, cachedSearch, cacheResponse, getCard, printings, onlyCached]);
 
     return printings;
 }

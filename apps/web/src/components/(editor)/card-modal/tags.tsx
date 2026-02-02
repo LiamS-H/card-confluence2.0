@@ -55,10 +55,13 @@ export function Tags({
     isOpen: boolean;
 }) {
     const loading = isOpen && !tags;
-    const no_tags = isOpen && tags?.length === 0;
+    const no_tags = tags?.length === 0;
     return (
         <AccordionItem value={"tags"}>
-            <AccordionTrigger disabled={loading || no_tags} noChevron={loading}>
+            <AccordionTrigger
+                disabled={loading || no_tags}
+                noChevron={loading || no_tags}
+            >
                 <div className="flex items-center w-full">
                     <span>Tags</span>
                     {no_tags && <span>: None</span>}

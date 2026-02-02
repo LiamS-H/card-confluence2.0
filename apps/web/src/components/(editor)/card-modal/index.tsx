@@ -11,7 +11,7 @@ import {
 } from "@/components/(ui)/dialog";
 import { Button } from "../../(ui)/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Printings } from "./printing";
+import { Printings } from "./printings";
 import { Related } from "./related";
 import { UndoButton } from "./undo-button";
 import Card from "./card";
@@ -49,17 +49,14 @@ export function CardModal() {
     const scrollDistanceFromTopRef = useRef(0);
     const [contentLoaded, setContentLoaded] = useState(false);
 
-    const [tabs, setTabs] = useState<string[]>([
-        "face-0",
-        "face-1",
-        "printings",
-    ]);
+    const [tabs, setTabs] = useState<string[]>(["face-0", "face-1"]);
 
-    const printings = usePrintings(card);
     const rulingsOpen = tabs.includes("rulings");
-    const rulings = useRulings(card);
+    const rulings = useRulings(card, !rulingsOpen);
+    const printingsOpen = tabs.includes("printings");
+    const printings = usePrintings(card, !printingsOpen);
     const tagsOpen = tabs.includes("tags");
-    const tags = useTags(card);
+    const tags = useTags(card, !tagsOpen);
 
     useEffect(() => {
         if (card) {
@@ -116,7 +113,7 @@ export function CardModal() {
 
     const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
-        if (!rulings && t === "rulings") return false;
+        if ((!rulings || rulings.length == 0) && t === "rulings") return false;
         if (!tags && t === "tags") return false;
         return true;
     });
@@ -160,7 +157,11 @@ export function CardModal() {
                             onValueChange={(e) => setTabs(e)}
                         >
                             <Oracle card={card} />
-                            <Printings id={card.id} printings={printings} />
+                            <Printings
+                                id={card.id}
+                                printings={printings}
+                                isOpen={printingsOpen}
+                            />
                             {card.all_parts && card.all_parts.length > 1 && (
                                 <AccordionItem value="related">
                                     <AccordionTrigger>

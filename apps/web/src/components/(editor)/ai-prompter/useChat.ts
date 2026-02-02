@@ -39,7 +39,7 @@ export function useChatId(chatId: ChatId) {
             removeChat: () => _removeChat(chatId),
             nameChat: (name: string) => _nameChat(chatId, name),
         }),
-        [chat, _addContents, _removeChat, _nameChat, chatId]
+        [chat, _addContents, _removeChat, _nameChat, chatId],
     );
 }
 
@@ -107,7 +107,7 @@ export function useChat({
                 }
                 console.log(
                     "[gemini] querying with contents",
-                    contents.map((c) => c)
+                    contents.map((c) => c),
                 );
                 const raw = await queryModel(contents);
                 if (!raw) {
@@ -137,7 +137,7 @@ export function useChat({
                     console.log(
                         `[gemini] invoking ${func.name}(`,
                         func.args,
-                        ")"
+                        ")",
                     );
                     switch (func.name) {
                         case "get_tag_info":
@@ -169,7 +169,7 @@ export function useChat({
                                 {
                                     autoDetail: true,
                                     autoInfo: true,
-                                }
+                                },
                             );
                             if (kw && suggestions) {
                                 suggestions = suggestions
@@ -225,7 +225,7 @@ export function useChat({
                                 query: name,
                             });
 
-                            if (searchResp.object === "error") {
+                            if (!searchResp || searchResp.object === "error") {
                                 addContent({
                                     role: "user",
                                     parts: [
@@ -234,7 +234,8 @@ export function useChat({
                                                 name: "get_rulings",
                                                 response: {
                                                     error: `Could not find a card with name ${name}.`,
-                                                    details: searchResp.details,
+                                                    details:
+                                                        searchResp?.details,
                                                 },
                                             },
                                         },
@@ -267,7 +268,10 @@ export function useChat({
                                 scryfall_id: card.id,
                             });
 
-                            if (rulingsResp.object === "error") {
+                            if (
+                                !rulingsResp ||
+                                rulingsResp.object === "error"
+                            ) {
                                 addContent({
                                     role: "user",
                                     parts: [
@@ -277,7 +281,7 @@ export function useChat({
                                                 response: {
                                                     error: `Could not fetch rulings for ${card.name}.`,
                                                     details:
-                                                        rulingsResp.details,
+                                                        rulingsResp?.details,
                                                 },
                                             },
                                         },
@@ -298,7 +302,7 @@ export function useChat({
                                                     (r) => ({
                                                         date: r.published_at,
                                                         text: r.comment,
-                                                    })
+                                                    }),
                                                 ),
                                             },
                                         },
@@ -315,7 +319,7 @@ export function useChat({
                             const resp = await cachedSearch({
                                 query: `${name}`,
                             });
-                            if (resp.object === "error") {
+                            if (!resp || resp.object === "error") {
                                 addContent({
                                     role: "user",
                                     parts: [
@@ -323,7 +327,7 @@ export function useChat({
                                             functionResponse: {
                                                 name: "get_cards",
                                                 response: {
-                                                    error: resp.details,
+                                                    error: resp?.details,
                                                 },
                                             },
                                         },
@@ -333,7 +337,7 @@ export function useChat({
                             }
                             const cards = (
                                 await Promise.all(
-                                    resp.data.map((c) => getCard(c))
+                                    resp.data.map((c) => getCard(c)),
                                 )
                             ).filter((c) => !!c);
                             // TODO: Rank the response based on some string similarity to shorten results
@@ -360,7 +364,7 @@ export function useChat({
                             });
                             console.log(
                                 "[gemini] retrieved cards",
-                                formatted_cards
+                                formatted_cards,
                             );
                             addContent({
                                 role: "user",
@@ -384,7 +388,7 @@ export function useChat({
                             const response = await cachedSearch({
                                 query: `!"${card_name}"`,
                             });
-                            if (response.object === "error") {
+                            if (!response || response.object === "error") {
                                 addContent({
                                     role: "user",
                                     parts: [
@@ -392,7 +396,7 @@ export function useChat({
                                             functionResponse: {
                                                 name: "get_tags",
                                                 response: {
-                                                    error: response.details,
+                                                    error: response?.details,
                                                 },
                                             },
                                         },
@@ -402,7 +406,7 @@ export function useChat({
                             }
 
                             const response_card = await getCard(
-                                response.data.at(0)
+                                response.data.at(0),
                             );
 
                             if (!response_card) {
@@ -426,7 +430,7 @@ export function useChat({
 
                             const tags = await fetchCardTags(
                                 set,
-                                collector_number
+                                collector_number,
                             );
 
                             addContent({
@@ -508,7 +512,7 @@ export function useChat({
             nameChat,
             catalog,
             chat.name,
-        ]
+        ],
     );
 
     //TODO: add chat stopping that actually removes / flags messages
