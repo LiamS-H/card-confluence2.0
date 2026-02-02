@@ -131,6 +131,12 @@ export function EditorSettingsModal() {
                         feedback={["Shown", "Hidden"]}
                         inverted
                     />
+                    <ToggleButton
+                        setting="vimBindings"
+                        label="Vim Bindings"
+                        feedback={["Enabled", "Disabled"]}
+                        inverted
+                    />
                 </div>
                 <DialogFooter>
                     <Button

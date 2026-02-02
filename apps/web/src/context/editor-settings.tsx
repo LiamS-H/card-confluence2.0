@@ -13,6 +13,7 @@ export interface IEditorSettings {
     disableAutocompleteInfo?: boolean;
     disableOrderInfo?: boolean;
     showSillyCards?: boolean;
+    vimBindings?: boolean;
 }
 
 export interface IEditorSettingsContext {

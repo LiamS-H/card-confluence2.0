@@ -2,11 +2,12 @@ import ReactCodeEditor, {
     type ReactCodeMirrorProps,
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
-import { EditorView, keymap } from "@codemirror/view";
+import { drawSelection, EditorView, keymap } from "@codemirror/view";
 import { indentLess, indentMore } from "@codemirror/commands";
 import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import { type ReactNode, type RefObject, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
+import { vim } from "@replit/codemirror-vim";
 import {
     completeScrycards,
     type ICatalog,
@@ -191,8 +192,13 @@ export function Editor({
                 autoDetail: !settings.disableAutocompleteDetail,
                 autoInfo: !settings.disableAutocompleteInfo,
             }),
+            drawSelection(),
             EditorView.lineWrapping,
         ];
+
+        if (settings.vimBindings) {
+            extensions.push(vim());
+        }
 
         if (!settings.disableTooltips) {
             extensions.push(ScrycardsTooltips);
@@ -211,7 +217,7 @@ export function Editor({
                     editorRef={editorRef}
                 />
             )),
-        [queryNodes]
+        [queryNodes],
     );
 
     return (
