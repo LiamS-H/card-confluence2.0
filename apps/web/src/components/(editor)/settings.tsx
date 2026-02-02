@@ -121,6 +121,11 @@ export function EditorSettingsModal() {
                         feedback={["Hidden", "Shown"]}
                     />
                     <ToggleButton
+                        setting="disableOrderInfo"
+                        label="Order Info"
+                        feedback={["Hidden", "Shown"]}
+                    />
+                    <ToggleButton
                         setting="showSillyCards"
                         label="Silly Cards"
                         feedback={["Shown", "Hidden"]}
