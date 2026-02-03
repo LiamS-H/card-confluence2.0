@@ -2,27 +2,40 @@ import { Button } from "@/components/(ui)/button";
 import { useHighlightContext } from "@/context/highlight";
 import { useCard } from "@/hooks/useCard";
 import { FlipHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
-import { isFlippable, Scrycard } from "react-scrycards";
+import { useEffect, useMemo, useState } from "react";
+import { isFlippable, Scrycard, type ScrycardSizes } from "react-scrycards";
 
 export default function Card() {
     const { selected, hovered } = useHighlightContext();
     const card = useCard(hovered || selected);
     const [flipped, setFlipped] = useState(false);
+    const [size, setSize] = useState<ScrycardSizes>("xs");
 
     useEffect(() => {
         setFlipped(false);
-    }, [card]);
+        setSize("xs");
+    }, [card?.id]);
 
-    return (
-        <div className="overflow-visible relative">
+    const cardComp = useMemo(() => {
+        // hack to make image update immediately from cache, by first rendering as MD then as XL
+        if (size !== "xl") {
+            setTimeout(() => setSize("xl"), 0);
+        }
+
+        return (
             <Scrycard
                 flipped={flipped}
                 animated
                 card={card}
-                size="xl"
+                size={size}
                 width="full"
             />
+        );
+    }, [card?.id, size]);
+
+    return (
+        <div className="overflow-visible relative">
+            {cardComp}
             {isFlippable(card) && (
                 <Button
                     className="absolute bottom-0 left-0 h-7 w-7"

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card } from "@/components/(editor)/card";
+import { Card } from "@/components/(editor)/card-list/card";
 import { OBSERVER_ROWS, useCardListSearch } from "./useCardListSearch";
 
 export function CardList({
