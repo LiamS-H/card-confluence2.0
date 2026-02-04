@@ -85,6 +85,6 @@ export function Card({
                 </div>
             </>
         ),
-        [card?.id],
+        [card?.id, flipped],
     );
 }

@@ -32,7 +32,7 @@ export default function Card() {
                 width="full"
             />
         );
-    }, [card?.id, size]);
+    }, [card?.id, size, flipped]);
 
     return (
         <div className="overflow-visible relative w-full">
@@ -44,6 +44,7 @@ export default function Card() {
                     size="icon"
                     onClick={(e) => {
                         e.stopPropagation();
+                        console.log("test");
                         setFlipped((f) => !f);
                     }}
                 >
