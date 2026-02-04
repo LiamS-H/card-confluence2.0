@@ -22,6 +22,8 @@ export interface Query {
         to: number;
         settings: SearchSettings;
     };
+    from: number;
+    to: number;
 }
 
 export type Domain = {
@@ -34,7 +36,7 @@ export type Domain = {
 
 function extractSettingsFromCursor(
     view: EditorView,
-    cursor: TreeCursor
+    cursor: TreeCursor,
 ): { settings: SearchSettings; noSettingText: string } {
     const settings: SearchSettings = {};
     cursor.firstChild();
@@ -90,7 +92,7 @@ export function queriesFromView(view: EditorView): {
         const from = cursor.from;
         const { settings, noSettingText } = extractSettingsFromCursor(
             view,
-            cursor
+            cursor,
         );
 
         if ((cursor.name as string) === "Query") {
@@ -120,6 +122,8 @@ export function queriesFromView(view: EditorView): {
     const queries: Query[] = [];
 
     while (cursor.name === "Query") {
+        let from = cursor.from;
+        let to = cursor.to;
         cursor.firstChild();
         const name: Query["name"] = {
             text: view.state.sliceDoc(cursor.from, cursor.to),
@@ -128,10 +132,10 @@ export function queriesFromView(view: EditorView): {
         };
 
         cursor.nextSibling();
-        const from = cursor.from;
+        const body_from = cursor.from;
         const { settings, noSettingText } = extractSettingsFromCursor(
             view,
-            cursor
+            cursor,
         );
 
         if (cursor.name === "Query") {
@@ -142,15 +146,28 @@ export function queriesFromView(view: EditorView): {
             noSettingText.trim();
 
         const body = {
-            text: view.state.sliceDoc(from, cursor.to),
+            text: view.state.sliceDoc(body_from, cursor.to),
             mergedTextNoSetting: combined_noSettingText,
-            from,
+            from: body_from,
             to: cursor.to,
             settings,
         };
-        queries.push({ name, body });
 
-        if (!cursor.nextSibling()) break;
+        const hasNext = cursor.nextSibling();
+        if (hasNext) {
+            to = cursor.from;
+        }
+        while (/\s/.test(view.state.doc.sliceString(from + 1, from + 2))) {
+            from += 1;
+        }
+
+        while (/\s/.test(view.state.doc.sliceString(to + 1, to + 2))) {
+            to += 1;
+        }
+
+        queries.push({ name, body, from, to });
+
+        if (!hasNext) break;
     }
 
     return {

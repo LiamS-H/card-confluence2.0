@@ -163,7 +163,9 @@ export function Editor({
     children?: ReactNode;
 }) {
     const { settings } = useEditorSettingsContext();
-    const { queryNodes } = useEditorQueriesContext();
+    const { queryNodes, activateQuery } = useEditorQueriesContext();
+    const queryNodesRef = useRef(queryNodes);
+    queryNodesRef.current = queryNodes;
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
@@ -174,8 +176,30 @@ export function Editor({
     }, []);
 
     const extensions = useMemo(() => {
+        function activateQ(e: EditorView) {
+            const selection =
+                e.state.selection.ranges[e.state.selection.mainIndex];
+            if (!selection) return false;
+            const index = queryNodesRef.current.findIndex((q) => {
+                return (
+                    q.query.from <= selection.from && selection.to <= q.query.to
+                );
+            });
+            if (index === -1) return false;
+            activateQuery(index);
+            return false;
+        }
         const extensions = [
             keymap.of([
+                {
+                    key: "Mod-q",
+                    preventDefault: true,
+                    shift: () => {
+                        activateQuery(null);
+                        return false;
+                    },
+                    run: activateQ,
+                },
                 {
                     key: "Tab",
                     preventDefault: true,
@@ -205,7 +229,7 @@ export function Editor({
         }
 
         return extensions;
-    }, [catalog, settings, scrycards]);
+    }, [catalog, settings, scrycards, activateQuery]);
 
     const queryComponents = useMemo(
         () =>

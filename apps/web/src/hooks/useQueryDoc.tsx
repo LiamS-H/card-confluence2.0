@@ -33,7 +33,7 @@ is:firstprinting
 
 export function useQueryDoc() {
     const [scryfallSettings, setScryfallSettings] = useState<ISearchSettings>(
-        {}
+        {},
     );
     const [_queryNodes, _setQueryNodes] = useState<
         IEditorQueriesContext["queryNodes"]
@@ -60,7 +60,8 @@ export function useQueryDoc() {
         }
         const query = queriesRef.current[index];
         if (!query) {
-            throw Error("Invalid Query Index");
+            console.error("Invalid Query Index:", index);
+            return;
         }
         const name = query.name.text;
         let count = 0;
@@ -69,6 +70,7 @@ export function useQueryDoc() {
                 count++;
             }
         }
+
         setActiveIndex(index);
         activeQueryNameRef.current = { n: name, c: count, i: index };
     }, []);
@@ -79,7 +81,7 @@ export function useQueryDoc() {
         (from: number, to: number, text: string) => {
             setDoc((doc) => doc.substring(0, from) + text + doc.substring(to));
         },
-        []
+        [],
     );
 
     const changeDocDomain = useCallback(
@@ -93,14 +95,14 @@ export function useQueryDoc() {
                 setDoc((doc) => `${new_domain}\n${doc}`);
             }
         },
-        [updateDocAt, _domain]
+        [updateDocAt, _domain],
     );
 
     const addDocQuery = useCallback(
         ({ name, body }: { name: string; body: string }) => {
             setDoc((doc) => doc + `\n@query ${name}\n${body}\n`);
         },
-        []
+        [],
     );
 
     const setDocQuery = useCallback(
@@ -111,14 +113,14 @@ export function useQueryDoc() {
             updateDocAt(q.name.from, q.name.to, name);
             updateDocAt(q.body.from, q.body.to, body);
         },
-        [updateDocAt, activeIndex]
+        [updateDocAt, activeIndex],
     );
 
     const updateQueries = useCallback(
         (view: EditorView, viewUpdate?: ViewUpdate) => {
             const isCompletion =
                 viewUpdate?.transactions[0]?.annotation(
-                    Transaction.userEvent
+                    Transaction.userEvent,
                 ) === "input.complete";
 
             setFastUpdate(false);
@@ -133,11 +135,11 @@ export function useQueryDoc() {
                 // TODO: placeholder for get-ast function
                 const ast = ((domain?.text ?? "") + " " + q.body.text).replace(
                     /\s/g,
-                    ""
+                    "",
                 );
                 const computed_settings = mergeObjects(
                     q.body.settings,
-                    domain?.settings
+                    domain?.settings,
                 );
                 return {
                     node,
@@ -160,7 +162,7 @@ export function useQueryDoc() {
             }
 
             const new_query_names = queries.map(
-                (q) => q.name.text || "[unnamed]"
+                (q) => q.name.text || "[unnamed]",
             );
             const old_query_names = queryNamesRef.current;
             queryNamesRef.current = new_query_names;
@@ -208,7 +210,7 @@ export function useQueryDoc() {
             }
             activateQuery(candidate.i);
         },
-        [activateQuery]
+        [activateQuery],
     );
 
     const onCreateEditor = useCallback<
@@ -218,7 +220,7 @@ export function useQueryDoc() {
             // (view,state ) => {
             updateQueries(view);
         },
-        [updateQueries]
+        [updateQueries],
     );
 
     const onUpdate = useCallback<NonNullable<ReactCodeMirrorProps["onUpdate"]>>(
@@ -230,13 +232,13 @@ export function useQueryDoc() {
                 return;
             updateQueries(viewUpdate.view, viewUpdate);
         },
-        [updateQueries]
+        [updateQueries],
     );
     const onChange = useCallback<NonNullable<ReactCodeMirrorProps["onChange"]>>(
         (value) => {
             setDoc(value);
         },
-        []
+        [],
     );
 
     const { queryNodes, activeQuery } = useMemo(() => {
@@ -268,7 +270,7 @@ export function useQueryDoc() {
 
     const computedSettings = useCompareMemo(
         activeQuery.computed_settings,
-        isSettingsEqual
+        isSettingsEqual,
     );
     const mergedSettings = useMemo(() => {
         return mergeObjects(scryfallSettings, computedSettings);
@@ -291,7 +293,7 @@ export function useQueryDoc() {
                 setFastUpdate(true);
                 setScryfallSettings(s);
             },
-            [setFastUpdate, setScryfallSettings]
+            [setFastUpdate, setScryfallSettings],
         ),
     };
 

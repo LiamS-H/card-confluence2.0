@@ -8,7 +8,7 @@ import { ISearchSettings } from "@/lib/search";
 import { Query, SearchSettings } from "codemirror-lang-scrycards";
 
 export interface IEditorQueriesContext {
-    activateQuery: (index: number | null, fast?: boolean) => void;
+    activateQuery: (index: number | null) => void;
     fastUpdate: boolean;
     queryNodes: {
         node: Node;
@@ -32,14 +32,14 @@ export interface IEditorQueriesContext {
 }
 
 export const editorQueriesContext = createContext<IEditorQueriesContext | null>(
-    null
+    null,
 );
 
 export function useEditorQueriesContext() {
     const ctx = useContext(editorQueriesContext);
     if (!ctx)
         throw new Error(
-            "useEditorQueriesContext must be used within an EditorQueriesProvider"
+            "useEditorQueriesContext must be used within an EditorQueriesProvider",
         );
     return ctx;
 }

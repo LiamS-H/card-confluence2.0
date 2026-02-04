@@ -18,6 +18,7 @@ export default function Card() {
 
     const cardComp = useMemo(() => {
         // hack to make image update immediately from cache, by first rendering as MD then as XL
+        // TODO: Replace with blur transition
         if (size !== "xl") {
             setTimeout(() => setSize("xl"), 0);
         }
@@ -25,7 +26,7 @@ export default function Card() {
         return (
             <Scrycard
                 flipped={flipped}
-                animated
+                animated={size === "xl" || undefined}
                 card={card}
                 size={size}
                 width="full"
@@ -34,7 +35,7 @@ export default function Card() {
     }, [card?.id, size]);
 
     return (
-        <div className="overflow-visible relative">
+        <div className="overflow-visible relative w-full">
             {cardComp}
             {isFlippable(card) && (
                 <Button
