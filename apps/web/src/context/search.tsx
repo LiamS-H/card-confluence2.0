@@ -1,5 +1,5 @@
 "use client";
-import { fetchRulings, fetchSearch } from "@/lib/scryfall";
+import { fetchRulings, fetchSearch } from "@repo/scryfall-search";
 import { type ISearchSettings } from "@/lib/search";
 import { fetchCardTags } from "../lib/scryfall";
 import type {

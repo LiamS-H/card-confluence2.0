@@ -11,7 +11,8 @@ import {
 } from "codemirror-lang-scrycards";
 import { getContents } from "@/lib/utils";
 import { useEditorQueriesContext } from "@/context/editor-queries";
-import { fetchCardTags, fetchRandom } from "@/lib/scryfall";
+import { fetchCardTags } from "@/lib/scryfall";
+import { fetchRandom } from "@repo/scryfall-search";
 import { useSearchContext } from "@/context/search";
 
 const MAX_CALLS = 10;
