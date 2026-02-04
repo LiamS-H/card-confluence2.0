@@ -133,7 +133,7 @@ export function CardModal() {
             <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
                 <div
                     ref={scrollRef}
-                    className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto"
+                    className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto [scrollbar-gutter:stable]"
                     onScroll={() => {
                         const scrollableElement = scrollRef.current;
                         if (!scrollableElement) return;
@@ -201,21 +201,23 @@ export function CardModal() {
                         </Accordion>
                     </DialogHeader>
 
-                    <div className="w-full sm:min-w-96 sm:w-96 overflow-visible p-2">
-                        <Card />
-                        <div className="flex flex-wrap w-full mt-2">
-                            <a href={card.scryfall_uri}>
-                                <Button variant="link">
-                                    View Scryfall
-                                    <ExternalLink />
-                                </Button>
-                            </a>
+                    <div className="w-full sm:min-w-96 sm:w-96 overflow-visible relative">
+                        <div className="md:fixed md:pr-8">
+                            <Card />
+                            <div className="flex flex-wrap w-full mt-2">
+                                <a href={card.scryfall_uri}>
+                                    <Button variant="link">
+                                        View Scryfall
+                                        <ExternalLink />
+                                    </Button>
+                                </a>
 
-                            <a href={tagger_link}>
-                                <Button variant="link">
-                                    View Tagger <ExternalLink />
-                                </Button>
-                            </a>
+                                <a href={tagger_link}>
+                                    <Button variant="link">
+                                        View Tagger <ExternalLink />
+                                    </Button>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
