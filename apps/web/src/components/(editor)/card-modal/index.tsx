@@ -114,7 +114,7 @@ export function CardModal() {
     const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
         if ((!rulings || rulings.length == 0) && t === "rulings") return false;
-        if (!tags && t === "tags") return false;
+        if ((!tags || tags.data?.length == 0) && t === "tags") return false;
         return true;
     });
 

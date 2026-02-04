@@ -41,16 +41,9 @@ export function Card({
         }
     }
 
-    return useMemo(
+    const cardComp = useMemo(
         () => (
             <>
-                {info && (
-                    <div className="absolute top-20 w-full flex justify-center z-10">
-                        <span className="p-2 rounded-sm bg-accent text-accent-foreground">
-                            {info}
-                        </span>
-                    </div>
-                )}
                 <div
                     className="overflow-clip relative"
                     role="button"
@@ -85,6 +78,23 @@ export function Card({
                 </div>
             </>
         ),
-        [card?.id, flipped],
+        [id, card, flipped, width, setHovered],
+    );
+
+    const infoComp = useMemo(() => {
+        if (!info) return null;
+        return (
+            <div className="absolute top-20 w-full flex justify-center z-10">
+                <span className="p-2 rounded-sm bg-accent text-accent-foreground">
+                    {info}
+                </span>
+            </div>
+        );
+    }, [info]);
+    return (
+        <>
+            {cardComp}
+            {infoComp}
+        </>
     );
 }
