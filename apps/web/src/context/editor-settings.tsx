@@ -11,7 +11,9 @@ export interface IEditorSettings {
     disableAutocomplete?: boolean;
     disableAutocompleteDetail?: boolean;
     disableAutocompleteInfo?: boolean;
+    disableOrderInfo?: boolean;
     showSillyCards?: boolean;
+    vimBindings?: boolean;
 }
 
 export interface IEditorSettingsContext {
@@ -22,7 +24,7 @@ export interface IEditorSettingsContext {
 }
 
 const editorSettingsContext = createContext<IEditorSettingsContext | null>(
-    null
+    null,
 );
 
 export function useEditorSettingsContext() {

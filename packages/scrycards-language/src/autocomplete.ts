@@ -48,6 +48,22 @@ export const completeScrycards: CompletionSource = (context) => {
                 to: cursor.to - 1,
                 options: catalog["card-names"].map((name) => ({
                     label: name,
+                    apply: (view, completion) => {
+                        completion.label = `!"${completion.label}"`;
+                        view.dispatch(
+                            view.state.update({
+                                changes: {
+                                    from,
+                                    to,
+                                    insert: completion.label,
+                                },
+                                selection: EditorSelection.cursor(
+                                    from + completion.label.length,
+                                ),
+                                userEvent: "completion.apply",
+                            }),
+                        );
+                    },
                 })),
             };
         }
@@ -85,6 +101,22 @@ export const completeScrycards: CompletionSource = (context) => {
                 to,
                 options: catalog["card-names"].map((name) => ({
                     label: name,
+                    apply: (view, completion) => {
+                        completion.label = `!"${completion.label}"`;
+                        view.dispatch(
+                            view.state.update({
+                                changes: {
+                                    from,
+                                    to,
+                                    insert: completion.label,
+                                },
+                                selection: EditorSelection.cursor(
+                                    from + completion.label.length,
+                                ),
+                                userEvent: "completion.apply",
+                            }),
+                        );
+                    },
                 })),
             };
         }
@@ -119,8 +151,8 @@ export const completeScrycards: CompletionSource = (context) => {
                         label: argument + tag,
                         displayLabel: tag,
                         // boost: results === 1 ? 2 : 0,
-                    })
-                )
+                    }),
+                ),
             );
         }
         return result;
@@ -163,10 +195,10 @@ export const completeScrycards: CompletionSource = (context) => {
                             insert: completion.displayLabel,
                         },
                         selection: EditorSelection.cursor(
-                            op_start + (completion.displayLabel?.length ?? 0)
+                            op_start + (completion.displayLabel?.length ?? 0),
                         ),
                         userEvent: "completion.apply",
-                    })
+                    }),
                 );
             };
             const node = nodeFromArg(lower_arg);
@@ -182,8 +214,8 @@ export const completeScrycards: CompletionSource = (context) => {
                         label: argument + tag,
                         displayLabel: tag,
                         apply,
-                    })
-                )
+                    }),
+                ),
             );
         }
         return result;
@@ -237,10 +269,10 @@ export const completeScrycards: CompletionSource = (context) => {
                         insert: completion.label,
                     },
                     selection: EditorSelection.cursor(
-                        from + completion.label.length
+                        from + completion.label.length,
                     ),
                     userEvent: "completion.apply",
-                })
+                }),
             );
         };
     }

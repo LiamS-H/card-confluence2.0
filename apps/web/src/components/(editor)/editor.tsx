@@ -2,11 +2,12 @@ import ReactCodeEditor, {
     type ReactCodeMirrorProps,
     type ReactCodeMirrorRef,
 } from "@uiw/react-codemirror";
-import { EditorView, keymap } from "@codemirror/view";
+import { drawSelection, EditorView, keymap } from "@codemirror/view";
 import { indentLess, indentMore } from "@codemirror/commands";
 import { acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import { type ReactNode, type RefObject, useMemo, useRef } from "react";
 import { useLightDark } from "@/components/(theme)/use-theme";
+import { vim } from "@replit/codemirror-vim";
 import {
     completeScrycards,
     type ICatalog,
@@ -162,7 +163,9 @@ export function Editor({
     children?: ReactNode;
 }) {
     const { settings } = useEditorSettingsContext();
-    const { queryNodes } = useEditorQueriesContext();
+    const { queryNodes, activateQuery } = useEditorQueriesContext();
+    const queryNodesRef = useRef(queryNodes);
+    queryNodesRef.current = queryNodes;
     const theme = useLightDark();
     const editorRef = useRef<ReactCodeMirrorRef | null>(null);
 
@@ -173,8 +176,30 @@ export function Editor({
     }, []);
 
     const extensions = useMemo(() => {
+        function activateQ(e: EditorView) {
+            const selection =
+                e.state.selection.ranges[e.state.selection.mainIndex];
+            if (!selection) return false;
+            const index = queryNodesRef.current.findIndex((q) => {
+                return (
+                    q.query.from <= selection.from && selection.to <= q.query.to
+                );
+            });
+            if (index === -1) return false;
+            activateQuery(index);
+            return false;
+        }
         const extensions = [
             keymap.of([
+                {
+                    key: "Mod-q",
+                    preventDefault: true,
+                    shift: () => {
+                        activateQuery(null);
+                        return false;
+                    },
+                    run: activateQ,
+                },
                 {
                     key: "Tab",
                     preventDefault: true,
@@ -191,15 +216,20 @@ export function Editor({
                 autoDetail: !settings.disableAutocompleteDetail,
                 autoInfo: !settings.disableAutocompleteInfo,
             }),
+            drawSelection(),
             EditorView.lineWrapping,
         ];
+
+        if (settings.vimBindings) {
+            extensions.push(vim());
+        }
 
         if (!settings.disableTooltips) {
             extensions.push(ScrycardsTooltips);
         }
 
         return extensions;
-    }, [catalog, settings, scrycards]);
+    }, [catalog, settings, scrycards, activateQuery]);
 
     const queryComponents = useMemo(
         () =>
@@ -211,7 +241,7 @@ export function Editor({
                     editorRef={editorRef}
                 />
             )),
-        [queryNodes]
+        [queryNodes],
     );
 
     return (

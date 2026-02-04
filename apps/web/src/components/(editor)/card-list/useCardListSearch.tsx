@@ -5,6 +5,7 @@ import {
 import { ISearchSettings } from "@/lib/search";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useSearch } from "./useSearch";
+import { useHighlightContext } from "@/context/highlight";
 export const GAP = 4;
 export const OVERSCAN_ROWS = 2;
 export const OBSERVER_ROWS = 2;
@@ -12,7 +13,7 @@ export const OBSERVER_ROWS = 2;
 function calcGrid(
     allData: string[],
     rect: DOMRect,
-    editorSettings: IEditorSettings
+    editorSettings: IEditorSettings,
 ): {
     cardH: number;
     cardW: number;
@@ -40,7 +41,7 @@ function calcGrid(
         Math.floor((containerWidth - GAP) / (200 + GAP));
 
     const CARD_WIDTH = Math.floor(
-        (containerWidth - GAP - columns * GAP) / columns
+        (containerWidth - GAP - columns * GAP) / columns,
     );
     const CARD_HEIGHT = (CARD_WIDTH * 278.55) / 200;
 
@@ -54,18 +55,18 @@ function calcGrid(
     const viewportBottom = scrollTop + viewportHeight;
     const containerRelativeViewportTop = Math.max(
         0,
-        viewportTop - containerTop
+        viewportTop - containerTop,
     );
     const containerRelativeViewportBottom = Math.max(
         0,
-        viewportBottom - containerTop
+        viewportBottom - containerTop,
     );
 
     const firstVisibleRow = Math.floor(
-        containerRelativeViewportTop / (CARD_HEIGHT + GAP)
+        containerRelativeViewportTop / (CARD_HEIGHT + GAP),
     );
     const lastVisibleRow = Math.ceil(
-        containerRelativeViewportBottom / (CARD_HEIGHT + GAP)
+        containerRelativeViewportBottom / (CARD_HEIGHT + GAP),
     );
 
     const startRow = Math.max(0, firstVisibleRow - OVERSCAN_ROWS);
@@ -141,6 +142,11 @@ export function useCardListSearch({
         return () => clearTimeout(timeout);
     }, [search, query, ast, settings, fastUpdate]);
 
+    const { setSearchResults } = useHighlightContext();
+    useEffect(() => {
+        setSearchResults(allData);
+    }, [allData, setSearchResults]);
+
     useEffect(() => {
         if (!query) {
             search(null);
@@ -163,7 +169,7 @@ export function useCardListSearch({
                     loadNextPage();
                 }
             },
-            { rootMargin: "100px" }
+            { rootMargin: "100px" },
         );
         observer.observe(sentinelEl);
         return () => observer.disconnect();
@@ -203,7 +209,7 @@ export function useCardListSearch({
             lastRect.current = rect;
             animationFrameRef.current = null;
             setGridLayout(
-                calcGrid(dataRef.current, rect, editorSettingsRef.current)
+                calcGrid(dataRef.current, rect, editorSettingsRef.current),
             );
         });
     }, []);

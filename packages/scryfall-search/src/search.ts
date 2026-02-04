@@ -36,7 +36,7 @@ export const SearchOrders = [
     },
     {
         label: "eur",
-        detail: "EUR",
+        detail: "€",
         info: "Sort cards by their lowest known Euro price: 0.01 -> highest, null last",
     },
     {

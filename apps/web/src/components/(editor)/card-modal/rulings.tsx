@@ -98,12 +98,12 @@ export function Rulings({
     isOpen: boolean;
 }) {
     const loading = isOpen && !rulings;
-    const no_rulings = isOpen && rulings?.length === 0;
+    const no_rulings = rulings?.length === 0;
     return (
         <AccordionItem value={"rulings"}>
             <AccordionTrigger
                 disabled={loading || no_rulings}
-                noChevron={loading}
+                noChevron={loading || no_rulings}
             >
                 <div className="flex items-center w-full">
                     <span>Rulings</span>

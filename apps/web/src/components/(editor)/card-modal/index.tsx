@@ -11,7 +11,7 @@ import {
 } from "@/components/(ui)/dialog";
 import { Button } from "../../(ui)/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Printings } from "./printing";
+import { Printings } from "./printings";
 import { Related } from "./related";
 import { UndoButton } from "./undo-button";
 import Card from "./card";
@@ -31,25 +31,32 @@ import { useTags } from "../../../hooks/useTags";
 import { Tags } from "./tags";
 
 export function CardModal() {
-    const { open, selected, setOpen, pushSelected, previous, goPrevious } =
-        useHighlightContext();
+    const {
+        open,
+        selected,
+        setOpen,
+        pushSelected,
+        previous,
+        goPrevious,
+        goNext,
+        goPrev,
+        hasNext,
+        hasPrev,
+    } = useHighlightContext();
     const card = useCard(selected);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scrollDistanceFromTopRef = useRef(0);
     const [contentLoaded, setContentLoaded] = useState(false);
 
-    const [tabs, setTabs] = useState<string[]>([
-        "face-0",
-        "face-1",
-        "printings",
-    ]);
+    const [tabs, setTabs] = useState<string[]>(["face-0", "face-1"]);
 
-    const printings = usePrintings(card);
     const rulingsOpen = tabs.includes("rulings");
-    const rulings = useRulings(card);
+    const rulings = useRulings(card, !rulingsOpen);
+    const printingsOpen = tabs.includes("printings");
+    const printings = usePrintings(card, !printingsOpen);
     const tagsOpen = tabs.includes("tags");
-    const tags = useTags(card);
+    const tags = useTags(card, !tagsOpen);
 
     useEffect(() => {
         if (card) {
@@ -78,7 +85,7 @@ export function CardModal() {
 
             const finalScrollTop = Math.max(
                 0,
-                Math.min(targetScrollTop, maxScrollTop)
+                Math.min(targetScrollTop, maxScrollTop),
             );
 
             scrollableElement.scrollTop = finalScrollTop;
@@ -106,7 +113,7 @@ export function CardModal() {
 
     const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
-        if (!rulings && t === "rulings") return false;
+        if ((!rulings || rulings.length == 0) && t === "rulings") return false;
         if (!tags && t === "tags") return false;
         return true;
     });
@@ -126,7 +133,7 @@ export function CardModal() {
             <DialogContent className="h-11/12 max-h-11/12 w-full min-w-48 sm:min-w-xl md:min-w-3xl lg:min-w-5xl px-2 sm:pt-8 md:px-4 md:pt-16 ">
                 <div
                     ref={scrollRef}
-                    className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto"
+                    className="flex flex-col md:flex-row items-center md:items-start gap-2 h-full overflow-y-auto [scrollbar-gutter:stable]"
                     onScroll={() => {
                         const scrollableElement = scrollRef.current;
                         if (!scrollableElement) return;
@@ -150,7 +157,11 @@ export function CardModal() {
                             onValueChange={(e) => setTabs(e)}
                         >
                             <Oracle card={card} />
-                            <Printings id={card.id} printings={printings} />
+                            <Printings
+                                id={card.id}
+                                printings={printings}
+                                isOpen={printingsOpen}
+                            />
                             {card.all_parts && card.all_parts.length > 1 && (
                                 <AccordionItem value="related">
                                     <AccordionTrigger>
@@ -190,28 +201,47 @@ export function CardModal() {
                         </Accordion>
                     </DialogHeader>
 
-                    <div className="w-full sm:min-w-96 sm:w-96 overflow-visible p-2">
-                        <Card />
-                        <div className="flex flex-wrap w-full mt-2">
-                            <a href={card.scryfall_uri}>
-                                <Button variant="link">
-                                    View Scryfall
-                                    <ExternalLink />
-                                </Button>
-                            </a>
+                    <div className="w-full sm:min-w-96 sm:w-96 overflow-visible relative">
+                        <div className="md:fixed md:pr-8">
+                            <Card />
+                            <div className="flex flex-wrap w-full mt-2">
+                                <a href={card.scryfall_uri}>
+                                    <Button variant="link">
+                                        View Scryfall
+                                        <ExternalLink />
+                                    </Button>
+                                </a>
 
-                            <a href={tagger_link}>
-                                <Button variant="link">
-                                    View Tagger <ExternalLink />
-                                </Button>
-                            </a>
+                                <a href={tagger_link}>
+                                    <Button variant="link">
+                                        View Tagger <ExternalLink />
+                                    </Button>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <DialogFooter className="self-end flex flex-col sm:flex-row">
+                <DialogFooter className="self-end flex flex-col sm:flex-row gap-2">
                     {goPrevious && previous && (
                         <UndoButton undo={goPrevious} prevId={previous} />
                     )}
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={goPrev}
+                            disabled={!hasPrev}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={goNext}
+                            disabled={!hasNext}
+                        >
+                            Next
+                        </Button>
+                    </div>
+
                     <DialogClose asChild>
                         <Button variant="outline">Close</Button>
                     </DialogClose>

@@ -37,13 +37,17 @@ import { useMemo } from "react";
 export function Printings({
     id,
     printings,
+    isOpen,
 }: {
     id: string;
     printings: string[] | null;
+    isOpen: boolean;
 }) {
     const { replaceSelected, setHovered } = useHighlightContext();
 
     return useMemo(() => {
+        const loading = isOpen && !printings;
+
         if (printings?.length === 1) {
             return (
                 <div className="py-4 border-b text-sm font-medium">
@@ -56,7 +60,15 @@ export function Printings({
         }
         return (
             <AccordionItem value={"printings"}>
-                {printings ? (
+                {loading ? (
+                    <AccordionTrigger disabled noChevron>
+                        <div className="flex gap-2 items-center w-full">
+                            <span>Printings</span>
+                            <Printing id={id} />
+                        </div>
+                        <LoaderCircle className="animate-spin" />
+                    </AccordionTrigger>
+                ) : (
                     <AccordionTrigger className="group hover:no-underline">
                         <div className="flex gap-2 items-center w-full">
                             <span className="group-hover:underline">
@@ -64,14 +76,6 @@ export function Printings({
                             </span>
                             <Printing id={id} />
                         </div>
-                    </AccordionTrigger>
-                ) : (
-                    <AccordionTrigger disabled noChevron>
-                        <div className="flex gap-2 items-center w-full">
-                            <span>Printings</span>
-                            <Printing id={id} />
-                        </div>
-                        <LoaderCircle className="animate-spin" />
                     </AccordionTrigger>
                 )}
                 <AccordionContent>
@@ -98,7 +102,7 @@ export function Printings({
                 </AccordionContent>
             </AccordionItem>
         );
-    }, [printings, id, replaceSelected, setHovered]);
+    }, [printings, id, replaceSelected, setHovered, isOpen]);
 }
 
 export function Printing({ id, select }: { id: string; select?: () => void }) {

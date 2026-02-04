@@ -1,6 +1,7 @@
 "use client";
-import { fetchRulings, fetchSearch } from "@/lib/scryfall";
+import { fetchRulings, fetchSearch } from "@repo/scryfall-search";
 import { type ISearchSettings } from "@/lib/search";
+import { fetchCardTags } from "../lib/scryfall";
 import type {
     ScryfallCard,
     ScryfallError,
@@ -19,6 +20,7 @@ export interface ICachedSearchProps {
     query: string;
     ast?: string;
     settings?: ISearchSettings;
+    onlyCached?: boolean;
 }
 
 export type ScryfallCached = Omit<ScryfallList.Cards, "data"> & {
@@ -30,19 +32,27 @@ export type SearchResponse = ScryfallCached | ScryfallError;
 export interface IRulingProps {
     scryfall_id: string;
     oracle_id: string;
+    onlyCached?: boolean;
 }
 export type RulingsResponse = ScryfallList.Rulings | ScryfallError;
 
+export interface ITagProps {
+    set: string;
+    collector_number: string;
+    onlyCached?: boolean;
+}
+
 interface ISearchContext {
     cachedRulings: (
-        props: IRulingProps
-    ) => Promise<RulingsResponse> | RulingsResponse;
+        props: IRulingProps,
+    ) => Promise<RulingsResponse> | RulingsResponse | null;
     cachedSearch: (
-        prop: ICachedSearchProps
-    ) => Promise<SearchResponse> | SearchResponse;
+        prop: ICachedSearchProps,
+    ) => Promise<SearchResponse> | SearchResponse | null;
+    cachedTags: (prop: ITagProps) => Promise<string[]> | string[] | null;
     cacheResponse: (props: ICachedSearchProps[], resp: SearchResponse) => void;
     getCard: (
-        id?: string
+        id?: string,
     ) => Promise<ScryfallCard.Any | undefined> | ScryfallCard.Any | undefined;
 }
 
@@ -61,17 +71,20 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
     const strMappings = useRef(new Map<string, SearchResponse>());
     const responsePromises = useRef(new Map<string, Promise<SearchResponse>>());
     const cardMappings = useRef(
-        new Map<string, ScryfallCard.Any | undefined>()
+        new Map<string, ScryfallCard.Any | undefined>(),
     );
     const rulingsMappings = useRef(new Map<string, RulingsResponse>());
     const rulingsPromises = useRef(new Map<string, Promise<RulingsResponse>>());
+    const tagPromises = useRef(new Map<string, Promise<string[]>>());
+    const tagMappings = useRef(new Map<string, string[]>());
     const { requestCard } = useScrycardsContext();
 
     const cachedSearch = useCallback(function ({
         query,
         ast,
         settings,
-    }: ICachedSearchProps): Promise<SearchResponse> | SearchResponse {
+        onlyCached,
+    }: ICachedSearchProps) {
         const settings_key = JSON.stringify(settings);
         const key = query + settings_key;
 
@@ -88,6 +101,8 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
 
         const p = responsePromises.current.get(key);
         if (p) return p;
+
+        if (onlyCached) return null;
 
         const result = new Promise<SearchResponse>(async (resolve) => {
             const new_resp = await fetchSearch(query, settings);
@@ -125,11 +140,13 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
     const cachedRulings = useCallback(function ({
         oracle_id,
         scryfall_id,
+        onlyCached,
     }: IRulingProps) {
         const cached_ruling = rulingsMappings.current.get(oracle_id);
         if (cached_ruling) return cached_ruling;
         const cached_request = rulingsPromises.current.get(oracle_id);
         if (cached_request) return cached_request;
+        if (onlyCached) return null;
         const ruling = fetchRulings(scryfall_id);
         ruling.then((resp) => {
             rulingsMappings.current.set(oracle_id, resp);
@@ -140,12 +157,33 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
         return ruling;
     }, []);
 
+    const cachedTags = useCallback(function ({
+        collector_number,
+        set,
+        onlyCached,
+    }: ITagProps) {
+        const hash = `${collector_number}:${set}`;
+        const cached_ruling = tagMappings.current.get(hash);
+        if (cached_ruling) return cached_ruling;
+        const cached_request = tagMappings.current.get(hash);
+        if (cached_request) return cached_request;
+        if (onlyCached) return null;
+        const tags = fetchCardTags(set, collector_number);
+        tags.then((resp) => {
+            tagMappings.current.set(hash, resp);
+            tagPromises.current.delete(hash);
+        });
+        tagPromises.current.set(hash, tags);
+
+        return tags;
+    }, []);
+
     const getCard = useCallback(
         function (id?: string) {
             if (!id) return;
             return cardMappings.current.get(id) || requestCard(id);
         },
-        [requestCard]
+        [requestCard],
     );
 
     const cacheResponse = useCallback(
@@ -162,12 +200,18 @@ export function SearchContextProvider({ children }: { children: ReactNode }) {
                 strMappings.current.set(key, resp);
             }
         },
-        []
+        [],
     );
 
     return (
         <searchContext.Provider
-            value={{ cachedSearch, cachedRulings, getCard, cacheResponse }}
+            value={{
+                cachedSearch,
+                cachedRulings,
+                cachedTags,
+                getCard,
+                cacheResponse,
+            }}
         >
             {children}
         </searchContext.Provider>

@@ -49,6 +49,11 @@ export function useSearch() {
             }
 
             const result = await cachedSearch(req);
+            if (result === null) {
+                throw Error(
+                    "null should only be returned from search using cache only.",
+                );
+            }
 
             // Check if query changed while we were fetching
             if (queryRef.current.ast !== req.ast) return;
@@ -56,7 +61,7 @@ export function useSearch() {
             if (
                 !isSettingsEqual(
                     queryRef.current.settings ?? {},
-                    req.settings ?? {}
+                    req.settings ?? {},
                 )
             ) {
                 return;
@@ -84,7 +89,7 @@ export function useSearch() {
                 return;
             }
         },
-        [cachedSearch, resetSearch]
+        [cachedSearch, resetSearch],
     );
 
     const loadNextPageDeps = useRef({
@@ -110,7 +115,7 @@ export function useSearch() {
                 ast,
                 settings: { ...settings, page: currentPage + 1 },
             },
-            false
+            false,
         );
     }, [search]);
 

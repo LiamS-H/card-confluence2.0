@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card } from "@/components/(editor)/card";
+import { Card } from "@/components/(editor)/card-list/card";
 import { OBSERVER_ROWS, useCardListSearch } from "./useCardListSearch";
 
 export function CardList({
@@ -95,7 +95,11 @@ export function CardList({
                                     height: gridLayout.cardH,
                                 }}
                             >
-                                <Card id={item.id} width={gridLayout.cardW} />
+                                <Card
+                                    id={item.id}
+                                    width={gridLayout.cardW}
+                                    index={item.index}
+                                />
                             </div>
                         ))}
 
