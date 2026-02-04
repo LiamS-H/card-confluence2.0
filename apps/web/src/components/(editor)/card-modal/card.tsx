@@ -13,7 +13,7 @@ export default function Card() {
 
     useEffect(() => {
         setFlipped(false);
-        setSize("xs");
+        setSize("md");
     }, [card?.id]);
 
     const cardComp = useMemo(() => {
