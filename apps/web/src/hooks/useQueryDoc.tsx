@@ -21,12 +21,12 @@ import { useCompareMemo } from "./useCompareMemo";
 const INITIAL = `
 order:cmc
 game:paper
-(legal:commander or year>=${new Date().toISOString().slice(0, 10)})
 
 @query latest cards
 order:released
 direction:desc
 is:firstprinting
+(legal:commander or year>=${new Date().toISOString().slice(0, 10)})
 
 @query my query
 `;
