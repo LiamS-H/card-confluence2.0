@@ -47,7 +47,6 @@ export function CardModal() {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scrollDistanceFromTopRef = useRef(0);
-    const [contentLoaded, setContentLoaded] = useState(false);
 
     const [tabs, setTabs] = useState<string[]>(["face-0", "face-1"]);
 
@@ -58,11 +57,7 @@ export function CardModal() {
     const tagsOpen = tabs.includes("tags");
     const tags = useTags(card, !tagsOpen);
 
-    useEffect(() => {
-        if (card) {
-            setContentLoaded(true);
-        }
-    }, [card]);
+    const contentLoaded = open && !!card;
 
     useLayoutEffect(() => {
         if (!contentLoaded) return;
@@ -96,12 +91,6 @@ export function CardModal() {
         setTimeout(resumeScroll, 0);
     }, [contentLoaded, open]);
 
-    useEffect(() => {
-        if (!open) {
-            setContentLoaded(false);
-        }
-    }, [open]);
-
     if (!open) return null;
 
     if (card === undefined) {
@@ -114,7 +103,7 @@ export function CardModal() {
     const disp_tabs = tabs.filter((t) => {
         if (!printings && t === "printings") return false;
         if ((!rulings || rulings.length == 0) && t === "rulings") return false;
-        if (!tags && t === "tags") return false;
+        if ((!tags || tags.length == 0) && t === "tags") return false;
         return true;
     });
 

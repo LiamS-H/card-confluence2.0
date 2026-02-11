@@ -27,7 +27,7 @@ export function useTags(
         } else {
             resolve(resp);
         }
-    }, [card, onlyCached]);
+    }, [cachedTags, card, onlyCached]);
 
     return tags;
 }
