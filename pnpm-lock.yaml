@@ -142,9 +142,6 @@ importers:
         specifier: ^3.3.0
         version: 3.4.0
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3
-        version: 3.3.3
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
