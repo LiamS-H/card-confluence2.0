@@ -41,6 +41,7 @@ export interface ICatalog {
     orders: IDetailedCatalogEntry[];
     uniques: IDetailedCatalogEntry[];
     products: string[];
+    languages: string[];
 }
 
 export function getEmptyCatalog(): ICatalog {
@@ -79,6 +80,7 @@ export function getEmptyCatalog(): ICatalog {
         orders: [],
         uniques: [],
         products: [],
+        languages: [],
     };
 }
 

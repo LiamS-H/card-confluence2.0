@@ -298,6 +298,9 @@ export const completeScrycards: CompletionSource = (context) => {
         case "artist":
             result.options.forEach((a) => (a.apply = apply));
             break;
+        case "lang":
+            result.options.forEach((a) => (a.apply = apply));
+            break;
     }
 
     return result;

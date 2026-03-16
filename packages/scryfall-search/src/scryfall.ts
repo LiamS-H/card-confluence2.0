@@ -23,7 +23,7 @@ export async function fetchWithHeaders(url: URL) {
 export async function fetchSearch(
     query: string,
     settings?: ISearchSettings,
-    fetch_func?: typeof fetchWithHeaders
+    fetch_func?: typeof fetchWithHeaders,
 ): Promise<ScryfallList.Cards | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/search");
     const params = { q: query };
@@ -45,7 +45,7 @@ export async function fetchSearch(
 }
 
 export async function fetchRandom(
-    query: string
+    query: string,
 ): Promise<ScryfallCard.Any | ScryfallError> {
     const url = new URL("https://api.scryfall.com/cards/random");
     const params = { q: query };
@@ -57,7 +57,7 @@ export async function fetchRandom(
 }
 
 export async function fetchRulings(
-    id: string
+    id: string,
 ): Promise<ScryfallList.Rulings | ScryfallError> {
     const url = new URL(`https://api.scryfall.com/cards/${id}/rulings`);
     const response = await fetch(url);
@@ -118,7 +118,7 @@ export async function fetchTags(): Promise<{
 
 export async function fetchCardTags(
     set: string,
-    collector_number: string
+    collector_number: string,
 ): Promise<string[]> {
     try {
         const cn = collector_number.match(/^\d+/)?.[0] ?? collector_number;
@@ -127,13 +127,13 @@ export async function fetchCardTags(
         const text = await resp.text();
 
         const metaTagMatch = text.match(
-            /<meta\s+property="og:description"\s+content="([^"]*)"/
+            /<meta\s+property="og:description"\s+content="([^"]*)"/,
         );
         if (!metaTagMatch || !metaTagMatch[1]) return [];
         const content = metaTagMatch[1];
 
         const cardTagsMatch = content.match(
-            /Card Tags:\s*([\s\S]*?)(?=\n\n|$)/
+            /Card Tags:\s*([\s\S]*?)(?=\n\n|$)/,
         );
         if (!cardTagsMatch || !cardTagsMatch[1]) return [];
 
@@ -187,7 +187,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
             })
             .catch((e) => {
                 console.error(e);
-            })
+            }),
     );
 
     for (const endpoint of catalogEndpoints) {
@@ -215,7 +215,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
             })
             .catch((e) => {
                 console.error(e);
-            })
+            }),
     );
 
     await Promise.allSettled(promises);
@@ -267,8 +267,11 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Full Art",
         "Funny",
         "Future",
+        "Galaxy Foil",
         "Game Changer",
         "Game Day",
+        "Gilded",
+        "Halo Foil",
         "Highres",
         "Historic",
         "Hybrid Mana",
@@ -280,8 +283,10 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "MTGO ID",
         "Masterpiece",
         "Meld",
+        "Meld Part",
+        "Meld Result",
         "Modal",
-        "Modal Double Faced",
+        "M D F C",
         "Modern",
         "Multiverse ID",
         "New",
@@ -297,6 +302,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Phyrexian Mana",
         "Planar",
         "Planeswalker Deck",
+        "Play Promo",
         "Prerelease Promo",
         "Printed Text",
         "Promo",
@@ -306,6 +312,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Reserved List",
         "Reversible",
         "Security Stamp",
+        "Serialized",
         "Showcase",
         "Spell",
         "Spellbook",
@@ -314,9 +321,11 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Stamped",
         "Starter Collection",
         "Starter Deck",
+        "Step and Compleat",
         "Story Spotlight",
         "TCGplayer ID",
         "Textless",
+        "Thick",
         "Token",
         "Tombstone",
         "Transform",
@@ -326,6 +335,29 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Variation",
         "Watermark",
     ];
+    const land_types = [
+        "Bikeland",
+        "Bondland",
+        "Bounceland",
+        "Canopyland",
+        "Checkland",
+        "Dual",
+        "Fastland",
+        "Fetchland",
+        "Filterland",
+        "Gainland",
+        "Painland",
+        "Pathway",
+        "Scryland",
+        "Shadowland",
+        "Shockland",
+        "Slowland",
+        "Storageland",
+        "Surveilland",
+        "Tangoland",
+        "Tricycleland",
+    ];
+    catalog.criteria = catalog.criteria.concat(land_types);
 
     catalog.formats = [
         { label: "standard", detail: undefined },
@@ -352,7 +384,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         { label: "predh", detail: undefined },
     ];
 
-    catalog.rarities = ["common", "uncommon", "rare", "mythic"];
+    catalog.rarities = ["common", "uncommon", "rare", "mythic", "special"];
 
     catalog.cubes = [
         "Arena",
@@ -369,6 +401,7 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "Livethedream",
         "Chromatic",
         "Vintage",
+        "APCube",
     ];
     catalog.games = ["paper", "mtgo", "mtga"];
     (catalog.orders as readonly IDetailedCatalogEntry[]) = SearchOrders;
@@ -397,6 +430,24 @@ export async function getCatalog(): Promise<Readonly<ICatalog>> {
         "token",
         "treasure_chest",
         "vanguard",
+    ];
+    catalog.languages = [
+        "English",
+        "Spanish",
+        "French",
+        "German",
+        "Italian",
+        "Portuguese",
+        "Japanese",
+        "Korean",
+        "Russian",
+        "Simplified Chinese",
+        "Traditional Chinese",
+        "Hebrew",
+        "Latin",
+        "Arabic",
+        "Sanskrit",
+        "Phyrexian",
     ];
 
     return catalog;

@@ -36,7 +36,8 @@ export const ARGUMENTS = [ // (to keep this list somewhat organized)
     'cah',
     "unique",
     "order",
-    "dir", "direction"
+    "dir", "direction",
+    "l", "lang","language"
 ] as const;
 
 export type Argument = (typeof ARGUMENTS)[number];
@@ -73,7 +74,8 @@ export type ARG_TYPE =
     | "uuid"
     | "unique"
     | "order"
-    | "dir";
+    | "dir"
+    | "lang";
 
 export const ARG_TYPE_MAP: Record<Argument, ARG_TYPE> = {
     o: "oracle",
@@ -149,6 +151,9 @@ export const ARG_TYPE_MAP: Record<Argument, ARG_TYPE> = {
     direction: "dir",
     order: "order",
     unique: "unique",
+    l: "lang",
+    lang: "lang",
+    language: "lang",
 };
 
 export type OPERATOR_TYPE = "assign" | "assert" | "all";
@@ -203,6 +208,7 @@ export const COMPLETION_MAP: ICompletionMap = {
         order: { operator: "assign", setting: "order" },
         dir: { operator: "assign", setting: "dir" },
         unique: { operator: "assign", setting: "unique" },
+        lang: { operator: "assert" },
     },
 };
 
@@ -333,6 +339,11 @@ const direction_Node: IDetailNode = {
     info: "Compatible with asc (ascending) or desc (descending). Note cards are sorted alphabetically by default",
 };
 
+const lang_Node: IDetailNode = {
+    detail: "Card Language",
+    info: "Filter the language the card was printed in.",
+};
+
 export const DETAIL_MAP: Record<Argument, IDetailNode> = {
     o: o_Node,
     oracle: o_Node,
@@ -410,7 +421,7 @@ See m: for instruction on mana symbol formatting.`,
     rarity: r_Node,
     cube: {
         detail: "Occurs in a given cube.",
-        info: "Find cards that are part of cube lists using the cube: keyword. The currently supported cubes are arena, grixis, legacy, chuck, twisted, protour, uncommon, april, modern, amaz, tinkerer, livethedream, chromatic, and vintage.",
+        info: "Find cards that are part of cube lists using the cube: keyword. The currently supported cubes are arena, grixis, legacy, chuck, twisted, protour, uncommon, april, modern, amaz, tinkerer, livethedream, chromatic, vintage, apcube.",
     },
     f: f_Node,
     format: f_Node,
@@ -499,6 +510,9 @@ See m: for instruction on mana symbol formatting.`,
         detail: "Duplicate handling",
         info: `The unique parameter specifies if Scryfall should remove “duplicate” results in your query.\n\nDefault duplicates are hidden.`,
     },
+    l: lang_Node,
+    lang: lang_Node,
+    language: lang_Node,
 };
 
 function detailEntriesWithSettings(
@@ -639,6 +653,8 @@ export function completionInfoFromArg(
             }));
         case "uuid":
             return null;
+        case "lang":
+            return catalog.languages.map((l) => ({ label: l }));
         default:
             return null;
     }
