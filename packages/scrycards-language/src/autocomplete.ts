@@ -312,6 +312,9 @@ export const completeScrycards: CompletionSource = (context) => {
         case "lang":
             result.options.forEach((a) => (a.apply = apply));
             break;
+        case "set":
+            result.options.forEach((a) => (a.apply = apply));
+            break;
     }
 
     return result;
