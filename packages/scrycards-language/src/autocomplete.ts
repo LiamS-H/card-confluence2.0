@@ -1,8 +1,9 @@
-import type {
-    Completion,
-    CompletionResult,
-    CompletionSection,
-    CompletionSource,
+import {
+    snippetCompletion,
+    type Completion,
+    type CompletionResult,
+    type CompletionSection,
+    type CompletionSource,
 } from "@codemirror/autocomplete";
 
 import { tagFromView } from "./utils/tag-from-view";
@@ -69,6 +70,16 @@ export const completeScrycards: CompletionSource = (context) => {
         }
 
         if (cursor.name !== "Argument") {
+            return {
+                from: cursor.from,
+                options: [
+                    snippetCompletion("@query ${name}\n${}", {
+                        label: "@query",
+                        info: "Write a new query.",
+                    }),
+                ],
+            };
+
             return {
                 from: cursor.from,
                 options: ARGUMENTS.map((tag): Completion => {
