@@ -503,7 +503,7 @@ See m: for instruction on mana symbol formatting.`,
 
 function detailEntriesWithSettings(
     entries: IDetailedCatalogEntry[],
-    settings: IEditorSettings
+    settings: IEditorSettings,
 ) {
     if (settings.autoDetail && settings.autoInfo) {
         return entries.map((f) => f);
@@ -523,7 +523,7 @@ function detailEntriesWithSettings(
 export function completionInfoFromArg(
     arg_type: ARG_TYPE,
     catalog: ICatalog,
-    settings: IEditorSettings
+    settings: IEditorSettings,
 ): Completion[] | null {
     switch (arg_type) {
         case "number":
@@ -537,11 +537,20 @@ export function completionInfoFromArg(
         case "type":
             return completionFromTypes(catalog);
         case "set":
-            return catalog.sets.map((set) => ({
-                label: set.code,
-                detail: settings.autoDetail ? set.name : undefined,
-                info: settings.autoInfo ? set.released : undefined,
-            }));
+            const options = [];
+            for (const set of catalog.sets) {
+                options.push({
+                    label: set.code,
+                    detail: settings.autoDetail ? set.name : undefined,
+                    info: settings.autoInfo ? set.released : undefined,
+                });
+                options.push({
+                    label: set.name,
+                    detail: settings.autoDetail ? set.code : undefined,
+                    info: settings.autoInfo ? set.released : undefined,
+                });
+            }
+            return options;
         case "is":
             return catalog.criteria.map((crit) => ({
                 label: crit.toLowerCase().replace(/ /g, "-"),
@@ -574,14 +583,14 @@ export function completionInfoFromArg(
                 ...catalog["keyword-actions"].map((k) => ({
                     label: k,
                     section: kac,
-                }))
+                })),
             );
             const aw = { name: "Ability Words", rank: 2 };
             req.push(
                 ...catalog["ability-words"].map((a) => ({
                     label: a,
                     section: aw,
-                }))
+                })),
             );
             return req;
         case "cmc":
